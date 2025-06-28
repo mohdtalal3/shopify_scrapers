@@ -1,0 +1,1845 @@
+{
+  "total_products": 19,
+  "extracted_at": "2025-06-28 16:09:12",
+  "products": {
+    "fendi-bug-eye-swim-shorts-blue": {
+      "base": {
+        "Handle": "fendi-bug-eye-swim-shorts-blue",
+        "Title": "FENDI BUG EYE SWIM SHORTS BLUE",
+        "Body (HTML)": "Crafted in Italy, these playful Bag Bugs print swim shorts from Fendi are perfect for you next summer destination. Featuring an elasticated waistband and side seam pockets.",
+        "Vendor": "Fendi",
+        "Product Category": "",
+        "Type": "Bottoms",
+        "Tags": "ALL PRODUCTS, BOTTOMS, CLOTHING, FENDI, OUR PICKS, SWIMWEAR, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "",
+          "size": "XS",
+          "color": null,
+          "price": 125.0,
+          "compare_price": 425.0,
+          "variant_id": 42791466303739,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/products/image.heic?v=1647607224"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/products/image_1efc4a6b-b0a7-41d4-8fd7-44a93e0b7038.heic?v=1647607232"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/products/image_56168002-1991-468c-ad08-2a040299ad21.heic?v=1647607243"
+        ],
+        "4": [
+          "https://notorious-plug.com/cdn/shop/products/image_f5a2f602-b9ef-429c-9535-155a8872613a.heic?v=1647607247"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "BOTTOMS",
+        "CLOTHING",
+        "FENDI",
+        "OUR PICKS",
+        "SWIMWEAR",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/fendi-bug-eye-swim-shorts-blue",
+      "extracted_at": "2025-06-28 16:07:42"
+    },
+    "amiri-crystal-ball-tee-black-1": {
+      "base": {
+        "Handle": "amiri-crystal-ball-tee-black-1",
+        "Title": "AMIRI CRYSTAL BALL TEE BLACK",
+        "Body (HTML)": "<p>Throughout AMIRI’s Spring/Summer 2023 collection, you’ll see myriad references to the occult and the art of fortune telling – with the crystal ball graphic that defines this T-shirt perhaps being the most obvious. It’s this ability to find inspiration in time-honoured art and practices and render it suited to the streetwear crowd that confirms the label’s cult status season after season.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PS23MJG007-001-S",
+          "size": "S",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55301252252021,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-001-L",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55301252284789,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-001-XL",
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55301252317557,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-001-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55485896491381,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRICRYSTALBALLT1.png?v=1704726615"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRICRYSTALBALLT2.png?v=1704726615"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-crystal-ball-tee-black-1",
+      "extracted_at": "2025-06-28 16:07:47"
+    },
+    "amiri-crystal-ball-tee-white": {
+      "base": {
+        "Handle": "amiri-crystal-ball-tee-white",
+        "Title": "AMIRI CRYSTAL BALL TEE WHITE",
+        "Body (HTML)": "<p>Throughout AMIRI’s Spring/Summer 2023 collection, you’ll see myriad references to the occult and the art of fortune telling – with the crystal ball graphic that defines this T-shirt perhaps being the most obvious. It’s this ability to find inspiration in time-honoured art and practices and render it suited to the streetwear crowd that confirms the label’s cult status season after season.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "NOTFORLTS, ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PS23MJG007-100-L",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55301324407157,
+          "title": "L",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-100-XL",
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55301324439925,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-100-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55485758734709,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MJG007-100-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 470.0,
+          "variant_id": 55485758767477,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/CRYSTALBALLWHITE0.png?v=1745333286"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/CRYSTALBALLWHITE2.png?v=1745333286"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/CRYSTALBALLWHITE4.png?v=1745333287"
+        ],
+        "4": [
+          "https://notorious-plug.com/cdn/shop/files/CRYSTALBALLWHITE23.png?v=1745333286"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-crystal-ball-tee-white",
+      "extracted_at": "2025-06-28 16:07:53"
+    },
+    "amiri-pegasus-tee-black": {
+      "base": {
+        "Handle": "amiri-pegasus-tee-black",
+        "Title": "AMIRI PEGASUS TEE BLACK",
+        "Body (HTML)": "<p>AMIRI Pegasus script logo t-shirt. Crafted from 100% cotton, this crew neck tee is perfect for the summer. The iconic Pegasus script logo adds a touch of luxury and makes it a standout piece. Stay comfortable and stylish all season long.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "NOTFORLTS, ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "SS23MJG015-001-XS",
+          "size": "XS",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55485616324981,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG015-001-S",
+          "size": "S",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301390926197,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG015-001-M",
+          "size": "M",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301390958965,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG015-001-L",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301390991733,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG015-001-XL",
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301391024501,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG015-001-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55485616357749,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_PEGASUSTEE.png?v=1745333537"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_PEGASUSTEE2.png?v=1745333538"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_PEGASUSTEE3.png?v=1745333537"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-pegasus-tee-black",
+      "extracted_at": "2025-06-28 16:07:57"
+    },
+    "amiri-precious-memories-tee-black-1": {
+      "base": {
+        "Handle": "amiri-precious-memories-tee-black-1",
+        "Title": "AMIRI PRECIOUS MEMORIES TEE BLACK",
+        "Body (HTML)": "<p>Amiri Short Sleeved Black T-Shirt</p><br/>Logo Design On Front Of TeeRegular Fit100% CottonMade in ItalyAmiri Visible Branding",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "NOTFORLTS, ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "XS",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55382804889973,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "S",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55301434933621,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "M",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55301434966389,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55301434999157,
+          "title": "L",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55301435031925,
+          "title": "XL",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 480.0,
+          "variant_id": 55382804922741,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_PRMTEE1.png?v=1734357631"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_PRMTEE.png?v=1734357632"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-precious-memories-tee-black-1",
+      "extracted_at": "2025-06-28 16:08:02"
+    },
+    "amiri-california-hawaiian-tee-black": {
+      "base": {
+        "Handle": "amiri-california-hawaiian-tee-black",
+        "Title": "AMIRI CALIFORNIA HAWAIIAN TEE BLACK",
+        "Body (HTML)": "<p>Taking a break from its usually distressed and rebellious aesthetic, Los Angeles-based label AMIRI clearly didn't look too far for inspiration when crafting its California Hawaiian tee. A classic crewneck layer that riffs on quintessential vacation dress codes, it's patched with a branded appliqué which is dotted with dreamy graphics depicting just a few of the Golden State's best-loved destinations.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "NOTFORLTS, ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "XS",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55382801056117,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "S",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55301490246005,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "M",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55301490278773,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55301490311541,
+          "title": "L",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55382801088885,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 550.0,
+          "variant_id": 55382801121653,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_CALIBLACKTEE1.png?v=1745334019"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_CALIBLACKTEE2.png?v=1745334019"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-california-hawaiian-tee-black",
+      "extracted_at": "2025-06-28 16:08:08"
+    },
+    "amiri-tie-dye-all-over-logo-tee-grey": {
+      "base": {
+        "Handle": "amiri-tie-dye-all-over-logo-tee-grey",
+        "Title": "AMIRI TIE DYE ALL OVER LOGO TEE GREY",
+        "Body (HTML)": "<br/>Cotton jersey T-shirt. · Logo pattern and tie dye effect printed throughout · Rib knit crewneck Supplier color: Gray<br/><br/><br/>100% cotton.<br/>Gender: Mens<br/>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "SS23MJG022-030-S",
+          "size": "S",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301735743861,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-030-M",
+          "size": "M",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301735776629,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-030-L",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301735809397,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-030-XL",
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301735842165,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-030-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55485892002165,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-030-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55485892034933,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_GREY21.png?v=1745335000"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_GREY2.png?v=1745334999"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_GREY1.png?v=1745334999"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-tie-dye-all-over-logo-tee-grey",
+      "extracted_at": "2025-06-28 16:08:12"
+    },
+    "amiri-tie-dye-all-over-logo-tee-blue": {
+      "base": {
+        "Handle": "amiri-tie-dye-all-over-logo-tee-blue",
+        "Title": "AMIRI TIE DYE ALL OVER LOGO TEE BLUE",
+        "Body (HTML)": "<br/>Cotton jersey T-shirt. · Logo pattern and tie dye effect printed throughout · Rib knit crewneck Supplier color: Blue<br/><br/><br/>100% cotton.<br/>Gender: Mens<br/>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "T-Shirts",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, OUR PICKS, T-SHIRTS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "SS23MJG022-420-XS",
+          "size": "XS",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55382818718069,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-420-M",
+          "size": "M",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301833326965,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-420-L",
+          "size": "L",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301833359733,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-420-XL",
+          "size": "XL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55301833392501,
+          "title": "XL",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MJG022-420-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 199.0,
+          "compare_price": 440.0,
+          "variant_id": 55485888430453,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_BLUE1.png?v=1745336337"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_BLUE2.png?v=1745336338"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1RI_TIEDYE_BLUE3.png?v=1745336338"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "OUR PICKS",
+        "T-SHIRTS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-tie-dye-all-over-logo-tee-blue",
+      "extracted_at": "2025-06-28 16:08:18"
+    },
+    "amiri-tie-dye-all-over-logo-swim-shorts-grey": {
+      "base": {
+        "Handle": "amiri-tie-dye-all-over-logo-swim-shorts-grey",
+        "Title": "AMIRI TIE DYE ALL OVER LOGO SWIM SHORTS GREY",
+        "Body (HTML)": "cool greytie-dye patternelasticated drawstring waistbandtwo side inset pocketsrear patch pocketBe mindful to try on swimwear over your own garments.",
+        "Vendor": "Notorious Plug",
+        "Product Category": "",
+        "Type": "Bottoms",
+        "Tags": "ALL PRODUCTS, AMIRI, BOTTOMS, CLOTHING, OUR PICKS, SWIMWEAR, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "SS23MSB002-030-XS",
+          "size": "XS",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55485883482485,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-S",
+          "size": "S",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55301896700277,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-M",
+          "size": "M",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55301896733045,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-L",
+          "size": "L",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55301896765813,
+          "title": "L",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-XL",
+          "size": "XL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55301896798581,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55485883515253,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "SS23MSB002-030-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 360.0,
+          "variant_id": 55485883548021,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_TDSHORTSGREY1.png?v=1745336755"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_TDSHORTSGREY3.png?v=1745336756"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "BOTTOMS",
+        "CLOTHING",
+        "OUR PICKS",
+        "SWIMWEAR",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-tie-dye-all-over-logo-swim-shorts-grey",
+      "extracted_at": "2025-06-28 16:08:24"
+    },
+    "amiri-fortune-swimshorts-black": {
+      "base": {
+        "Handle": "amiri-fortune-swimshorts-black",
+        "Title": "AMIRI FORTUNE SWIMSHORTS BLACK",
+        "Body (HTML)": "<p>Amiri fortune swim shorts. Crystal ball logo with arts district homage. Zipped pockets. </p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Bottoms",
+        "Tags": "ALL PRODUCTS, AMIRI, BOTTOMS, CLOTHING, OUR PICKS, SWIMWEAR, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PS23MSB004-001-XS",
+          "size": "XS",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55485664100725,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-S",
+          "size": "S",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55301950964085,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-M",
+          "size": "M",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55301950996853,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-L",
+          "size": "L",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55301951029621,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-XL",
+          "size": "XL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55301960991093,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55485664133493,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PS23MSB004-001-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 175.0,
+          "compare_price": 575.0,
+          "variant_id": 55485664166261,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_FORTUNEBLACK1.png?v=1745337210"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_FORTUNE2.png?v=1745337212"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_FORTUNE3.png?v=1745337210"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "BOTTOMS",
+        "CLOTHING",
+        "OUR PICKS",
+        "SWIMWEAR",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-fortune-swimshorts-black",
+      "extracted_at": "2025-06-28 16:08:29"
+    },
+    "amiri-alchemy-landscape-frame-hoodie-black": {
+      "base": {
+        "Handle": "amiri-alchemy-landscape-frame-hoodie-black",
+        "Title": "AMIRI ALCHEMY LANDSCAPE FRAME HOODIE BLACK",
+        "Body (HTML)": "<p>For this Alchemy take on the traditional hoody, the L.A. label experiments with a more sophisticated style - backgrounding its bold typeface logo with an ornate landscape ‘framed’ at the front and back. The most fashionable of chemical combinations! 100% Cotton, Fixed Hood, Kangaroo Pocket, Printed Branding</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "XS",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55490234810741,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "S",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302053855605,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302053888373,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302053921141,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55490234843509,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55490234876277,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55490234909045,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_ALCHEMYHOODIE2.png?v=1745337836"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_ALCHEMYHOODIE3.png?v=1745337835"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_ALCHEMYHOODIE1.png?v=1745337835"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-alchemy-landscape-frame-hoodie-black",
+      "extracted_at": "2025-06-28 16:08:34"
+    },
+    "amiri-precious-memories-hoodie-black-1": {
+      "base": {
+        "Handle": "amiri-precious-memories-hoodie-black-1",
+        "Title": "AMIRI PRECIOUS MEMORIES HOODIE BLACK",
+        "Body (HTML)": "<br/><p class=\"_2wApW\">black cotton logo print at the chest classic hood drop shoulder logo print at the chest logo print to the rear long sleeves front pouch pocket straight hem</p><br/>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "XS",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55490243363189,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "S",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55302067323253,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55302067356021,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55302067388789,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55490243395957,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55490243428725,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 790.0,
+          "variant_id": 55490243461493,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_PRECIOUSHOODIE2.png?v=1740565923"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_PRECIOUSHOODIE.png?v=1740565924"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_PRECIOUSHOODIE3.png?v=1740565924"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-precious-memories-hoodie-black-1",
+      "extracted_at": "2025-06-28 16:08:39"
+    },
+    "amiri-crystal-ball-hoodie-black-white": {
+      "base": {
+        "Handle": "amiri-crystal-ball-hoodie-black-white",
+        "Title": "AMIRI CRYSTAL BALL HOODIE BLACK WHITE",
+        "Body (HTML)": "<p>The Amiri Crystal Ball Hoodie in Black is a must-have for the fashion-forward individual. Made from soft cotton-jersey, this relaxed-fit hoody features a unique crystal ball design that adds a touch of mystique to any outfit. Its comfortable fit and high-quality material make it perfect for both casual and dressy occasions. Upgrade your wardrobe with this fashionable and versatile piece.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "",
+          "size": "S",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 750.0,
+          "variant_id": 55302089015669,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 750.0,
+          "variant_id": 55302089048437,
+          "title": "XL",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 750.0,
+          "variant_id": 55490239627637,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 750.0,
+          "variant_id": 55490239660405,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_CRYSTHOODIE0.png?v=1745338466"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_CRYSTHOODIE.png?v=1745338466"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_CRYSTHOODIE2.png?v=1745338467"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-crystal-ball-hoodie-black-white",
+      "extracted_at": "2025-06-28 16:08:45"
+    },
+    "amiri-ma-bar-logo-hoodie-tan": {
+      "base": {
+        "Handle": "amiri-ma-bar-logo-hoodie-tan",
+        "Title": "AMIRI MA BAR LOGO HOODIE TAN",
+        "Body (HTML)": "<p>Amiri Ma Bar Logo Hoodie in Brown Self: 100% cotton Lining: 100% viscose. Made in Italy. Dry clean only. Kangaroo pocket. Front screenprint logo graphic. Silver-tone logo at back. Ribbed edges.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PF23MJL006-281-XS",
+          "size": "XS",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55485681336693,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL006-281-M",
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302103335285,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL006-281-L",
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302103368053,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL006-281-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55485681369461,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/MA_BAR_TANHOODIE.png?v=1745338830"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/MA_BAR_TANHOODIE2.png?v=1745338831"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/MA_BAR_TANHOODIE3.png?v=1745338830"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-ma-bar-logo-hoodie-tan",
+      "extracted_at": "2025-06-28 16:08:49"
+    },
+    "amiri-script-logo-sweater-black-1": {
+      "base": {
+        "Handle": "amiri-script-logo-sweater-black-1",
+        "Title": "AMIRI SCRIPT LOGO SWEATER BLACK",
+        "Body (HTML)": "<p>AMIRI embraces a minimalist aesthetic with this black sweatshirt. Expertly crafted from premium cotton, it features a refined design with the logo elegantly embroidered in contrasting white cursive on the chest. This understated yet stylish detail adds a touch of sophistication to the classic, comfortable silhouette.</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PF23MJL008-001-L",
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 755.0,
+          "variant_id": 55485701554549,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL008-001-XL",
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 755.0,
+          "variant_id": 55302116966773,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL008-001-XXL",
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 755.0,
+          "variant_id": 55485701587317,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJL008-001-XXXL",
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 755.0,
+          "variant_id": 55485701620085,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_SCRIPTLOGO1.png?v=1725291585"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_SCRIPTLOGO2.png?v=1725291585"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM1_SCRIPTLOGO3.png?v=1725291585"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-script-logo-sweater-black-1",
+      "extracted_at": "2025-06-28 16:08:54"
+    },
+    "amiri-micro-ma-bar-logo-hoodie-black": {
+      "base": {
+        "Handle": "amiri-micro-ma-bar-logo-hoodie-black",
+        "Title": "AMIRI MICRO MA BAR LOGO HOODIE BLACK",
+        "Body (HTML)": "<p>Amiri Micro MA Bar Hoodie in Black combines comfort and style with its non-detachable hood, ribbed cuffs, straight hem and small front logo detail. This hoodie also features a convenient front kangaroo pocket. Made from 100% cotton.</p>",
+        "Vendor": "Notorious Plug",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "AMIRIDEAL, NOTFORLTS, ALL PRODUCTS, AMIRI, AMIRI DEAL, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "",
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 850.0,
+          "variant_id": 55302135939445,
+          "title": "M",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/MICROLOGOHOODIE_BK.png?v=1745339485"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/MICROLOGOHOODIE_BK2.png?v=1745339485"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/MICROLOGOHOODIE_BK3.png?v=1745339484"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "AMIRI DEAL",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-micro-ma-bar-logo-hoodie-black",
+      "extracted_at": "2025-06-28 16:08:59"
+    },
+    "amiri-crystal-embellished-logo-hoodie-black": {
+      "base": {
+        "Handle": "amiri-crystal-embellished-logo-hoodie-black",
+        "Title": "AMIRI CRYSTAL EMBELLISHED LOGO HOODIE BLACK",
+        "Body (HTML)": "<p>Made in Italy. Crystal embellished MA logo to the front chest and in larger lettering at the back. Dry clean. Front kangaroo pocket. Crystal embellished logo at chest and back. Midweight jersey fabric</p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": "PF23MJG033-001-XS",
+          "size": "XS",
+          "color": null,
+          "price": 350.0,
+          "compare_price": 1390.0,
+          "variant_id": 55485666787701,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "PF23MJG033-001-S",
+          "size": "S",
+          "color": null,
+          "price": 350.0,
+          "compare_price": 1390.0,
+          "variant_id": 55302202098037,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM11CRYSTALEMBB.png?v=1745340477"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM11CRYSTALEMBB3.png?v=1745340478"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM11CRYSTALEMBB22.png?v=1745340476"
+        ],
+        "4": [
+          "https://notorious-plug.com/cdn/shop/files/AM11CRYSTALEMBB2.png?v=1745340477"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-crystal-embellished-logo-hoodie-black",
+      "extracted_at": "2025-06-28 16:09:03"
+    },
+    "amiri-california-hawaiian-hoodie-black-1": {
+      "base": {
+        "Handle": "amiri-california-hawaiian-hoodie-black-1",
+        "Title": "AMIRI CALIFORNIA HAWAIIAN HOODIE BLACK",
+        "Body (HTML)": "<p>Showing the brand's focus on Californian nostalgia and streetwear aesthetic, this black hoodie from AMIRI has a relaxed cut made of cotton. Its design is enhanced by a contrasting logo at the chest and colourful an applique detail on the back. </p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "XS",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220786037,
+          "title": "XS",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "S",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220818805,
+          "title": "S",
+          "available": false,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220851573,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": "",
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55302205669749,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220884341,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220917109,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490220949877,
+          "title": "XXXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_CALI_H2.png?v=1740477641"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AMIRI_CALI_H1.png?v=1740477641"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-california-hawaiian-hoodie-black-1",
+      "extracted_at": "2025-06-28 16:09:08"
+    },
+    "amiri-california-hawaiian-hoodie-white": {
+      "base": {
+        "Handle": "amiri-california-hawaiian-hoodie-white",
+        "Title": "AMIRI CALIFORNIA HAWAIIAN HOODIE WHITE",
+        "Body (HTML)": "<p>Showing the brand's focus on Californian nostalgia and streetwear aesthetic, this white hoodie from AMIRI has a relaxed cut made of cotton. Its design is enhanced by a contrasting logo at the chest and colourful an applique detail on the back. </p>",
+        "Vendor": "Amiri",
+        "Product Category": "",
+        "Type": "Sweats",
+        "Tags": "ALL PRODUCTS, AMIRI, CLOTHING, HOODIES & SWEATSHIRTS, OUR PICKS, VIEW ALL CLOTHING, Men, All Mens Clothing",
+        "Published": "TRUE",
+        "Status": "active",
+        "Variant Inventory Policy": "deny",
+        "Variant Fulfillment Service": "manual"
+      },
+      "variants": [
+        {
+          "sku": null,
+          "size": "S",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490215674229,
+          "title": "S",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "M",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55302232801653,
+          "title": "M",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "L",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490215706997,
+          "title": "L",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490215739765,
+          "title": "XL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        },
+        {
+          "sku": null,
+          "size": "XXL",
+          "color": null,
+          "price": 275.0,
+          "compare_price": 940.0,
+          "variant_id": 55490215772533,
+          "title": "XXL",
+          "available": true,
+          "inventory_management": "shopify",
+          "weight": 1361
+        }
+      ],
+      "images": {
+        "1": [
+          "https://notorious-plug.com/cdn/shop/files/AM11_CALIWHITE.png?v=1745341166"
+        ],
+        "2": [
+          "https://notorious-plug.com/cdn/shop/files/AM11_CALIWHITE2.png?v=1745341167"
+        ],
+        "3": [
+          "https://notorious-plug.com/cdn/shop/files/AM11_CALIWHITE4.png?v=1745341166"
+        ],
+        "4": [
+          "https://notorious-plug.com/cdn/shop/files/AM11_CALIWHITE3.png?v=1745341167"
+        ]
+      },
+      "collections": [
+        "ALL PRODUCTS",
+        "AMIRI",
+        "CLOTHING",
+        "HOODIES & SWEATSHIRTS",
+        "OUR PICKS",
+        "VIEW ALL CLOTHING"
+      ],
+      "source_url": "https://notorious-plug.com/collections/clothing/products/amiri-california-hawaiian-hoodie-white",
+      "extracted_at": "2025-06-28 16:09:12"
+    }
+  }
+}
