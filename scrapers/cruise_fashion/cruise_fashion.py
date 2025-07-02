@@ -359,7 +359,7 @@ def complete_workflow(base_url=BASE_URL, brand="ami-paris", category="Clothing",
     # Step 2: Fetch product data
     data = fetch_and_save_product_data(color_codes)
     
-    # Step 3: Clean and save product data
+    # Step 3: Clean and save product dat
     if data:
         cleaned_products = clean_and_save_product_data()
         upsert_product(cleaned_products, base_url)
