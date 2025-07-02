@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -331,7 +331,7 @@ def clean_and_save_product_data(raw_json_file="response_data.json", cleaned_json
     with open(cleaned_json_file, "w", encoding="utf-8") as f:
         json.dump({"products": list(cleaned_products.values())}, f, indent=2, ensure_ascii=False)
     print(f"[✓] Cleaned product data saved to {cleaned_json_file}")
-    return cleaned_products
+    return {"products": list(cleaned_products.values())}
 
 
 # ===== MAIN WORKFLOW FUNCTIONS =====
@@ -356,7 +356,7 @@ def complete_workflow(base_url=BASE_URL, brand="ami-paris", category="Clothing",
     """Run the complete workflow: scraping, fetching, and processing data"""
     # Step 1: Scrape color codes
     color_codes = scrape_and_save_color_codes(base_url, brand, category)
-    color_codes = color_codes[:1]
+    color_codes = color_codes[:8]
     # Step 2: Fetch product data
     data = fetch_and_save_product_data(color_codes)
     

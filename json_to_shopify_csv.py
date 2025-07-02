@@ -1,13 +1,28 @@
 import json
 import pandas as pd
 import os
+from db import get_product_by_website
+from urllib.parse import urlparse
 
-def json_to_shopify_csv(cleaned_json_file="cleaned_products.json", output_file="shopify_products.csv"):
-    """Read cleaned JSON and create Shopify CSV."""
-    with open(cleaned_json_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    products = data.get("products", [])
 
+
+def extract_clean_domain(url):
+    netloc = urlparse(url).netloc
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
+
+    # Split domain by dots and remove known subdomains/TLDs
+    parts = netloc.split(".")
+    
+    # Keep the main name only (skip subdomains and TLDs)
+    if len(parts) >= 2:
+        return parts[-2]  # like 'cruisefashion' or 'nike'
+    return parts[0]
+
+
+
+def shopify_csv_from_products(products, output_file="shopify_products.csv"):
+    """Convert a list of product dicts to Shopify CSV."""
     rows = []
     handle_first_row = {}
     for product in products:
@@ -116,5 +131,28 @@ def json_to_shopify_csv(cleaned_json_file="cleaned_products.json", output_file="
         new_df.to_csv(output_file, index=False)
         print(f"[✓] Created new Shopify CSV file: {output_file}")
 
+def convert_website_to_shopify_csv(website_url, output_file=None):
+    """Fetch product data for a website and convert directly to Shopify CSV."""
+    product_data = get_product_by_website(website_url)
+    if not product_data or "products" not in product_data:
+        print(f"No product data found for website: {website_url}")
+        return
+    if output_file is None:
+        output_file = f"{extract_clean_domain(website_url)}_shopify_products.csv"
+    shopify_csv_from_products(product_data["products"]["products"], output_file=output_file)
+
+
+# The original function is kept for compatibility
+
+def json_to_shopify_csv(cleaned_json_file="cleaned_products.json", output_file="shopify_products.csv"):
+    """Read cleaned JSON and create Shopify CSV."""
+    with open(cleaned_json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    products = data.get("products", [])
+    #print(products)
+    shopify_csv_from_products(products, output_file)
+
 if __name__ == "__main__":
-    json_to_shopify_csv() 
+    # Example usage: convert_website_to_shopify_csv('example_website')
+    #json_to_shopify_csv() 
+    convert_website_to_shopify_csv("https://www.cruisefashion.com")
