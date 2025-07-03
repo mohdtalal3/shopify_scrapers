@@ -1,0 +1,9 @@
+downloaded_files
+extras
+# Ignore all __pycache__ folders
+__pycache__/
+*/__pycache__/
+**/__pycache__/
+
+# Ignore .pyc files
+*.pyc
