@@ -26,7 +26,7 @@ def upsert_product(product_json: dict, website_url: str, currency: str):
             {
                 "products": product_json,
                 "website_url": website_url,
-                "currency": currency
+                "type": currency  # Use 'type' column instead of 'currency'
             },
             on_conflict=["website_url"]  # IMPORTANT: match conflict on this column
         ).execute()

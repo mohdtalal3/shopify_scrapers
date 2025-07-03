@@ -1,334 +1,660 @@
 {
   "products": [
     {
-      "Handle": "ami-paris-oversize-two-buttons-jacket-549955",
-      "Title": "Oversize Two Buttons Jacket",
-      "Body (HTML)": "<p>As a tailored touch of elegance to your look with this Oversize Two Buttons Jacket from Ami Paris,. Suave and sophisticated this blazer boasts a chic colourway making it ideal for business meetings or after work dinners.<br><br>Product Highlights:<br><br>* Fully Lined with Notch Collar and Horn Buttons<br><br>* Composition: 100% New Wool with a Sleek Wool Crepe Finish: for breathable, luxurious wear.<br><br>* Care: Do not wash</p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Blazers",
-      "Tags": "Mens, Formal Clothing, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-chiquito-brown-suede",
+      "Title": "JACQUEMUS LE CHIQUITO BROWN SUEDE",
+      "Body (HTML)": "<p><p>Signature mini handbag<br/><br/>- Suede leather structured bag<br/>- Reinforced handle<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Engraved lobster clip<br/>- Gold metal logo and hardware<br/>- Fully lined in cotton<br/>- Dyed edges<br/>- 12 x 9 cm</p><br/><br/>100% Cowskin<br/>Made in Italy<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "54995504350",
-          "size": "S (34)",
-          "color": "Taupe 218",
-          "Variant Price": 149.0,
-          "Variant Compare At Price": 750.0,
+          "Variant SKU": "213BA001-3066-850",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 250.0,
+          "Variant Compare At Price": 520.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a4.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a6.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "54995504430",
-          "size": "L (38)",
-          "color": "Taupe 218",
-          "Variant Price": 149.0,
-          "Variant Compare At Price": 750.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a4.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a6.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "54995504470",
-          "size": "XL L(40)",
-          "color": "Taupe 218",
-          "Variant Price": 149.0,
-          "Variant Compare At Price": 750.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a4.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a6.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/54995504_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_BROWNSUEDE.png?v=1737388167",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_BROWNSUEDE2.png?v=1737388167"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-wool-blend-oversized-coat-610254",
-      "Title": "Wool-Blend Oversized Coat",
-      "Body (HTML)": "<p>A modern reimagining of the classic overcoat silhouette, the Wool-Blend Oversized Coat by Ami Paris is the epitome of timeless sophistication. Crafted from a premium wool blend, this coat is the perfect addition to your autumn/winter capsule collection. Renowned for their classic pieces crafted by the modern gentleman, this single-breasted coat features an oversized fit that strikes a seamless balance between sophisticated tailoring and laid-back everyday style. <br><br>With notched lapels, a longline length, and a navy blue colourway, this men's coat is a testament to the brand's dedication to creating versatile wardrobe staples. It features two side pockets and a front button fastening, elevating both style and functionality. Impeccably designed to suit a myriad of occasions, it effortlessly transitions from formal gatherings to casual outings, making it an indispensable addition to your wardrobe. <br><br>90% wool, 10% polyamide. Always follow care label instructions.</p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Overcoats",
-      "Tags": "Mens, Jackets, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-chiquito-croc-light-khaki",
+      "Title": "JACQUEMUS LE CHIQUITO CROC LIGHT KHAKI",
+      "Body (HTML)": "<p><p>Signature mini handbag<br/><br/>- Smooth leather structured bag<br/>- Reinforced handle<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Engraved lobster clip<br/>- Gold metal logo and hardware<br/>- Fully lined in cotton<br/>- Dyed edges<br/>- 12 x 9 cm</p><br/><br/>100% Cowskin<br/>Made in Italy<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "61025418350",
-          "size": "S (46)",
-          "color": "Night Blue 430",
-          "Variant Price": 509.0,
-          "Variant Compare At Price": 1700.0,
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 250.0,
+          "Variant Compare At Price": 520.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/61025418_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LCHQ_GREENCROC1.png?v=1749567627",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LCHQ_GREENCROC.png?v=1749567627",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LCHQ_GREENCROC3.png?v=1749567627"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-boxy-fit-leather-shirt-673876",
-      "Title": "Boxy Fit Leather Shirt",
-      "Body (HTML)": "<p>Step into the spotlight with the Ami Paris Boxy Fit Leather Shirt, a daring piece that commands attention on any occasion. Whether it's a night out with friends or a statement look at a fashion-forward event, this shirt exudes confidence and luxury.<br><br>Product Highlights:<br><br>* Lamb leather construction: Experience unparalleled luxury and sophistication, elevating the shirt to a statement piece of enduring quality.<br><br>* Chest pocket with Ami branding: Embrace subtle branding with a modern edge, adding a touch of urban chic to your ensemble.<br><br>* Outer composition: 100% lamb leather<br><br>* Care: Do not wash, spot clean only</p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Oxford Shirt - Long Sleeve",
-      "Tags": "Womens, Casual Long Sleeve Shirts, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-petit-bambino-white",
+      "Title": "JACQUEMUS LE PETIT BAMBINO WHITE",
+      "Body (HTML)": "<p><p>Jacquemus revisits its iconic 'Le Bambino' bag in an irresistible 'Petit' size. Crafted from hand-selected leather in White, this accessory is detailed with a glossy gold-tone 'J' to match the exaggerated clasps. Keep yours in the dust bag between uses.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "67387603390",
-          "size": "12 (M)",
-          "color": "Black 001",
-          "Variant Price": 339.0,
-          "Variant Compare At Price": 1130.0,
+          "Variant SKU": null,
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 365.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "67387603430",
-          "size": "14 (L)",
-          "color": "Black 001",
-          "Variant Price": 339.0,
-          "Variant Compare At Price": 1130.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "67387603470",
-          "size": "16 (XL)",
-          "color": "Black 001",
-          "Variant Price": 339.0,
-          "Variant Compare At Price": 1130.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67387603_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_WHITE1.png?v=1749566293",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_WHITE2.png?v=1749566294",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_WHITE3.png?v=1749566293",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_WHITE4.png?v=1749566293"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-carrot-fit-trousers-518597",
-      "Title": "Carrot Fit Trousers",
-      "Body (HTML)": "<p></p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Chinos",
-      "Tags": "Mens, Trousers, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-petit-bambino-camel-brown",
+      "Title": "JACQUEMUS LE PETIT BAMBINO CAMEL BROWN",
+      "Body (HTML)": "<p><p>Jacquemus revisits its iconic 'Le Bambino' bag in an irresistible 'Petit' size. Crafted from hand-selected leather in a 'Camel' Brown shade, this accessory is detailed with a glossy gold-tone 'J' to match the exaggerated clasps. Keep yours in the dust bag between uses.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "51859702390",
-          "size": "38",
-          "color": "Heather Grey",
-          "Variant Price": 105.0,
-          "Variant Compare At Price": 350.0,
+          "Variant SKU": null,
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 365.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "51859702430",
-          "size": "40",
-          "color": "Heather Grey",
-          "Variant Price": 105.0,
-          "Variant Compare At Price": 350.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51859702_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_CAMELBROWN.png?v=1749565932",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_CAMELBROWN3.png?v=1749565932",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_CAMELBROWN2.png?v=1749565933"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-pinstripe-trousers-511699",
-      "Title": "Pinstripe Trousers",
-      "Body (HTML)": "<p></p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Straight Trousers",
-      "Tags": "Mens, Trousers, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-petit-bambino-black",
+      "Title": "JACQUEMUS LE PETIT BAMBINO BLACK",
+      "Body (HTML)": "<p><p>Jacquemus revisits its iconic 'Le Bambino' bag in an irresistible 'Petit' size. Crafted from hand-selected leather in Black, this accessory is detailed with a glossy gold-tone 'J' to match the exaggerated clasps. Keep yours in the dust bag between uses.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "51169902470",
-          "size": "X Large",
-          "color": "Grey 0552",
-          "Variant Price": 105.0,
-          "Variant Compare At Price": 350.0,
+          "Variant SKU": null,
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 365.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a5.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/51169902_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LPB_BK.png?v=1749565681",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LPB_BK3.png?v=1749565681",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LPB_BK2.png?v=1749565680",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LPB_BK4.png?v=1749565681"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-long-skirt-with-bias-cut-575618",
-      "Title": "Long Skirt With Bias Cut",
-      "Body (HTML)": "<p></p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Maxi Skirts",
-      "Tags": "Womens, Skirts, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-petit-bambino-dark-purple",
+      "Title": "JACQUEMUS LE PETIT BAMBINO DARK PURPLE",
+      "Body (HTML)": "<p><p>Jacquemus revisits its iconic 'Le Bambino' bag in an irresistible 'Petit' size. Crafted from hand-selected suede leather in a 'Dark Purple' shade, this accessory is detailed with a glossy gold-tone 'J' to match the exaggerated clasps. Keep yours in the dust bag between uses.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "57561803350",
-          "size": "10 (38)",
-          "color": "BLACK",
-          "Variant Price": 155.0,
-          "Variant Compare At Price": 515.0,
+          "Variant SKU": null,
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 365.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a11.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a12.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "57561803390",
-          "size": "12 (40)",
-          "color": "BLACK",
-          "Variant Price": 155.0,
-          "Variant Compare At Price": 515.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a11.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/57561803_o_a12.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_DP1.png?v=1749565259",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_DP2.png?v=1749565259",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_DP3.png?v=1749565259"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-belted-coat-332952",
-      "Title": "Belted Coat",
-      "Body (HTML)": "<p>Elevate your winter elegance with the Ami Paris Belted Coat, a statement piece perfect for chic seasonal soirees or sleek city strolls. The domed metal snap buttons with engraved ami alexandre mattiussi offer a luxury finishing touch, for any winter occasion that calls for sophistication.<br><br>Product Highlights: <br><br>* Features a removable fabric belt and chin strap that provides warmth and style.<br><br>* With a rear vent and tab fastening showcasing the glamorous attention to detail.<br><br>* Composition: Main Fabric: 56% virgin wool, 44% cotton. Lining: 50% cotton, 50% polyester. Sleeve Lining: 54% acetate, 45% viscose, 1% polyester. Pocket Lining: 65% polyester, 35% cotton.<br><br>* Care: Dry clean only.</p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Trench Coats",
-      "Tags": "Womens, Jackets, Clothing, Ami Paris",
+      "Handle": "jacquemus-le-petit-bambino-dark-green",
+      "Title": "JACQUEMUS LE PETIT BAMBINO DARK GREEN",
+      "Body (HTML)": "<p><p>Jacquemus revisits its iconic 'Le Bambino' bag in an irresistible 'Petit' size. Crafted from hand-selected suede leather in a 'Dark Green' shade, this accessory is detailed with a glossy gold-tone 'J' to match the exaggerated clasps. Keep yours in the dust bag between uses.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "33295205350",
-          "size": "10 (38)",
-          "color": "Dark Coffee 221",
-          "Variant Price": 419.0,
-          "Variant Compare At Price": 1390.0,
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 365.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a11.jpg?v=00010101000000"
-          ]
-        },
-        {
-          "Variant SKU": "33295205390",
-          "size": "12 (40)",
-          "color": "Dark Coffee 221",
-          "Variant Price": 419.0,
-          "Variant Compare At Price": 1390.0,
-          "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/33295205_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JQ_LPB_DG1.png?v=1749564909",
+            "https://notorious-plug.com/cdn/shop/files/JACQ_LBP_DG2.png?v=1749564909"
           ]
         }
       ]
     },
     {
-      "Handle": "ami-paris-bardot-top-673775",
-      "Title": "Bardot Top",
-      "Body (HTML)": "<p>Add a luxurious piece to your collection with the Ami Paris Bardot Top, a brand known for its stylish and contemporary designs. Adorned with a ruched neckline radiating allure. From upscale events to sipping cocktails, this top will effortlessly elevate any ensemble.<br><br>Product Highlights:<br><br>* Gracefully falls to the hip exuding a flattering silhouette.<br><br>* Straight hem boasts a timeless appeal.<br><br>* Composition: 70% cotton, 30% polyamide.<br><br>* Care: Hand wash, refer to product label.</p>",
-      "Vendor": "Ami Paris",
-      "Product Category": "Clothing",
-      "Type": "Wrap Tops",
-      "Tags": "Womens, T-Shirts, Clothing, Ami Paris",
+      "Handle": "jacquemus-bag",
+      "Title": "JACQUEMUS LE CHIQUITO HOMME BEIGE",
+      "Body (HTML)": "<p><p>Inspired by the original Chiquito by Jacquemus, this masculine version of the mini bag will have you jumping on the paradoxically big trend of late. Presented in leather with the iconic logo, it features a removable shoulder strap with a leather insert, magnetic closure, and an interior card pocket.</p></p>",
+      "Vendor": "Notorious Plug",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
       "variants": [
         {
-          "Variant SKU": "67377505350",
-          "size": "10 (38)",
-          "color": "Dark Coffee/221",
-          "Variant Price": 92.0,
-          "Variant Compare At Price": 305.0,
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 465.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/JACQ_CHIQUITOHOMME_BEIGE.png?v=1749563367",
+            "https://notorious-plug.com/cdn/shop/files/DBF57DF0-0FA8-4E98-B33B-FF0430D5DEE6.jpg?v=1749563367"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-homme-dark-beige",
+      "Title": "JACQUEMUS LE CHIQUITO HOMME DARK BEIGE",
+      "Body (HTML)": "<p><p>Inspired by the original Chiquito by Jacquemus, this masculine version of the mini bag will have you jumping on the paradoxically big trend of late. Presented in leather with the iconic logo, it features a removable shoulder strap with a leather insert, magnetic closure, and an interior card pocket.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 250.0,
+          "Variant Compare At Price": 535.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JQ_HOMMEBEIGE1.png?v=1748342242",
+            "https://notorious-plug.com/cdn/shop/files/JQ_HOMMEBEIGE2.png?v=1748342242",
+            "https://notorious-plug.com/cdn/shop/files/JQ_HOMMEBEIGE3.png?v=1748342242"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-homme-light-khaki",
+      "Title": "JACQUEMUS LE CHIQUITO HOMME LIGHT KHAKI",
+      "Body (HTML)": "<p><p>Inspired by the original Chiquito by Jacquemus, this masculine version of the mini bag will have you jumping on the paradoxically big trend of late. Presented in leather with the iconic logo, it features a removable shoulder strap with a leather insert, magnetic closure, and an interior card pocket.</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 450.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JQ_LKHAKIHOMME1.png?v=1748341435",
+            "https://notorious-plug.com/cdn/shop/files/JQ_LKHAKIHOMME2.png?v=1748341434",
+            "https://notorious-plug.com/cdn/shop/files/JQ_LKHAKIHOMME3.png?v=1748341434",
+            "https://notorious-plug.com/cdn/shop/files/JQ_LKHAKIHOMME4.png?v=1748341434"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-noeud-light-pink",
+      "Title": "JACQUEMUS LE CHIQUITO NOEUD LIGHT PINK",
+      "Body (HTML)": "<p><p>Jacquemus' cult 'Le Chiquito' bags are never in stock for long, so you won't want to leave this one lingering in your wish list. Made from smooth leather, it has a structured shape, an artfully twisted handle, and a longer shoulder strap. Match any jewelry to the gold designer lettering.</p><br/>100% Leather</p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 375.0,
+          "Variant Compare At Price": 745.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JQ_NOUED_LPINK.png?v=1748334414",
+            "https://notorious-plug.com/cdn/shop/files/JQ_NOUED_LPINK2.png?v=1748334414",
+            "https://notorious-plug.com/cdn/shop/files/JQ_NOUED_LPINK3.png?v=1748334415",
+            "https://notorious-plug.com/cdn/shop/files/JQ_NOUED_LPINK4.png?v=1748334415",
+            "https://notorious-plug.com/cdn/shop/files/JQ_NOUED_LPINK5.png?v=1748334414"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "nike-dunk-high-1985-green-denim",
+      "Title": "NIKE DUNK HIGH 1985 GREEN DENIM",
+      "Body (HTML)": "<p><p>Worn well and well-worn, the Dunk returns once again to match the original shape, look and feel of the '85 high top. Sun-washed Enamel Green denim brings the Americana flair. Raw-edge detailing and contrast stitching add a free-spirited look to any 'fit. And the aged midsole delivers a little hook-shot spirit back to the streets. Lace up and take your game anywhere—in cushioned high-top comfort.</p></p>",
+      "Vendor": "Nike",
+      "Product Category": "all-products-2",
+      "Type": "",
+      "Tags": "NOTFORLTS, ALL PRODUCTS, FOOTWEAR, NIKE, OUR PICKS, SNEAKERS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 5 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
           ]
         },
         {
-          "Variant SKU": "67377505390",
-          "size": "12 (40)",
-          "color": "Dark Coffee/221",
-          "Variant Price": 92.0,
-          "Variant Compare At Price": 305.0,
+          "Variant SKU": "DV1143-300",
+          "size": "US 5.5 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
           "images": [
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a1.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a2.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a3.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a10.jpg?v=00010101000000",
-            "https://cdn.media.amplience.net/i/frasersdev/67377505_o_a11.jpg?v=00010101000000"
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 6 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 6.5 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 7 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 9 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 9.5 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        },
+        {
+          "Variant SKU": "DV1143-300",
+          "size": "US 10.5 (W)",
+          "color": "",
+          "Variant Price": 65.0,
+          "Variant Compare At Price": 125.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN1.png?v=1737488263",
+            "https://notorious-plug.com/cdn/shop/files/DUNK_GREEN2.png?v=1737488261"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "nike-air-max-1-87-qs-gorge-green",
+      "Title": "NIKE AIR MAX 1 '87 QS GORGE GREEN",
+      "Body (HTML)": "<p><p>Use size chart in pictures to choose correct size.</p><br/><p>Make the team with the Air Max 1 Obsidian. Dressed in varsity hues, the suede and nylon upper delivers a sporty finish, while embroidered accents put extra pep in your step. The Gum outsole completes your 'fit with vintage style. Fast-paced looks, tried-and-tested cushioning and that classic wavy mudguard—no wonder it's reigned supreme since 1987.</p></p>",
+      "Vendor": "Notorious Plug",
+      "Product Category": "all-products-2",
+      "Type": "",
+      "Tags": "NOTFORLTS, ALL PRODUCTS, FOOTWEAR, NIKE, OUR PICKS, SNEAKERS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 5.5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 6.5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 7 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 7.5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 8 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 8.5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 9 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 9.5 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 10 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        },
+        {
+          "Variant SKU": "DV3887-400",
+          "size": "US 13 (W)",
+          "color": "",
+          "Variant Price": 85.0,
+          "Variant Compare At Price": 155.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_1.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/AIRMAX_DV3887_2.png?v=1737474596",
+            "https://notorious-plug.com/cdn/shop/files/NIKESIZECHAT1.png?v=1737977478"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-orange",
+      "Title": "JACQUEMUS LE CHIQUITO HOMME ORANGE",
+      "Body (HTML)": "<p><p>Signature mini handbag<br/><br/>- Suede leather structured bag<br/>- Reinforced handle<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Engraved lobster clip<br/>- Gold metal logo and hardware<br/>- Fully lined in cotton<br/>- Dyed edges<br/>- 12 x 9 cm</p><br/><br/>100% Cowskin<br/>Made in Italy<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "215BA001-3040-750",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 225.0,
+          "Variant Compare At Price": 450.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JQ_ORANGEHOME1.png?v=1748341784",
+            "https://notorious-plug.com/cdn/shop/files/JQ_ORANGEHOMME2.png?v=1748341784",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_ORANGE2.png?v=1748341784",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_ORANGE.png?v=1748341784"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-yellow",
+      "Title": "JACQUEMUS LE CHIQUITO YELLOW",
+      "Body (HTML)": "<p><p>Signature mini handbag<br/><br/>- Suede leather structured bag<br/>- Reinforced handle<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Engraved lobster clip<br/>- Gold metal logo and hardware<br/>- Fully lined in cotton<br/>- Dyed edges<br/>- 12 x 9 cm</p><br/><br/>100% Cowskin<br/>Made in Italy<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "213BA001-3061-250",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 200.0,
+          "Variant Compare At Price": 520.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_YELLOW.png?v=1737388977",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_YELLOW2.png?v=1737388976",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_YELLOW3.png?v=1737388976"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-moyen-light-green",
+      "Title": "JACQUEMUS LE CHIQUITO MOYEN LIGHT GREEN",
+      "Body (HTML)": "<p><p>Buffed leather top handle bag in green. Logo hardware at face. · Rolled carry handle at top · Adjustable and detachable shoulder strap · Foldover flap with magnetic press-stud closure · Card slot and leather logo patch at interior · Twill lining in beige · Gold-tone hardware · H5.5 x W7 x D3.25 in Supplier color: Light green</p></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "213BA002-3060-510",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 350.0,
+          "Variant Compare At Price": 710.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_MOYEN_LG.png?v=1737222112",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_MOYEN_LG2.png?v=1737222114",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_MOYEN_LG3.png?v=1737222113"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-carinu-white",
+      "Title": "JACQUEMUS LE CARINU WHITE",
+      "Body (HTML)": "<p><p>The Le Carinu. It’s sculpted from buttery smooth leather to a sleek, boxy profile that’s stripped back of any fussy details, save for the wide shoulder strap and the French label’s moniker in gold-tone lettering across the front.</p><br/>100% cow leather; lining 100% cotton</p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 275.0,
+          "Variant Compare At Price": 540.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINU_WHITE.png?v=1737221766",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINU_WHITE3.png?v=1737221766",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINU_WHITE4.png?v=1737221767",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINU_WHITE2.png?v=1737221765"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-carinu-pink",
+      "Title": "JACQUEMUS LE CARINU PINK",
+      "Body (HTML)": "<p><p>The Le Carinu. It’s sculpted from buttery smooth leather to a sleek, boxy profile that’s stripped back of any fussy details, save for the wide shoulder strap and the French label’s moniker in gold-tone lettering across the front.</p><br/>100% cow leather; lining 100% cotton</p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "213BA08-300-450",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 275.0,
+          "Variant Compare At Price": 540.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINUPINK1.png?v=1737468008",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINUPINK2.png?v=1737468008",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINUPINK3.png?v=1737468008",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECARINUPINK4.png?v=1737468008"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-noeud-yellow",
+      "Title": "JACQUEMUS LE CHIQUITO NOEUD YELLOW",
+      "Body (HTML)": "<p><p>Coiled leather handbag<br/><br/>- Extendable top handle that can be wrapped and snapped closed<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Interior pocket<br/>- Gold metal logo and hardware<br/>- Fully lined<br/>- Painted edges<br/>- 18 x 13,5 cm<br/><br/>Each leather is unique and has been carefully selected by our team. Its irregularities and color variations are natural. To preserve the original condition of this piece, we recommend keeping it out of the sun and away from cosmetics, water and heat sources. It can be stored in its pouch in a dry place.</p><br/><br/>100% Leather<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "213BA005-3032-250",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 375.0,
+          "Variant Compare At Price": 740.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITOND_YELLOW.png?v=1737217662",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITOND_YELLOW2.png?v=1737217663"
+          ]
+        }
+      ]
+    },
+    {
+      "Handle": "jacquemus-le-chiquito-light-green",
+      "Title": "JACQUEMUS LE CHIQUITO LIGHT GREEN",
+      "Body (HTML)": "<p><p>Signature mini handbag<br/><br/>- Smooth leather structured bag<br/>- Reinforced handle<br/>- Magnetic flap closure<br/>- Long removable strap<br/>- Engraved lobster clip<br/>- Gold metal logo and hardware<br/>- Fully lined in cotton<br/>- Dyed edges<br/>- 12 x 9 cm</p><br/><br/>100% Cowskin<br/>Made in Italy<br/></p>",
+      "Vendor": "Jacquemus",
+      "Product Category": "accessories",
+      "Type": "",
+      "Tags": "NOTFORLTS, ACCESSORIES, ALL PRODUCTS, BAGS, JACQUEMUS, JACQUEMUS, OUR PICKS, WOMENS, Women, All Women",
+      "variants": [
+        {
+          "Variant SKU": "213BA001-3028-510",
+          "size": "O/S",
+          "color": "",
+          "Variant Price": 250.0,
+          "Variant Compare At Price": 520.0,
+          "images": [
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_LTGREEN.png?v=1737215982",
+            "https://notorious-plug.com/cdn/shop/files/JCQ_LECHIQUITO_LTGREEN2.png?v=1737215981"
           ]
         }
       ]

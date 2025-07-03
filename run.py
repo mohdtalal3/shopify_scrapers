@@ -13,3 +13,6 @@ Comment or uncomment the lines below to run the desired workflow.
 # convert_website_to_shopify_csv("https://www.cruisefashion.com")
 
 # --- Add more scrapers/converters below as needed --- 
+
+# from json_to_shopify_csv import convert_website_to_shopify_csv
+# convert_website_to_shopify_csv("https://notorious-plug.com")
