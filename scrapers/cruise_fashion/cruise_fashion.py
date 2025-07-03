@@ -293,7 +293,6 @@ def clean_and_save_product_data(raw_json_file="response_data.json", cleaned_json
         category = product["attributes"].get("category", "")
         type = product["attributes"].get("subCategory", "")
         tags = f"{product['attributes'].get('gender', '')}, {product['attributes'].get('activityGroup', '')}, {product['attributes'].get('category', '')}, {product['attributes'].get('brand', '')}"
-        gender = product["attributes"].get("gender", "")
         color = product["attributes"].get("color", "")
 
         if handle not in cleaned_products:
@@ -360,7 +359,7 @@ def complete_workflow(base_url=BASE_URL, brand="ami-paris", category="Clothing",
     # Step 2: Fetch product data
     data = fetch_and_save_product_data(color_codes)
     
-    # Step 3: Clean and save product data
+    # Step 3: Clean and save product dat
     if data:
         cleaned_products = clean_and_save_product_data()
         upsert_product(cleaned_products, base_url)
