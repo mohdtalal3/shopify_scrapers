@@ -86,22 +86,13 @@ def shopify_csv_from_products(products, output_file="shopify_products.csv"):
                 for col in ["Title", "Body (HTML)", "Vendor", "Product Category", "Type", "Tags", "Published"]:
                     row[col] = ""
             rows.append(row)
-            # Additional image rows: repeat only required fields
+            # Additional image rows: only Handle, Image Src, Image Position
             for img_idx, img_url in enumerate(images[1:], 2):
-                img_row = {
-                    "Handle": base["Handle"],
-                    "Option1 Name": "",
-                    "Option1 Value": opt1_val,
-                    "Option2 Name": "",
-                    "Option2 Value": opt2_val,
-                    "Variant Price": variant["Variant Price"],
-                    "Variant Compare At Price": variant["Variant Compare At Price"],
-                    "Variant Inventory Policy": base["Variant Inventory Policy"],
-                    "Variant Fulfillment Service": base["Variant Fulfillment Service"],
-                    "Status": base["Status"],
-                    "Image Src": img_url,
-                    "Image Position": img_idx,
-                }
+                img_row = {col: "" for col in base.keys()}
+                img_row["Handle"] = base["Handle"]
+                img_row["Image Src"] = img_url
+                img_row["Image Position"] = img_idx
+                # All other columns blank
                 rows.append(img_row)
 
     shopify_columns = [
@@ -154,5 +145,5 @@ def json_to_shopify_csv(cleaned_json_file="cleaned_products.json", output_file="
 
 if __name__ == "__main__":
     # Example usage: convert_website_to_shopify_csv('example_website')
-    #json_to_shopify_csv() 
-    convert_website_to_shopify_csv("https://www.cruisefashion.com")
+    json_to_shopify_csv() 
+    #convert_website_to_shopify_csv("https://www.cruisefashion.com")
