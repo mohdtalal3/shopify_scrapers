@@ -362,7 +362,7 @@ def complete_workflow(base_url=BASE_URL, brand="ami-paris", category="Clothing",
     # Step 3: Clean and save product dat
     if data:
         cleaned_products = clean_and_save_product_data()
-        upsert_product(cleaned_products, base_url)
+        upsert_product(cleaned_products, base_url,"pound")
         print(f"[✓] Complete workflow finished successfully! Final output saved to {output_file}")
     else:
         print("[❌] Workflow failed at the data fetching step.")

@@ -20,12 +20,13 @@ def test_connection():
 
 from datetime import datetime
 
-def upsert_product(product_json: dict, website_url: str):
+def upsert_product(product_json: dict, website_url: str, currency: str):
     try:
         response = supabase.table("products").upsert(
             {
                 "products": product_json,
-                "website_url": website_url
+                "website_url": website_url,
+                "currency": currency
             },
             on_conflict=["website_url"]  # IMPORTANT: match conflict on this column
         ).execute()
@@ -80,7 +81,8 @@ if __name__ == "__main__":
         print("\nUpserting product:")
         upsert_product(
             product_json={"product1": "Example Product", "price": 19.99},
-            website_url="talal"
+            website_url="talal",
+            currency="pound"
         )
         
         # Retrieve all products
