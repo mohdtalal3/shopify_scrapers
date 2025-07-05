@@ -1,0 +1,17 @@
+{
+  "base_url": "https://banditrunning.com",
+  "total_collections": 2,
+  "extracted_at": "2025-07-04 16:21:18",
+  "collections": {
+    "womens": {
+      "collection_url": "https://banditrunning.com/collections//collections/women?filter.p.tag=filter-type:bottoms&filter.p.tag=filter-type:compression&filter.p.tag=filter-type:crew+necks&filter.p.tag=filter-type:crop+singlets&filter.p.tag=filter-type:hoodies&filter.p.tag=filter-type:leggings&filter.p.tag=filter-type:long+sleeves&filter.p.tag=filter-type:outerwear&filter.p.tag=filter-type:run+tees&filter.p.tag=filter-type:run+tights&filter.p.tag=filter-type:shorts&filter.p.tag=filter-type:sweatpants&filter.p.tag=filter-type:tanks&filter.p.tag=filter-type:tees&filter.p.tag=filter-type:tops",
+      "total_products": 0,
+      "products": []
+    },
+    "mens": {
+      "collection_url": "https://banditrunning.com/collections/collections/mens?filter.p.tag=filter-type:bottoms&filter.p.tag=filter-type:compression&filter.p.tag=filter-type:crew+necks&filter.p.tag=filter-type:half-tights&filter.p.tag=filter-type:hoodies&filter.p.tag=filter-type:long+sleeves&filter.p.tag=filter-type:longsleeves&filter.p.tag=filter-type:pants&filter.p.tag=filter-type:run+tees&filter.p.tag=filter-type:shorts&filter.p.tag=filter-type:sweatpants&filter.p.tag=filter-type:tanks&filter.p.tag=filter-type:tees&filter.p.tag=filter-type:tops",
+      "total_products": 0,
+      "products": []
+    }
+  }
+}

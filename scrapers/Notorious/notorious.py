@@ -18,6 +18,12 @@ COLLECTIONS = {
     "shoes": "/collections/shoes"
 }
 
+# Global data storage lists
+ALL_COLLECTION_DATA = {}
+ALL_PRODUCT_URLS = []
+DETAILED_PRODUCT_DATA = {}
+CLEANED_PRODUCTS_DATA = []
+
 # Default headers for web requests (using the working headers from extractor.py)
 DEFAULT_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -255,9 +261,13 @@ def scrape_collection_urls(collection_path):
         'products': all_products
     }
 
-def scrape_all_collection_urls(output_file="all_url.json"):
-    """Scrape all collections to get product URLs and save to JSON"""
-    all_collections_data = {}
+def scrape_all_collection_urls():
+    """Scrape all collections to get product URLs and store in global list"""
+    global ALL_COLLECTION_DATA, ALL_PRODUCT_URLS
+    
+    ALL_COLLECTION_DATA.clear()
+    ALL_PRODUCT_URLS.clear()
+    
     total_products = 0
     global_seen_urls = set()  # Track URLs across all collections
     global_seen_titles = set()  # Track titles across all collections
@@ -289,8 +299,15 @@ def scrape_all_collection_urls(output_file="all_url.json"):
                 global_seen_urls.add(product_url)
                 global_seen_titles.add(product_title)
                 unique_products.append(product)
+                # Add to global product URLs list
+                ALL_PRODUCT_URLS.append({
+                    'url': product['url'],
+                    'title': product['title'],
+                    'collection': collection_name,
+                    'tags': product.get('tags', [])
+                })
         
-        all_collections_data[collection_name] = {
+        ALL_COLLECTION_DATA[collection_name] = {
             'collection_url': collection_data['collection_url'],
             'total_products': len(unique_products),
             'products': unique_products
@@ -300,29 +317,17 @@ def scrape_all_collection_urls(output_file="all_url.json"):
         
         print(f"Completed {collection_name}: {len(unique_products)} unique products")
     
-    # Save all data to JSON file
-    data = {
-        'base_url': BASE_URL,
-        'total_collections': len(all_collections_data),
-        'extracted_at': time.strftime('%Y-%m-%d %H:%M:%S'),
-        'collections': all_collections_data
-    }
-    
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    
     print(f"\n{'='*60}")
     print("SCRAPING COMPLETED SUCCESSFULLY!")
     print(f"{'='*60}")
     print(f"Total collections scraped: {len(COLLECTIONS)}")
     print(f"Total unique products extracted: {total_products}")
-    print(f"Data saved to {output_file}")
     
     # Print summary for each collection
-    for collection_name, data in all_collections_data.items():
+    for collection_name, data in ALL_COLLECTION_DATA.items():
         print(f"{collection_name}: {data['total_products']} unique products")
     
-    return data
+    return ALL_COLLECTION_DATA
 
 # ===== PRODUCT DATA EXTRACTION MODULE =====
 def extract_product_json_from_url(url, max_retries=3):
@@ -647,38 +652,13 @@ def structure_product_data(raw_product_data, source_url, additional_tags=None):
         print(f"Error structuring product data: {e}")
         return None
 
-def get_product_urls_from_json(json_file="all_url.json", limit=None):
-    """Get product URLs from the scraped JSON file"""
-    try:
-        with open(json_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        product_urls = []
-        for collection_name, collection_data in data.get('collections', {}).items():
-            for product in collection_data.get('products', []):
-                product_urls.append({
-                    'url': product['url'],
-                    'title': product['title'],
-                    'collection': collection_name,
-                    'tags': product.get('tags', [])
-                })
-        
-        if limit:
-            product_urls = product_urls[:limit]
-        
-        print(f"Found {len(product_urls)} product URLs to process")
-        return product_urls
-        
-    except FileNotFoundError:
-        print(f"File {json_file} not found. Please run scrape_all_collection_urls() first.")
-        return []
-    except Exception as e:
-        print(f"Error reading product URLs from {json_file}: {e}")
-        return []
-
-def extract_detailed_product_data(product_urls, output_file="extracted_product_json.json", batch_size=10, delay=2):
-    """Extract detailed product data from URLs and save to JSON"""
-    all_structured_data = {'products': {}}
+def extract_detailed_product_data(limit=None, batch_size=10, delay=2):
+    """Extract detailed product data from URLs and store in global dict"""
+    global DETAILED_PRODUCT_DATA, ALL_PRODUCT_URLS
+    
+    DETAILED_PRODUCT_DATA.clear()
+    
+    product_urls = ALL_PRODUCT_URLS[:limit] if limit else ALL_PRODUCT_URLS
     processed_count = 0
     
     print(f"Starting detailed extraction of {len(product_urls)} products...")
@@ -696,7 +676,7 @@ def extract_detailed_product_data(product_urls, output_file="extracted_product_j
             
             if structured_data:
                 handle = structured_data['handle']
-                all_structured_data['products'][handle] = structured_data
+                DETAILED_PRODUCT_DATA[handle] = structured_data
                 processed_count += 1
                 print(f"✅ Successfully processed: {handle}")
             else:
@@ -704,38 +684,23 @@ def extract_detailed_product_data(product_urls, output_file="extracted_product_j
         else:
             print(f"❌ No data extracted from: {url}")
         
-        # Save progress periodically
-        if (i + 1) % batch_size == 0 or i == len(product_urls) - 1:
-            with open(output_file, 'w', encoding='utf-8') as f:
-                json.dump(all_structured_data, f, indent=2, ensure_ascii=False)
-            print(f"💾 Progress saved: {processed_count}/{i+1} products processed")
-        
         # Be polite to the server
         if i < len(product_urls) - 1:
             time.sleep(delay)
     
     print(f"\n🎉 Detailed extraction completed!")
-    print(f"📄 Data saved to: {output_file}")
     print(f"📊 Successfully processed: {processed_count}/{len(product_urls)} products")
     
-    return all_structured_data
-
-def save_json_response(data, filename="response_data.json"):
-    """Save API response to JSON file"""
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-        print(f"💾 Data saved to {filename}")
+    return DETAILED_PRODUCT_DATA
 
 # ===== DATA CLEANING MODULE =====
-def clean_and_save_product_data(raw_json_file="extracted_product_json.json", cleaned_json_file="cleaned_products.json"):
+def clean_and_save_product_data():
     """Clean and format product data to match the exact specified structure."""
-    with open(raw_json_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    global CLEANED_PRODUCTS_DATA, DETAILED_PRODUCT_DATA
+    
+    CLEANED_PRODUCTS_DATA.clear()
 
-    products_data = data.get("products", {})
-    cleaned_products = []
-
-    for handle, product_data in products_data.items():
+    for handle, product_data in DETAILED_PRODUCT_DATA.items():
         base_data = product_data.get("base", {})
         variants = product_data.get("variants", [])
         images = product_data.get("images", {})
@@ -799,36 +764,28 @@ def clean_and_save_product_data(raw_json_file="extracted_product_json.json", cle
                 "variants": cleaned_variants
             }
             
-            cleaned_products.append(cleaned_product)
+            CLEANED_PRODUCTS_DATA.append(cleaned_product)
 
-    # Save cleaned data in the exact format specified
-    final_output = {"products": cleaned_products}
+    print(f"[✓] Cleaned product data processed in memory")
+    print(f"[✓] Total products processed: {len(CLEANED_PRODUCTS_DATA)}")
+    print(f"[✓] Total variants: {sum(len(p['variants']) for p in CLEANED_PRODUCTS_DATA)}")
     
-    with open(cleaned_json_file, "w", encoding="utf-8") as f:
-        json.dump(final_output, f, indent=2, ensure_ascii=False)
-    
-    print(f"[✓] Cleaned product data saved to {cleaned_json_file}")
-    print(f"[✓] Total products processed: {len(cleaned_products)}")
-    print(f"[✓] Total variants: {sum(len(p['variants']) for p in cleaned_products)}")
-    
-    return final_output
+    return {"products": CLEANED_PRODUCTS_DATA}
 
 # ===== MAIN WORKFLOW FUNCTIONS =====
-def scrape_and_save_product_urls(output_file="all_url.json"):
-    """Complete workflow to scrape and save product URLs"""
-    urls_data = scrape_all_collection_urls(output_file)
-    return urls_data
+def scrape_and_save_product_urls():
+    """Complete workflow to scrape product URLs and store in global list"""
+    return scrape_all_collection_urls()
 
-def extract_and_save_detailed_data(url_file="all_url.json", output_file="extracted_product_json.json", limit=None, batch_size=10, delay=2):
-    """Complete workflow to extract and save detailed product data"""
-    product_urls = get_product_urls_from_json(url_file, limit)
-    if not product_urls:
+def extract_and_save_detailed_data(limit=None, batch_size=10, delay=2):
+    """Complete workflow to extract detailed product data and store in global dict"""
+    if not ALL_PRODUCT_URLS:
+        print("No product URLs found. Please run scrape_and_save_product_urls() first.")
         return None
     
-    detailed_data = extract_detailed_product_data(product_urls, output_file, batch_size, delay)
-    return detailed_data
+    return extract_detailed_product_data(limit, batch_size, delay)
 
-def complete_workflow(limit=None, output_file="shopify_products.csv"):
+def complete_workflow(limit=None):
     """Run the complete workflow: URL scraping, detailed extraction, and processing data"""
     # Step 1: Scrape product URLs from all collections
     print("=== STEP 1: Scraping Product URLs ===")
@@ -844,10 +801,14 @@ def complete_workflow(limit=None, output_file="shopify_products.csv"):
         cleaned_products = clean_and_save_product_data()
         upsert_product(cleaned_products, BASE_URL, "pound")
         print(f"[✓] Complete workflow finished successfully! Data processed and saved to database")
+        print(f"[✓] Global data available in:")
+        print(f"    - ALL_COLLECTION_DATA: {len(ALL_COLLECTION_DATA)} collections")
+        print(f"    - ALL_PRODUCT_URLS: {len(ALL_PRODUCT_URLS)} product URLs")
+        print(f"    - DETAILED_PRODUCT_DATA: {len(DETAILED_PRODUCT_DATA)} detailed products")
+        print(f"    - CLEANED_PRODUCTS_DATA: {len(CLEANED_PRODUCTS_DATA)} cleaned products")
     else:
         print("[❌] Workflow failed at the detailed data extraction step.")
 
 # Run the script if executed directly
 if __name__ == "__main__":
-    # Example usage - limit to 20 products for testing, remove limit for full scrape
     complete_workflow()
