@@ -13,19 +13,39 @@ from scrapers.aloyoga.aloyoga import complete_workflow_aloyoga
 from color_maps import run_color_mapping
 
 
-
-
 def run_all_scrapers():
-    complete_workflow_lululemon()
-    complete_workflow_sportsdirect()
-    complete_workflow_mytheresa()
-    complete_workflow_hypefly()
-    complete_workflow_youngla()
-    complete_workflow_tory()
-    complete_workflow_thedesignerboxuk()
-    complete_workflow_shop437()
-    complete_workflow_polene_paris()
-    complete_workflow_notorious()
-    complete_workflow_gymshark()
-    complete_workflow_aloyoga()
-    run_color_mapping()
+    scrapers = [
+        ("Lululemon", complete_workflow_lululemon),
+        ("Sports Direct", complete_workflow_sportsdirect),
+        ("Mytheresa", complete_workflow_mytheresa),
+        ("Hypefly", complete_workflow_hypefly),
+        ("YoungLA", complete_workflow_youngla),
+        ("Tory", complete_workflow_tory),
+        ("The Designer Box UK", complete_workflow_thedesignerboxuk),
+        ("Shop437", complete_workflow_shop437),
+        ("Polene Paris", complete_workflow_polene_paris),
+        ("Notorious", complete_workflow_notorious),
+        ("Gymshark", complete_workflow_gymshark),
+        ("Alo Yoga", complete_workflow_aloyoga)
+    ]
+    
+    for scraper_name, scraper_function in scrapers:
+        try:
+            print(f"\n🔄 Starting {scraper_name} scraper...")
+            scraper_function()
+            print(f"✅ {scraper_name} scraper completed successfully")
+        except Exception as e:
+            print(f"❌ {scraper_name} scraper failed with error: {str(e)}")
+            print(f"   Continuing with next scraper...")
+    
+    # Run color mapping at the end
+    try:
+        print(f"\n🔄 Starting color mapping...")
+        run_color_mapping()
+        print(f"✅ Color mapping completed successfully")
+    except Exception as e:
+        print(f"❌ Color mapping failed with error: {str(e)}")
+        print(f"   Continuing...")
+
+if __name__ == "__main__":
+    run_all_scrapers()

@@ -142,7 +142,7 @@ def run_color_mapping():
                 update_mapped_colors_in_db(mapped["colors"])
         except Exception as e:
             print(f"Error parsing or updating batch: {e}")
-        time.sleep(5)
+        time.sleep(10)
 
 # Example usage
 if __name__ == "__main__":

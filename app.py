@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 import logging
 from dotenv import load_dotenv
-
+from scrapers_run import run_all_scrapers
 # Load environment variables
 load_dotenv()
 
@@ -71,18 +71,7 @@ def perform_scraping(user_email):
     
     try:
         logger.info(f"Starting scraping process for user: {user_email}")
-        
-        # Simulate scraping work (replace this with your actual scraping logic)
-        # This could involve:
-        # - Connecting to Shopify APIs
-        # - Scraping product data
-        # - Processing and storing data
-        # - etc.
-        
-        # Simulate processing time (remove this in production)
-        #time.sleep(10)  # Simulate 30 seconds of work
-        input()
-        # Send completion email
+        run_all_scrapers()
         subject = "Shopify Scraping Completed"
         body = f"""
         Hello,
@@ -190,4 +179,5 @@ def health_check():
 
 if __name__ == '__main__':
     # Development server
-    app.run(debug=True, host='0.0.0.0', port=5002)
+    #app.run(debug=True, host='0.0.0.0', port=5002)
+    app.run(host='0.0.0.0', port=5000)
