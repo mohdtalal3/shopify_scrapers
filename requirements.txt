@@ -1,0 +1,8 @@
+requests
+beautifulsoup4
+pandas
+python-dotenv
+supabase
+flask
+flask-cors
+google-genai

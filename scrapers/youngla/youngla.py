@@ -7,7 +7,7 @@ import time
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from db import upsert_product
+from db import upsert_all_product_data
 BASE_URL = "https://www.youngla.com"
 
 def extract_visible_product_ids_from_html(html):
@@ -33,7 +33,7 @@ def extract_visible_product_ids_from_html(html):
 
 def scrape_product_ids_from_collections(collections):
     all_ids = set()
-    with SB(uc=True, headless=True) as sb:
+    with SB(uc=True, headless=False) as sb:
         for entry in collections:
             url = entry["url"] if isinstance(entry, dict) else entry
             try:
@@ -275,23 +275,78 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow(collections):
-    print("🔍 Scraping product IDs...")
-    scraped_ids = scrape_product_ids_from_collections(collections)
-    unique_ids = list(set(scraped_ids))
-    print(f"🎯 Total Unique Product IDs: {len(unique_ids)}")
+def scrape_youngla(collections):
+    print("🔍 Scraping product IDs from all collections...")
+    all_scraped_ids = []
+    product_id_to_collection = {}  # Map product IDs to their source collection
+    
+    # Scrape IDs from each collection URL
+    for i, collection in enumerate(collections):
+        print(f"→ Processing collection {i+1}/{len(collections)}: {collection['url']}")
+        try:
+            collection_ids = scrape_product_ids_from_collections([collection])
+            all_scraped_ids.extend(collection_ids)
+            
+            # Map each product ID to its source collection
+            for product_id in collection_ids:
+                product_id_to_collection[str(product_id)] = collection
+            
+            print(f"✓ Found {len(collection_ids)} product IDs from {collection['url']}")
+        except Exception as e:
+            print(f"✗ Error scraping {collection['url']}: {e}")
+            continue
+    
+    unique_ids = list(set(all_scraped_ids))
+    print(f"🎯 Total Unique Product IDs across all collections: {len(unique_ids)}")
+
+    if not unique_ids:
+        print("❌ No product IDs found. Exiting.")
+        return
 
     gids = format_shopify_gids(unique_ids)
 
     print("📦 Fetching product data in batches...")
     raw_data = fetch_shopify_products_batched(gids)
 
+    # Process products with their correct collection data
     all_products = []
-    for entry in collections:
-        gender_tag = entry.get("gender")
-        product_type = entry.get("product_type")
-        print(f"🧹 Cleaning data for {entry['url']}...")
-        cleaned = clean_and_save_product_data_only_available_with_all_images_from_data(raw_data, gender_tag, product_type)
+    products_by_collection = {}
+    
+    # Group products by their source collection
+    for product in raw_data.get("data", {}).get("nodes", []):
+        if product is None:
+            continue
+        
+        # Extract product ID from the Shopify GID
+        product_gid = product.get("id", "")
+        product_id = product_gid.split("/")[-1] if "/" in product_gid else product_gid
+        
+        # Find which collection this product belongs to
+        source_collection = product_id_to_collection.get(str(product_id))
+        if source_collection:
+            collection_key = source_collection["url"]
+            if collection_key not in products_by_collection:
+                products_by_collection[collection_key] = {
+                    "products": [],
+                    "collection_info": source_collection
+                }
+            products_by_collection[collection_key]["products"].append(product)
+    
+    # Now process each collection's products with the correct gender/type
+    for collection_url, collection_data in products_by_collection.items():
+        products = collection_data["products"]
+        collection_info = collection_data["collection_info"]
+        
+        gender_tag = collection_info.get("gender")
+        product_type = collection_info.get("product_type")
+        
+        print(f"🧹 Cleaning {len(products)} products for {collection_url} (gender: {gender_tag})...")
+        
+        # Create a temporary data structure for this collection
+        temp_data = {"data": {"nodes": products}}
+        cleaned = clean_and_save_product_data_only_available_with_all_images_from_data(
+            temp_data, gender_tag, product_type
+        )
         all_products.extend(cleaned)
 
     # Remove duplicate products by handle (keep first occurrence)
@@ -306,34 +361,51 @@ def complete_workflow(collections):
     with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
         json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
-    upsert_product({"products": unique_products}, BASE_URL, "USD")
+    upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
+    print(f"📊 Total unique products processed: {len(unique_products)}")
+    
+    # Show breakdown by gender
+    gender_breakdown = {}
+    for prod in unique_products:
+        category = prod.get("Product Category", "unknown")
+        gender_breakdown[category] = gender_breakdown.get(category, 0) + 1
+    
+    print("📈 Products by gender:")
+    for gender, count in gender_breakdown.items():
+        print(f"   {gender}: {count} products")
 
-# 🔧 Run Everything
-if __name__ == "__main__":
+
+
+
+def complete_workflow_youngla():
     collections = [
         {"url": "https://www.youngla.com/collections/tanks", "gender": "men", "product_type": "tanks"},
         {"url": "https://www.youngla.com/collections/t-shirts", "gender": "men", "product_type": "shirts"},
         {"url": "https://www.youngla.com/collections/long-sleeves-for-him", "gender": "men", "product_type": "long sleeves"},
         {"url": "https://www.youngla.com/collections/shorts", "gender": "men", "product_type": "shorts"},
-        # {"url": "https://www.youngla.com/collections/jeans", "gender": "men", "product_type": "pants"},
-        # {"url": "https://www.youngla.com/collections/outerwear", "gender": "men", "product_type": "outerwear"},
-        # {"url": "https://www.youngla.com/collections/joggers", "gender": "men", "product_type": "joggers"},
-        # {"url": "https://www.youngla.com/collections/hats", "gender": "men", "product_type": "hats"},
-        # {"url": "https://www.youngla.com/collections/lifting-gear", "gender": "men", "product_type": "accessories"},
+        {"url": "https://www.youngla.com/collections/jeans", "gender": "men", "product_type": "pants"},
+        {"url": "https://www.youngla.com/collections/outerwear", "gender": "men", "product_type": "outerwear"},
+        {"url": "https://www.youngla.com/collections/joggers", "gender": "men", "product_type": "joggers"},
+        {"url": "https://www.youngla.com/collections/hats", "gender": "men", "product_type": "hats"},
+        {"url": "https://www.youngla.com/collections/lifting-gear", "gender": "men", "product_type": "accessories"},
     ]
 
-#     collections += [
-#     {"url": "https://www.youngla.com/collections/bras", "gender": "women", "product_type": "bras"},
-#     {"url": "https://www.youngla.com/collections/shirts", "gender": "women", "product_type": "tops"},
-#     {"url": "https://www.youngla.com/collections/bodysuits", "gender": "women", "product_type": "bodysuits"},
-#     {"url": "https://www.youngla.com/collections/shorts-1", "gender": "women", "product_type": "shorts"},
-#     {"url": "https://www.youngla.com/collections/joggers-1", "gender": "women", "product_type": "leggings"},
-#     {"url": "https://www.youngla.com/collections/joggers-pants-for-her", "gender": "women", "product_type": "joggers"},
-#     {"url": "https://www.youngla.com/collections/outwear", "gender": "women", "product_type": "outerwear"},
-#     {"url": "https://www.youngla.com/collections/tanks-1", "gender": "women", "product_type": "matching sets"},
-#     {"url": "https://www.youngla.com/collections/accessories-for-her", "gender": "women", "product_type": "accessories"},
-# ]
+    collections += [
+    {"url": "https://www.youngla.com/collections/bras", "gender": "women", "product_type": "bras"},
+    {"url": "https://www.youngla.com/collections/shirts", "gender": "women", "product_type": "tops"},
+    {"url": "https://www.youngla.com/collections/bodysuits", "gender": "women", "product_type": "bodysuits"},
+    {"url": "https://www.youngla.com/collections/shorts-1", "gender": "women", "product_type": "shorts"},
+    {"url": "https://www.youngla.com/collections/joggers-1", "gender": "women", "product_type": "leggings"},
+    {"url": "https://www.youngla.com/collections/joggers-pants-for-her", "gender": "women", "product_type": "joggers"},
+    {"url": "https://www.youngla.com/collections/outwear", "gender": "women", "product_type": "outerwear"},
+    {"url": "https://www.youngla.com/collections/tanks-1", "gender": "women", "product_type": "matching sets"},
+    {"url": "https://www.youngla.com/collections/accessories-for-her", "gender": "women", "product_type": "accessories"},
+]
+    scrape_youngla(collections)
+# 🔧 Run Everything
 
 
-    complete_workflow(collections)
+
+if __name__ == "__main__":
+    complete_workflow_youngla()

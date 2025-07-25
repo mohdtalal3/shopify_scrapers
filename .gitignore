@@ -7,3 +7,12 @@ __pycache__/
 
 # Ignore .pyc files
 *.pyc
+
+
+run.py
+
+.env
+
+kate.py
+
+text.txt
