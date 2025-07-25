@@ -6,3 +6,4 @@ supabase
 flask
 flask-cors
 google-genai
+seleniumbase
