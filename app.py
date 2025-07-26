@@ -28,57 +28,64 @@ scraping_status = {
     'user_email': None
 }
 
-def send_email(to_email, subject, body):
-    """Send email notification"""
+def send_email(to_email, subject, body, cc_emails=None):
+    """Send email notification with optional CC"""
     try:
-        # Email configuration - set these environment variables
         smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
         smtp_port = int(os.getenv('SMTP_PORT', '587'))
         sender_email = os.getenv('FROM_EMAIL')
         sender_password = os.getenv('EMAIL_PASSWORD')
-        
+
         if not sender_email or not sender_password:
             logger.error("Email credentials not configured")
             return False
-        
+
+        # Ensure cc_emails is a list
+        cc_emails = cc_emails or []
+        # Combine recipients for sending
+        recipients = [to_email] + cc_emails
+
         # Create message
         message = MIMEMultipart()
         message["From"] = sender_email
         message["To"] = to_email
+        if cc_emails:
+            message["Cc"] = ", ".join(cc_emails)
         message["Subject"] = subject
-        
-        # Add body to email
+
+        # Add body
         message.attach(MIMEText(body, "plain"))
-        
-        # Create SMTP session
+
+        # SMTP session
         server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()  # enable security
+        server.starttls()
         server.login(sender_email, sender_password)
-        text = message.as_string()
-        server.sendmail(sender_email, to_email, text)
+        server.sendmail(sender_email, recipients, message.as_string())
         server.quit()
-        
-        logger.info(f"Email sent successfully to {to_email}")
+
+        logger.info(f"Email sent successfully to {recipients}")
         return True
-        
+
     except Exception as e:
         logger.error(f"Failed to send email: {str(e)}")
         return False
 
+
+        # Started at: {scraping_status['started_at']}
+        # 
 def perform_scraping(user_email):
     """Simulate scraping process"""
     global scraping_status
     
     try:
         logger.info(f"Starting scraping process for user: {user_email}")
-        run_all_scrapers()
+        #run_all_scrapers()
         subject = "Shopify Scraping Completed"
         body = f"""
         Hello,
         
         Your Shopify scraping process has been completed successfully.
         
-        Started at: {scraping_status['started_at']}
         Completed at: {datetime.now().isoformat()}
         
         You can now check your dashboard for the updated data.
@@ -87,7 +94,7 @@ def perform_scraping(user_email):
         ELYPTRA
         """
         
-        #send_email(user_email, subject, body)
+        send_email(user_email, subject, body,["eashan.shah@themirage.store","themirageseo@gmail.com"])
         logger.info(f"Scraping completed for user: {user_email}")
         
     except Exception as e:
@@ -179,5 +186,5 @@ def health_check():
 
 if __name__ == '__main__':
     # Development server
-    #app.run(debug=True, host='0.0.0.0', port=5002)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5002)
+    #app.run(host='0.0.0.0', port=5000)

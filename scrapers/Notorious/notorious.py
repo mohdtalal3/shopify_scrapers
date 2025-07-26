@@ -1,14 +1,13 @@
 import requests
 import time
 import json
-import re
-from bs4 import BeautifulSoup
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from check import graphql_url
 from db import upsert_all_product_data
 import matplotlib.colors as mcolors
-
+import re
 #https://notorious-plug.com/collections/amiri
 #https://${p}/api/unstable/graphql.json`
 
@@ -21,8 +20,21 @@ import matplotlib.colors as mcolors
 
 BASE_URL = "https://notorious-plug.com"
 
-def format_shopify_gids(product_ids):
-    return [f"gid://shopify/Product/{pid}" for pid in product_ids]
+
+graphql_url = "https://notorious-plugged.myshopify.com/api/unstable/graphql.json"
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Origin": "https://notorious-plug.com",
+    "Referer": "https://notorious-plug.com",
+    "User-Agent": "Mozilla/5.0",
+    "x-shopify-storefront-access-token": "3260355354f75aae395e213ca40bf675"
+}
+
+def extract_handle_from_url(url):
+    import re
+    match = re.search(r'/collections/([^/?#]+)', url)
+    return match.group(1) if match else None
 def extract_product_type(title):
     # Remove "The " prefix if present
 
@@ -43,70 +55,60 @@ def extract_product_type(title):
     else:
         return second_last
 
+def fetch_product_ids_from_collection(url):
+    collection_handle = extract_handle_from_url(url)
+    print(collection_handle)
+    all_ids = []
+    has_next_page = True
+    after_cursor = None
 
-def get_all_product_ids(base_url):
-    def extract_last_page_number(html):
-        soup = BeautifulSoup(html, "html.parser")
-        pagination = soup.select(".Pagination__NavItem")
-        page_numbers = [int(a.text) for a in pagination if a.text.isdigit()]
-        return max(page_numbers) if page_numbers else 1
+    while has_next_page:
+        query = """
+        query ($handle: String!, $cursor: String) {
+          collectionByHandle(handle: $handle) {
+            products(first: 250, after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+          }
+        }
+        """
 
-    def extract_product_ids_from_meta(html):
-        pattern = r'var\s+meta\s*=\s*({.*?});\s*\n'
-        match = re.search(pattern, html, re.DOTALL)
-        if not match:
-            return []
+        variables = {
+            "handle": collection_handle,
+            "cursor": after_cursor
+        }
 
-        meta_block = match.group(1)
-        cleaned = re.sub(r',\s*([\]}])', r'\1', meta_block)
+        payload = {
+            "query": query,
+            "variables": variables
+        }
 
-        try:
-            meta_json = json.loads(cleaned)
-            products = meta_json.get("products", [])
-            return [p["id"] for p in products if isinstance(p, dict) and "id" in p]
-        except Exception as e:
-            print(f"[!] JSON error: {e}")
-            return []
+        response = requests.post(graphql_url, headers=headers, json=payload)
+        data = response.json()
 
-    all_ids = set()
+        edges = data["data"]["collectionByHandle"]["products"]["edges"]
+        for edge in edges:
+            gid = edge["node"]["id"]
+            numeric_id = gid.split("/")[-1]
+            all_ids.append(numeric_id)
 
-    # Fetch page 1
-    print(f"→ Scraping page 1: {base_url}")
-    response = requests.get(base_url)
-    response.raise_for_status()
-    html = response.text
-
-    # Extract from page 1
-    all_ids.update(extract_product_ids_from_meta(html))
-    last_page = extract_last_page_number(html)
-    print(f"[✓] Total pages found: {last_page}")
-
-    # Loop from page 2 to last
-    for page in range(2, last_page + 1):
-        paged_url = f"{base_url}?page={page}"
-        print(f"→ Scraping page {page}: {paged_url}")
-        try:
-            res = requests.get(paged_url)
-            res.raise_for_status()
-            all_ids.update(extract_product_ids_from_meta(res.text))
-        except Exception as e:
-            print(f"[✗] Error on page {page}: {e}")
-    print(all_ids)
-    return list(all_ids)
-
+        page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
+        has_next_page = page_info["hasNextPage"]
+        after_cursor = page_info["endCursor"]
+    return all_ids
+def format_shopify_gids(product_ids):
+    return [f"gid://shopify/Product/{pid}" for pid in product_ids]
 
 
 def fetch_shopify_products_batched(product_ids):
-    url = "https://notorious-plugged.myshopify.com/api/unstable/graphql.json"
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "*/*",
-        "Origin": "https://notorious-plug.com",
-        "Referer": "https://notorious-plug.com",
-        "User-Agent": "Mozilla/5.0",
-        "x-shopify-storefront-access-token": "3260355354f75aae395e213ca40bf675"
-    }
-
     query = """
     query test($ids: [ID!]!, $countryCode: CountryCode!, $languageCode: LanguageCode!) 
     @inContext(country: $countryCode, language: $languageCode) {
@@ -140,7 +142,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 100) {
+          media(first: 250) {
             edges {
               node {
                 id
@@ -149,7 +151,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 100) {
+          images(first: 250) {
             edges {
               node {
                 id
@@ -158,7 +160,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 100) {
+          variants(first: 250) {
             edges {
               node {
                 id
@@ -184,12 +186,11 @@ def fetch_shopify_products_batched(product_ids):
         }
       }
     }
-    """
-
+    """  # omitted for brevity (use your full query here)
     all_responses = {"data": {"nodes": []}}
 
-    for i in range(0, len(product_ids), 100):
-        batch = product_ids[i:i+100]
+    for i in range(0, len(product_ids), 250):
+        batch = product_ids[i:i+250]
         payload = {
             "query": query,
             "variables": {
@@ -200,23 +201,22 @@ def fetch_shopify_products_batched(product_ids):
         }
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(graphql_url, headers=headers, json=payload)
             if response.status_code == 200:
                 data = response.json()
                 all_responses["data"]["nodes"].extend(data.get("data", {}).get("nodes", []))
-                print(f"[✓] Batch {i//100+1} fetched")
+                print(f"[✓] Batch {i//250+1} fetched")
             else:
-                print(f"[✗] Failed batch {i//100+1}: {response.status_code}")
+                print(f"[✗] Failed batch {i//250+1}: {response.status_code}")
                 print(response.text)
         except Exception as e:
-            print(f"[!] Exception in batch {i//100+1}: {e}")
+            print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
-
-    # # Save to JSON file
-    # with open("shopify_products.json", "w", encoding="utf-8") as f:
+    # # # Save the results to a JSON file
+    # with open("output.json", "w", encoding="utf-8") as f:
     #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
-
     return all_responses
+
 
 
 def ngrams_from_words(words, n):
@@ -322,7 +322,8 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_notorious():
+def complete_workflow_bandit_running():
+
     collections = [
         {"url": "https://notorious-plug.com/collections/amiri", "gender": "men"},
         {"url": "https://notorious-plug.com/collections/womens", "gender": "women"},
@@ -337,7 +338,7 @@ def complete_workflow_notorious():
     for i, collection in enumerate(collections):
         print(f"→ Processing collection {i+1}/{len(collections)}: {collection['url']}")
         try:
-            collection_ids = get_all_product_ids(collection["url"])
+            collection_ids = fetch_product_ids_from_collection(collection["url"])
             all_scraped_ids.extend(collection_ids)
             
             # Map each product ID to its source collection
@@ -410,11 +411,11 @@ def complete_workflow_notorious():
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
-    # # Write one JSON file
+    # # # Write one JSON file
     # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
     #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
-    upsert_all_product_data(unique_products, BASE_URL, "USD")
+    upsert_all_product_data(unique_products, BASE_URL, "GBP")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
     
@@ -432,6 +433,7 @@ def complete_workflow_notorious():
 # 🔧 Run Everything
 if __name__ == "__main__":
 
-    complete_workflow_notorious()
+
+    complete_workflow_bandit_running()
 
 

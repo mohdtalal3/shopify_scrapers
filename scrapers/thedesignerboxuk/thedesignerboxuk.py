@@ -1,89 +1,85 @@
 import requests
 import time
 import json
-import re
-from bs4 import BeautifulSoup
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
-
+import re
 # BSS_PL.publicAccessToken = "d2e6ee62da9d5158adadada8c59c4bb1";
-
 BASE_URL = "https://thedesignerboxuk.com"
 
+
+graphql_url = "https://thedesignerbox.myshopify.com/api/2024-01/graphql.json"
+
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Origin": "https://thedesignerboxuk.com",
+    "Referer": "https://thedesignerboxuk.com",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "x-shopify-storefront-access-token": "d2e6ee62da9d5158adadada8c59c4bb1"
+}
+def extract_handle_from_url(url):
+    import re
+    match = re.search(r'/collections/([^/?#]+)', url)
+    return match.group(1) if match else None
+
+
+def fetch_product_ids_from_collection(url):
+    collection_handle = extract_handle_from_url(url)
+    print(collection_handle)
+    all_ids = []
+    has_next_page = True
+    after_cursor = None
+
+    while has_next_page:
+        query = """
+        query ($handle: String!, $cursor: String) {
+          collectionByHandle(handle: $handle) {
+            products(first: 250, after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+          }
+        }
+        """
+
+        variables = {
+            "handle": collection_handle,
+            "cursor": after_cursor
+        }
+
+        payload = {
+            "query": query,
+            "variables": variables
+        }
+
+        response = requests.post(graphql_url, headers=headers, json=payload)
+        data = response.json()
+
+        edges = data["data"]["collectionByHandle"]["products"]["edges"]
+        for edge in edges:
+            gid = edge["node"]["id"]
+            numeric_id = gid.split("/")[-1]
+            all_ids.append(numeric_id)
+
+        page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
+        has_next_page = page_info["hasNextPage"]
+        after_cursor = page_info["endCursor"]
+    return all_ids
 def format_shopify_gids(product_ids):
     return [f"gid://shopify/Product/{pid}" for pid in product_ids]
 
 
-def extract_last_page(html):
-    soup = BeautifulSoup(html, "html.parser")
-    pagination = soup.select("div.pagination .page a")
-    if not pagination:
-        return 1
-    try:
-        return max(int(a.text) for a in pagination if a.text.isdigit())
-    except:
-        return 1
-
-def extract_main_product_ids_only(html):
-    """
-    Extract only main product IDs from:
-    window.ORDERSIFY_BIS.collection_products = window.ORDERSIFY_BIS.collection_products || [ ... ];
-    """
-    pattern = r'window\.ORDERSIFY_BIS\.collection_products\s*=\s*window\.ORDERSIFY_BIS\.collection_products\s*\|\|\s*(\[\s*\{.*?\}\s*\]);'
-    match = re.search(pattern, html, re.DOTALL)
-    if not match:
-        return set()
-
-    json_text = match.group(1)
-    try:
-        products = json.loads(json_text)
-        return set(product['id'] for product in products if isinstance(product, dict) and 'id' in product)
-    except Exception as e:
-        print("JSON parse error:", e)
-        return set()
-
-def scrape_main_product_ids(urls):
-    all_main_ids = set()
-    urls = [item["url"] for item in urls]
-    for base_url in urls:
-        try:
-            print(f"\n🔍 Processing: {base_url}")
-            response = requests.get(base_url)
-            response.raise_for_status()
-            last_page = extract_last_page(response.text)
-
-            for page in range(1, last_page + 1):
-                paged_url = f"{base_url}?page={page}"
-                print(f"  📄 Fetching page {page}...")
-                resp = requests.get(paged_url)
-                if resp.status_code == 200:
-                    html = resp.text
-                    main_ids = extract_main_product_ids_only(html)
-                    all_main_ids.update(main_ids)
-
-        except Exception as e:
-            print(f"❌ Error processing {base_url}: {e}")
-
-    return sorted(all_main_ids)
-
-
-
-
 def fetch_shopify_products_batched(product_ids):
-    url = "https://thedesignerbox.myshopify.com/api/2024-01/graphql.json"
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "*/*",
-        "Origin": "https://thedesignerboxuk.com",
-        "Referer": "https://thedesignerboxuk.com",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-        "x-shopify-storefront-access-token": "d2e6ee62da9d5158adadada8c59c4bb1"
-    }
-
-
     query = """
     query test($ids: [ID!]!, $countryCode: CountryCode!, $languageCode: LanguageCode!) 
     @inContext(country: $countryCode, language: $languageCode) {
@@ -117,7 +113,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 100) {
+          media(first: 250) {
             edges {
               node {
                 id
@@ -126,7 +122,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 100) {
+          images(first: 250) {
             edges {
               node {
                 id
@@ -135,7 +131,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 100) {
+          variants(first: 250) {
             edges {
               node {
                 id
@@ -161,12 +157,11 @@ def fetch_shopify_products_batched(product_ids):
         }
       }
     }
-    """
-
+    """  # omitted for brevity (use your full query here)
     all_responses = {"data": {"nodes": []}}
 
-    for i in range(0, len(product_ids), 100):
-        batch = product_ids[i:i+100]
+    for i in range(0, len(product_ids), 250):
+        batch = product_ids[i:i+250]
         payload = {
             "query": query,
             "variables": {
@@ -177,23 +172,22 @@ def fetch_shopify_products_batched(product_ids):
         }
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(graphql_url, headers=headers, json=payload)
             if response.status_code == 200:
                 data = response.json()
                 all_responses["data"]["nodes"].extend(data.get("data", {}).get("nodes", []))
-                print(f"[✓] Batch {i//100+1} fetched")
+                print(f"[✓] Batch {i//250+1} fetched")
             else:
-                print(f"[✗] Failed batch {i//100+1}: {response.status_code}")
+                print(f"[✗] Failed batch {i//250+1}: {response.status_code}")
                 print(response.text)
         except Exception as e:
-            print(f"[!] Exception in batch {i//100+1}: {e}")
+            print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
-
-    # # # Save to JSON file
-    # with open("shopify_products.json", "w", encoding="utf-8") as f:
+    # # # # Save the results to a JSON file
+    # with open("output.json", "w", encoding="utf-8") as f:
     #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
-
     return all_responses
+
 
 
 def ngrams_from_words(words, n):
@@ -206,7 +200,6 @@ def build_title_ngrams(title):
     for n in range(1, min(3, len(last3))+1):
         ngram_tags.update(ngrams_from_words(last3, n))
     return ngram_tags
-
 def clean_and_save_product_data_only_available_with_all_images_from_data(
     data, gender_tag=None, product_type=None
 ):
@@ -219,10 +212,11 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
         if not product.get("availableForSale", True):
             continue
+
         handle = product.get("handle")
         title = product.get("title")
         description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
-        brand = product.get("vendor", "")
+        brand = product.get("vendor")
         product_tags = set(product.get("tags", []))
 
         # Gender-based tags
@@ -237,6 +231,11 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         all_tags = product_tags | gender_tags 
         tags_str = ', '.join(sorted(all_tags))
 
+      # Category is just gender
+        category_val = gender_tag.lower() if gender_tag else ""
+        type_val=product.get("productType")
+
+
         all_images = []
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
@@ -245,8 +244,17 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
         # Category is just gender
         category_val = gender_tag.lower() if gender_tag else ""
+                # Use provided product_type if available
         type_val=product.get("productType")
 
+        all_images = []
+        for edge in product.get("images", {}).get("edges", []):
+            url = edge["node"].get("originalSrc")
+            if url:
+                all_images.append(url)
+
+        # Category is just gender
+        category_val = gender_tag.lower() if gender_tag else ""
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {
@@ -271,7 +279,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             compare_price = float(variant.get("compareAtPrice", {}).get("amount", 0)) if variant.get("compareAtPrice") else 0
             color, size = "", ""
             for opt in variant.get("selectedOptions", []):
-                if opt["name"].lower() == "colour":
+                if opt["name"].lower() == "color":
                     color = opt["value"]
                 elif opt["name"].lower() == "size":
                     size = opt["value"]
@@ -296,7 +304,6 @@ def complete_workflow_thedesignerboxuk():
         {"url": "https://thedesignerboxuk.com/en-us/collections/casablanca", "gender": "men"},
         {"url": "https://thedesignerboxuk.com/en-us/collections/sale", "gender": "men"}
     ]
-
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
     product_id_to_collection = {}  # Map product IDs to their source collection
@@ -305,7 +312,7 @@ def complete_workflow_thedesignerboxuk():
     for i, collection in enumerate(collections):
         print(f"→ Processing collection {i+1}/{len(collections)}: {collection['url']}")
         try:
-            collection_ids = scrape_main_product_ids([collection])
+            collection_ids = fetch_product_ids_from_collection(collection["url"])
             all_scraped_ids.extend(collection_ids)
             
             # Map each product ID to its source collection
@@ -378,10 +385,10 @@ def complete_workflow_thedesignerboxuk():
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
-    # Write one JSON file
+    # # # # Write one JSON file
     # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
     #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
-    # Upload all at once
+    # # Upload all at once
     upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
@@ -399,10 +406,6 @@ def complete_workflow_thedesignerboxuk():
 
 # 🔧 Run Everything
 if __name__ == "__main__":
-    collections = [
-        {"url": "https://thedesignerboxuk.com/en-us/collections/casablanca", "gender": "men"},
-        {"url": "https://thedesignerboxuk.com/en-us/collections/sale", "gender": "men"}
-    ]
 
 
     complete_workflow_thedesignerboxuk()

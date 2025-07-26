@@ -1,81 +1,94 @@
-from seleniumbase import SB
-from bs4 import BeautifulSoup
-import re
 import requests
-import json
 import time
+import json
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
-BASE_URL = "https://www.youngla.com"
 
-def extract_visible_product_ids_from_html(html):
-    soup = BeautifulSoup(html, "html.parser")
-    product_cards = soup.find_all("product-card")
-    ids = []
+#https://${p}/api/unstable/graphql.json`
 
-    for card in product_cards:
-        is_sold_out = False
-        if "sold-out" in card.get("class", []):
-            is_sold_out = True
-        elif card.find("div", class_="sold-out-badge"):
-            is_sold_out = True
-        elif re.search(r'sold\s*out', card.get_text(), re.I):
-            is_sold_out = True
+        # <script id="shopify-features" type="application/json">
+        #     {
+        #         "accessToken": "3260355354f75aae395e213ca40bf675",
+        #         "betas": [
+        #             "rich-media-storefront-analytics"
+        #         ],
 
-        if not is_sold_out:
-            product_id = card.get("data-product-id")
-            if product_id:
-                ids.append(product_id)
 
-    return ids
+BASE_URL = "https://youngla.com"
 
-def scrape_product_ids_from_collections(collections):
-    all_ids = set()
-    with SB(uc=True, headless=False) as sb:
-        for entry in collections:
-            url = entry["url"] if isinstance(entry, dict) else entry
-            try:
-                sb.open(url)
-                sb.sleep(3)
-                while True:
-                    sb.scroll_to_bottom()
-                    sb.sleep(2)
-                    html = sb.get_page_source()
-                    ids = extract_visible_product_ids_from_html(html)
-                    print(f"[✓] {len(ids)} product IDs found on {url}")
-                    all_ids.update(ids)
-                    break
-                    try:
-                        next_button = 'a[rel="next"].pagination__link'
-                        if sb.is_element_visible(next_button):
-                            sb.click(next_button)
-                            sb.sleep(2)
-                        else:
-                            break
-                    except Exception:
-                        break
-            except Exception as e:
-                print(f"[!] Error loading {url}, retrying...")
-                sb.open(url)
-                sb.sleep(3)
-    return list(all_ids)
 
+graphql_url = "https://youngla.myshopify.com/api/2023-04/graphql.json?skipListener=true"
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Origin": "https://www.youngla.com",
+    "Referer": "https://www.youngla.com/",
+    "User-Agent": "Mozilla/5.0",
+    "x-shopify-storefront-access-token": "6f60648595741abd3683fed017be5e3a"
+}
+
+def extract_handle_from_url(url):
+    import re
+    match = re.search(r'/collections/([^/?#]+)', url)
+    return match.group(1) if match else None
+
+
+def fetch_product_ids_from_collection(url):
+    collection_handle = extract_handle_from_url(url)
+    print(collection_handle)
+    all_ids = []
+    has_next_page = True
+    after_cursor = None
+
+    while has_next_page:
+        query = """
+        query ($handle: String!, $cursor: String) {
+          collectionByHandle(handle: $handle) {
+            products(first: 250, after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+          }
+        }
+        """
+
+        variables = {
+            "handle": collection_handle,
+            "cursor": after_cursor
+        }
+
+        payload = {
+            "query": query,
+            "variables": variables
+        }
+
+        response = requests.post(graphql_url, headers=headers, json=payload)
+        data = response.json()
+
+        edges = data["data"]["collectionByHandle"]["products"]["edges"]
+        for edge in edges:
+            gid = edge["node"]["id"]
+            numeric_id = gid.split("/")[-1]
+            all_ids.append(numeric_id)
+
+        page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
+        has_next_page = page_info["hasNextPage"]
+        after_cursor = page_info["endCursor"]
+    return all_ids
 def format_shopify_gids(product_ids):
     return [f"gid://shopify/Product/{pid}" for pid in product_ids]
 
-def fetch_shopify_products_batched(product_ids):
-    url = "https://youngla.myshopify.com/api/2023-04/graphql.json?skipListener=true"
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "*/*",
-        "Origin": "https://www.youngla.com",
-        "Referer": "https://www.youngla.com/",
-        "User-Agent": "Mozilla/5.0",
-        "x-shopify-storefront-access-token": "6f60648595741abd3683fed017be5e3a"
-    }
 
+def fetch_shopify_products_batched(product_ids):
     query = """
     query test($ids: [ID!]!, $countryCode: CountryCode!, $languageCode: LanguageCode!) 
     @inContext(country: $countryCode, language: $languageCode) {
@@ -109,7 +122,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 100) {
+          media(first: 250) {
             edges {
               node {
                 id
@@ -118,7 +131,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 100) {
+          images(first: 250) {
             edges {
               node {
                 id
@@ -127,7 +140,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 100) {
+          variants(first: 250) {
             edges {
               node {
                 id
@@ -156,8 +169,8 @@ def fetch_shopify_products_batched(product_ids):
     """  # omitted for brevity (use your full query here)
     all_responses = {"data": {"nodes": []}}
 
-    for i in range(0, len(product_ids), 100):
-        batch = product_ids[i:i+100]
+    for i in range(0, len(product_ids), 250):
+        batch = product_ids[i:i+250]
         payload = {
             "query": query,
             "variables": {
@@ -168,30 +181,23 @@ def fetch_shopify_products_batched(product_ids):
         }
 
         try:
-            response = requests.post(url, headers=headers, json=payload)
+            response = requests.post(graphql_url, headers=headers, json=payload)
             if response.status_code == 200:
                 data = response.json()
                 all_responses["data"]["nodes"].extend(data.get("data", {}).get("nodes", []))
-                print(f"[✓] Batch {i//100+1} fetched")
+                print(f"[✓] Batch {i//250+1} fetched")
             else:
-                print(f"[✗] Failed batch {i//100+1}: {response.status_code}")
+                print(f"[✗] Failed batch {i//250+1}: {response.status_code}")
                 print(response.text)
         except Exception as e:
-            print(f"[!] Exception in batch {i//100+1}: {e}")
+            print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
-
+    # # # Save the results to a JSON file
+    # with open("output.json", "w", encoding="utf-8") as f:
+    #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
     return all_responses
 
-def ngrams_from_words(words, n):
-    return [' '.join(words[i:i+n]) for i in range(len(words)-n+1)]
 
-def build_title_ngrams(title):
-    words = title.strip().split()
-    last3 = words[-3:] if len(words) >= 3 else words
-    ngram_tags = set()
-    for n in range(1, min(3, len(last3))+1):
-        ngram_tags.update(ngrams_from_words(last3, n))
-    return ngram_tags
 
 def clean_and_save_product_data_only_available_with_all_images_from_data(
     data, gender_tag=None, product_type=None
@@ -202,26 +208,40 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     for product in products:
         if product is None:
             continue
+
+        if not product.get("availableForSale", True):
+            continue
+
         handle = product.get("handle")
         title = product.get("title")
         description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
-        brand = product.get("vendor", "")
+        brand = product.get("vendor")
         product_tags = set(product.get("tags", []))
 
-        # Gender-based tags
-        gender_tags = set()
+        # Process tags: split by colon and clean
+        cleaned_tags = set()
+        for tag in product_tags:
+            # Split tags by colon and add individual parts
+            split_tags = tag.split(":")
+            cleaned_tags.update(part.strip().lower() for part in split_tags if part.strip())
+
+        # Add gender-specific tags, but skip clothing tags for accessories or hats
         if gender_tag:
-            if gender_tag.lower() == "men":
-                gender_tags = {"all clothing men", "mens", "men clothing", "men"}
-            elif gender_tag.lower() == "women":
-                gender_tags = {"all clothing women", "womens", "women clothing", "women"}
+            gender_lower = gender_tag.lower()
+            type_lower = product_type.lower() if product_type else ""
+            if gender_lower == "men" and type_lower not in ["accessories", "hats"]:
+                cleaned_tags.update(["clothing men", "mens", "men's clothing"])
+            elif gender_lower == "women" and type_lower not in ["accessories", "hats"]:
+                cleaned_tags.update(["clothing women", "womens", "women's clothing"])
 
-        # N-grams from last 3 words of title
-        ngram_tags = build_title_ngrams(title)
+        # Add product type to tags if available
+        type_val = product_type
+        if type_val:
+            cleaned_tags.add(type_val.lower())
 
-        all_tags = product_tags | gender_tags | ngram_tags
-        tags_str = ', '.join(sorted(all_tags))
-
+        # Convert tags to list
+        product_tags = list(cleaned_tags)
+        product_tags = ", ".join(tag.strip() for tag in product_tags if tag.strip())
         all_images = []
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
@@ -229,9 +249,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 all_images.append(url)
 
         # Category is just gender
-        category_val = gender_tag.lower() if gender_tag else ""
-        # Use provided product_type if available
-        type_val = product_type if product_type else ""
+        category_val = gender_lower if gender_tag else ""
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {
@@ -241,7 +259,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 "Vendor": brand,
                 "Product Category": category_val,
                 "Type": type_val,
-                "Tags": tags_str,
+                "Tags": product_tags,
                 "variants": []
             }
 
@@ -275,7 +293,28 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def scrape_youngla(collections):
+def complete_workflow_youngla():
+
+    collections = [
+        {"url": "https://www.youngla.com/collections/tanks", "gender": "men", "product_type": "tanks"},
+        {"url": "https://www.youngla.com/collections/t-shirts", "gender": "men", "product_type": "shirts"},
+        {"url": "https://www.youngla.com/collections/long-sleeves-for-him", "gender": "men", "product_type": "long sleeves"},
+        {"url": "https://www.youngla.com/collections/shorts", "gender": "men", "product_type": "shorts"},
+        {"url": "https://www.youngla.com/collections/jeans", "gender": "men", "product_type": "pants"},
+        {"url": "https://www.youngla.com/collections/outerwear", "gender": "men", "product_type": "outerwear"},
+        {"url": "https://www.youngla.com/collections/joggers", "gender": "men", "product_type": "joggers"},
+        {"url": "https://www.youngla.com/collections/hats", "gender": "men", "product_type": "hats"},
+        {"url": "https://www.youngla.com/collections/lifting-gear", "gender": "men", "product_type": "accessories"},
+         {"url": "https://www.youngla.com/collections/bras", "gender": "women", "product_type": "bras"},
+        {"url": "https://www.youngla.com/collections/shirts", "gender": "women", "product_type": "tops"},
+        {"url": "https://www.youngla.com/collections/bodysuits", "gender": "women", "product_type": "bodysuits"},
+        {"url": "https://www.youngla.com/collections/shorts-1", "gender": "women", "product_type": "shorts"},
+        {"url": "https://www.youngla.com/collections/joggers-1", "gender": "women", "product_type": "leggings"},
+        {"url": "https://www.youngla.com/collections/joggers-pants-for-her", "gender": "women", "product_type": "joggers"},
+        {"url": "https://www.youngla.com/collections/outwear", "gender": "women", "product_type": "outerwear"},
+        {"url": "https://www.youngla.com/collections/tanks-1", "gender": "women", "product_type": "tanks"},
+        {"url": "https://www.youngla.com/collections/accessories-for-her", "gender": "women", "product_type": "accessories"},
+    ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
     product_id_to_collection = {}  # Map product IDs to their source collection
@@ -284,7 +323,7 @@ def scrape_youngla(collections):
     for i, collection in enumerate(collections):
         print(f"→ Processing collection {i+1}/{len(collections)}: {collection['url']}")
         try:
-            collection_ids = scrape_product_ids_from_collections([collection])
+            collection_ids = fetch_product_ids_from_collection(collection["url"])
             all_scraped_ids.extend(collection_ids)
             
             # Map each product ID to its source collection
@@ -357,55 +396,29 @@ def scrape_youngla(collections):
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
-    # Write one JSON file
-    with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
-        json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    # # # Write one JSON file
+    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
     upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
     
-    # Show breakdown by gender
-    gender_breakdown = {}
-    for prod in unique_products:
-        category = prod.get("Product Category", "unknown")
-        gender_breakdown[category] = gender_breakdown.get(category, 0) + 1
+    # # Show breakdown by gender
+    # gender_breakdown = {}
+    # for prod in unique_products:
+    #     category = prod.get("Product Category", "unknown")
+    #     gender_breakdown[category] = gender_breakdown.get(category, 0) + 1
     
-    print("📈 Products by gender:")
-    for gender, count in gender_breakdown.items():
-        print(f"   {gender}: {count} products")
+    # print("📈 Products by gender:")
+    # for gender, count in gender_breakdown.items():
+    #     print(f"   {gender}: {count} products")
 
 
-
-
-def complete_workflow_youngla():
-    collections = [
-        {"url": "https://www.youngla.com/collections/tanks", "gender": "men", "product_type": "tanks"},
-        {"url": "https://www.youngla.com/collections/t-shirts", "gender": "men", "product_type": "shirts"},
-        {"url": "https://www.youngla.com/collections/long-sleeves-for-him", "gender": "men", "product_type": "long sleeves"},
-        {"url": "https://www.youngla.com/collections/shorts", "gender": "men", "product_type": "shorts"},
-        {"url": "https://www.youngla.com/collections/jeans", "gender": "men", "product_type": "pants"},
-        {"url": "https://www.youngla.com/collections/outerwear", "gender": "men", "product_type": "outerwear"},
-        {"url": "https://www.youngla.com/collections/joggers", "gender": "men", "product_type": "joggers"},
-        {"url": "https://www.youngla.com/collections/hats", "gender": "men", "product_type": "hats"},
-        {"url": "https://www.youngla.com/collections/lifting-gear", "gender": "men", "product_type": "accessories"},
-    ]
-
-    collections += [
-    {"url": "https://www.youngla.com/collections/bras", "gender": "women", "product_type": "bras"},
-    {"url": "https://www.youngla.com/collections/shirts", "gender": "women", "product_type": "tops"},
-    {"url": "https://www.youngla.com/collections/bodysuits", "gender": "women", "product_type": "bodysuits"},
-    {"url": "https://www.youngla.com/collections/shorts-1", "gender": "women", "product_type": "shorts"},
-    {"url": "https://www.youngla.com/collections/joggers-1", "gender": "women", "product_type": "leggings"},
-    {"url": "https://www.youngla.com/collections/joggers-pants-for-her", "gender": "women", "product_type": "joggers"},
-    {"url": "https://www.youngla.com/collections/outwear", "gender": "women", "product_type": "outerwear"},
-    {"url": "https://www.youngla.com/collections/tanks-1", "gender": "women", "product_type": "matching sets"},
-    {"url": "https://www.youngla.com/collections/accessories-for-her", "gender": "women", "product_type": "accessories"},
-]
-    scrape_youngla(collections)
 # 🔧 Run Everything
-
-
-
 if __name__ == "__main__":
+
+
     complete_workflow_youngla()
+
+

@@ -4,7 +4,7 @@ import json
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from db import upsert_product
+from db import upsert_all_product_data
 
 #https://${p}/api/unstable/graphql.json`
 
@@ -44,7 +44,7 @@ def fetch_product_ids_from_collection(url):
         query = """
         query ($handle: String!, $cursor: String) {
           collectionByHandle(handle: $handle) {
-            products(first: 100, after: $cursor) {
+            products(first: 250, after: $cursor) {
               pageInfo {
                 hasNextPage
                 endCursor
@@ -121,7 +121,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 100) {
+          media(first: 250) {
             edges {
               node {
                 id
@@ -130,7 +130,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 100) {
+          images(first: 250) {
             edges {
               node {
                 id
@@ -139,7 +139,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 100) {
+          variants(first: 250) {
             edges {
               node {
                 id
@@ -168,8 +168,8 @@ def fetch_shopify_products_batched(product_ids):
     """  # omitted for brevity (use your full query here)
     all_responses = {"data": {"nodes": []}}
 
-    for i in range(0, len(product_ids), 100):
-        batch = product_ids[i:i+100]
+    for i in range(0, len(product_ids), 250):
+        batch = product_ids[i:i+250]
         payload = {
             "query": query,
             "variables": {
@@ -184,12 +184,12 @@ def fetch_shopify_products_batched(product_ids):
             if response.status_code == 200:
                 data = response.json()
                 all_responses["data"]["nodes"].extend(data.get("data", {}).get("nodes", []))
-                print(f"[✓] Batch {i//100+1} fetched")
+                print(f"[✓] Batch {i//250+1} fetched")
             else:
-                print(f"[✗] Failed batch {i//100+1}: {response.status_code}")
+                print(f"[✗] Failed batch {i//250+1}: {response.status_code}")
                 print(response.text)
         except Exception as e:
-            print(f"[!] Exception in batch {i//100+1}: {e}")
+            print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
     # Save the results to a JSON file
     with open("output.json", "w", encoding="utf-8") as f:
@@ -215,7 +215,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
         brand = product.get("vendor", "")
         product_tags = list(set(product.get("tags", [])))
-
+        product_tags = ", ".join(tag.strip() for tag in product_tags if tag.strip())
 
         all_images = []
         for edge in product.get("images", {}).get("edges", []):
@@ -359,7 +359,7 @@ def complete_workflow_polene_paris():
     with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
         json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
-    upsert_product({"products": unique_products}, BASE_URL, "USD")
+    upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
     

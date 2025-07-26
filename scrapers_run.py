@@ -15,11 +15,11 @@ from color_maps import run_color_mapping
 
 def run_all_scrapers():
     scrapers = [
-        ("Lululemon", complete_workflow_lululemon),
-        ("Sports Direct", complete_workflow_sportsdirect),
-        ("Mytheresa", complete_workflow_mytheresa),
-        ("Hypefly", complete_workflow_hypefly),
-        ("YoungLA", complete_workflow_youngla),
+        #("Lululemon", complete_workflow_lululemon),
+        #("Sports Direct", complete_workflow_sportsdirect),
+       # ("Mytheresa", complete_workflow_mytheresa),
+        #("Hypefly", complete_workflow_hypefly),
+        #("YoungLA", complete_workflow_youngla),
         ("Tory", complete_workflow_tory),
         ("The Designer Box UK", complete_workflow_thedesignerboxuk),
         ("Shop437", complete_workflow_shop437),

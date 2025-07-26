@@ -1,353 +1,406 @@
-# from seleniumbase import SB
-# from bs4 import BeautifulSoup
-# import re
-# import requests
-# import json
-# import time
-# import sys
-# import os
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-# from db import upsert_all_product_data
-# BASE_URL = "https://banditrunning.com/"
+import requests
+import time
+import json
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from db import upsert_all_product_data
 
-# def extract_visible_product_ids_from_html(html):
-#     """Extract product handles from Bandit Running HTML using BeautifulSoup"""
-#     soup = BeautifulSoup(html, "html.parser")
-    
-#     # Find all links that contain "/products/" similar to url.py approach
-#     product_links = soup.find_all('a', href=re.compile(r'/products/'))
-    
-#     handles = set()  # Use set to avoid duplicates
-    
-#     print(f"[DEBUG] Found {len(product_links)} product links on page")
-    
-#     for link in product_links:
-#         href = link.get('href', '')
-#         if '/products/' in href:
-#             # Check if this product is sold out by looking for the sold out indicator
-#             # Find the parent container that might contain the sold out pills
-#             parent_container = link.find_parent()
-#             while parent_container and parent_container.name != 'body':
-#                 # Look for the sold out pills structure
-#                 sold_out_pills = parent_container.find('ul', class_='c-item-card__pills')
-#                 if sold_out_pills:
-#                     sold_out_pill = sold_out_pills.find('li', class_='btn btn-pill', string=re.compile(r'Sold Out', re.IGNORECASE))
-#                     if sold_out_pill:
-#                         print(f"[DEBUG] Skipped sold out product: {href}")
-#                         break
-#                 parent_container = parent_container.find_parent()
-#             else:
-#                 # If we didn't find a sold out indicator, extract the handle
-#                 match = re.search(r'/products/([^?&#]+)', href)
-#                 if match:
-#                     handle = match.group(1)
-#                     handles.add(handle)
-#                     print(f"[DEBUG] Added product: {handle}")
-#                 else:
-#                     print(f"[DEBUG] Skipped link (couldn't extract handle): {href}")
-#         else:
-#             print(f"[DEBUG] Skipped link (not product): {href}")
+#https://${p}/api/unstable/graphql.json`
 
-#     print(f"[DEBUG] Extracted {len(handles)} available product handles")
-#     return list(handles)
+        # <script id="shopify-features" type="application/json">
+        #     {
+        #         "accessToken": "3260355354f75aae395e213ca40bf675",
+        #         "betas": [
+        #             "rich-media-storefront-analytics"
+        #         ],
 
-# def scrape_product_ids_from_collections(collections):
-#     """Scrape product handles from Bandit Running collections using selenium similar to url.py"""
-#     all_ids = set()
-#     with SB(uc=True, headless=True) as sb:
-#         for entry in collections:
-#             url = entry["url"] if isinstance(entry, dict) else entry
-#             page_num = 1
-#             try:
-#                 print(f"[INFO] Loading collection: {url}")
-#                 sb.open(url)
-#                 sb.sleep(3)
-                
-#                 # Scroll and load all products similar to url.py approach
-#                 last_height = sb.execute_script("return document.body.scrollHeight")
-#                 products_count = 0
-#                 no_new_products_count = 0
-                
-#                 while True:
-#                     # Scroll down to bottom
-#                     sb.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#                     sb.sleep(3)
-                    
-#                     # Get current HTML and extract handles
-#                     html = sb.get_page_source()
-#                     ids = extract_visible_product_ids_from_html(html)
-                    
-#                     current_products = len(ids)
-#                     if current_products > products_count:
-#                         print(f"[✓] Found {current_products} products (was {products_count})")
-#                         products_count = current_products
-#                         all_ids.update(ids)
-#                         no_new_products_count = 0
-#                     else:
-#                         no_new_products_count += 1
-#                         print(f"[INFO] No new products found. Attempt {no_new_products_count}/3")
-                        
-#                     # If no new products found for 3 consecutive attempts, stop
-#                     if no_new_products_count >= 3:
-#                         print(f"[✓] No new products loading. Finished scrolling for {url}")
-#                         break
-                        
-#                     # Check if page height changed
-#                     new_height = sb.execute_script("return document.body.scrollHeight")
-#                     if new_height == last_height:
-#                         print("[INFO] Page height unchanged, trying more scrolling...")
-#                         sb.execute_script("window.scrollBy(0, 500);")
-#                         sb.sleep(2)
-                    
-#                     last_height = new_height
-                
-#                 print(f"[✓] Collection {url}: {len(all_ids)} total unique product handles found")
-                
-#             except Exception as e:
-#                 print(f"[!] Error loading {url}: {e}")
-                
-#     return list(all_ids)
 
-# def scrape_product_descriptions_and_images(product_handles):
-#     """Fetch product data using .js endpoints similar to extract_data.py approach"""
-#     product_data = {}
+BASE_URL = "https://bandit-run-club.com"
+
+
+graphql_url = "https://bandit-run-club.myshopify.com/api/unstable/graphql.json"
+headers = {
+    "Content-Type": "application/json",
+    "Accept": "*/*",
+    "Origin": "https://banditrunning.com",
+    "Referer": "https://banditrunning.com",
+    "User-Agent": "Mozilla/5.0",
+    "x-shopify-storefront-access-token": "323ac04ad7d2c091260b708cb928bc88"
+}
+def extract_handle_from_url(url):
+    import re
+    match = re.search(r'/collections/([^/?#]+)', url)
+    return match.group(1) if match else None
+
+
+def fetch_product_ids_from_collection(url):
+    collection_handle = extract_handle_from_url(url)
+    print(collection_handle)
+    all_ids = []
+    has_next_page = True
+    after_cursor = None
+
+    while has_next_page:
+        query = """
+        query ($handle: String!, $cursor: String) {
+          collectionByHandle(handle: $handle) {
+            products(first: 250, after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              edges {
+                node {
+                  id
+                }
+              }
+            }
+          }
+        }
+        """
+
+        variables = {
+            "handle": collection_handle,
+            "cursor": after_cursor
+        }
+
+        payload = {
+            "query": query,
+            "variables": variables
+        }
+
+        response = requests.post(graphql_url, headers=headers, json=payload)
+        data = response.json()
+
+        edges = data["data"]["collectionByHandle"]["products"]["edges"]
+        for edge in edges:
+            gid = edge["node"]["id"]
+            numeric_id = gid.split("/")[-1]
+            all_ids.append(numeric_id)
+
+        page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
+        has_next_page = page_info["hasNextPage"]
+        after_cursor = page_info["endCursor"]
+    return all_ids
+def format_shopify_gids(product_ids):
+    return [f"gid://shopify/Product/{pid}" for pid in product_ids]
+
+
+def fetch_shopify_products_batched(product_ids):
+    query = """
+    query test($ids: [ID!]!, $countryCode: CountryCode!, $languageCode: LanguageCode!) 
+    @inContext(country: $countryCode, language: $languageCode) {
+      nodes(ids: $ids) {
+        ... on Product {
+          id
+          availableForSale
+          title
+          handle
+          createdAt
+          description
+          descriptionHtml
+          productType
+          onlineStoreUrl
+          options { id name values }
+          featuredImage {
+            id
+            originalSrc
+            transformedSrc(maxWidth: 800, maxHeight: 800, crop: CENTER)
+          }
+          updatedAt
+          tags
+          totalInventory
+          vendor
+          requiresSellingPlan
+          compareAtPriceRange {
+            maxVariantPrice { amount currencyCode }
+            minVariantPrice { amount currencyCode }
+          }
+          priceRange {
+            maxVariantPrice { amount currencyCode }
+            minVariantPrice { amount currencyCode }
+          }
+          media(first: 250) {
+            edges {
+              node {
+                id
+                alt
+                previewImage { url id }
+              }
+            }
+          }
+          images(first: 250) {
+            edges {
+              node {
+                id
+                originalSrc
+                transformedSrc(maxWidth: 800, maxHeight: 800, crop: CENTER)
+              }
+            }
+          }
+          variants(first: 250) {
+            edges {
+              node {
+                id
+                sku
+                title
+                price { amount currencyCode }
+                weight
+                weightUnit
+                requiresShipping
+                currentlyNotInStock
+                compareAtPrice { amount currencyCode }
+                quantityAvailable
+                selectedOptions { name value }
+                availableForSale
+                image {
+                  id
+                  originalSrc
+                  transformedSrc(maxWidth: 800, maxHeight: 800, crop: CENTER)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """  # omitted for brevity (use your full query here)
+    all_responses = {"data": {"nodes": []}}
+
+    for i in range(0, len(product_ids), 250):
+        batch = product_ids[i:i+250]
+        payload = {
+            "query": query,
+            "variables": {
+                "ids": batch,
+                "countryCode": "US",
+                "languageCode": "EN"
+            }
+        }
+
+        try:
+            response = requests.post(graphql_url, headers=headers, json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                all_responses["data"]["nodes"].extend(data.get("data", {}).get("nodes", []))
+                print(f"[✓] Batch {i//250+1} fetched")
+            else:
+                print(f"[✗] Failed batch {i//250+1}: {response.status_code}")
+                print(response.text)
+        except Exception as e:
+            print(f"[!] Exception in batch {i//250+1}: {e}")
+        time.sleep(1.2)
+    # # Save the results to a JSON file
+    # with open("output.json", "w", encoding="utf-8") as f:
+    #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
+    return all_responses
+
+
+
+def clean_and_save_product_data_only_available_with_all_images_from_data(
+    data, gender_tag=None, product_type=None
+):
+    products = data.get("data", {}).get("nodes", [])
+    cleaned_products = {}
+
+    for product in products:
+        if product is None:
+            continue
+
+        if not product.get("availableForSale", True):
+            continue
+
+        handle = product.get("handle")
+        title = product.get("title")
+        description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
+        brand = "Bandit Running"
+        product_tags = set(product.get("tags", []))
+
+        # Process tags: split by colon and clean
+        cleaned_tags = set()
+        for tag in product_tags:
+            # Split tags by colon and add individual parts
+            split_tags = tag.split(":")
+            cleaned_tags.update(part.strip().lower() for part in split_tags if part.strip())
+
+        # Add gender-specific tags
+        if gender_tag:
+            gender_lower = gender_tag.lower()
+            if gender_lower == "men":
+                cleaned_tags.update(["clothing men", "mens", "men's clothing"])
+            elif gender_lower == "women":
+                cleaned_tags.update(["clothing women", "womens", "women's clothing"])
+
+        # Add product type to tags if available
+        type_val = product.get("productType")
+        if type_val:
+            cleaned_tags.add(type_val.lower())
+
+        # Convert tags to list
+        product_tags = list(cleaned_tags)
+        product_tags = ", ".join(tag.strip() for tag in product_tags if tag.strip())
+        all_images = []
+        for edge in product.get("images", {}).get("edges", []):
+            url = edge["node"].get("originalSrc")
+            if url:
+                all_images.append(url)
+
+        # Category is just gender
+        category_val = gender_lower if gender_tag else ""
+
+        if handle not in cleaned_products:
+            cleaned_products[handle] = {
+                "Handle": handle,
+                "Title": title,
+                "Body (HTML)": description,
+                "Vendor": brand,
+                "Product Category": category_val,
+                "Type": type_val,
+                "Tags": product_tags,
+                "variants": []
+            }
+
+        seen = set()
+        for edge in product.get("variants", {}).get("edges", []):
+            variant = edge["node"]
+            if not variant.get("availableForSale", False):
+                continue
+
+            sku = variant.get("sku", "")
+            price = float(variant.get("price", {}).get("amount", 0))
+            compare_price = float(variant.get("compareAtPrice", {}).get("amount", 0)) if variant.get("compareAtPrice") else 0
+            color, size = "", ""
+            for opt in variant.get("selectedOptions", []):
+                if opt["name"].lower() == "color":
+                    color = opt["value"]
+                elif opt["name"].lower() == "size":
+                    size = opt["value"]
+
+            if (size, sku) not in seen:
+                cleaned_products[handle]["variants"].append({
+                    "Variant SKU": sku,
+                    "size": size,
+                    "color": color,
+                    "Variant Price": price,
+                    "Variant Compare At Price": compare_price,
+                    "images": list(set(all_images))
+                })
+                seen.add((size, sku))
+
+    # Return as a list of product dicts
+    return list(cleaned_products.values())
+
+def complete_workflow_bandit_running():
+
+    collections = [
+        {"url": "https://banditrunning.com/collections/mens", "gender": "men"},
+        {"url": "https://banditrunning.com/collections/women", "gender": "women"},
+    ]
+    print("🔍 Scraping product IDs from all collections...")
+    all_scraped_ids = []
+    product_id_to_collection = {}  # Map product IDs to their source collection
     
-#     headers = {
-#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-#         'Accept': 'application/json, text/javascript, */*; q=0.01',
-#         'Accept-Language': 'en-US,en;q=0.9',
-#         'Connection': 'keep-alive',
-#         'Referer': 'https://banditrunning.com/',
-#     }
-    
-#     for i, handle in enumerate(product_handles):
-#         try:
-#             # Construct the .js endpoint URL
-#             url = f"https://banditrunning.com/products/{handle}.js"
+    # Scrape IDs from each collection URL
+    for i, collection in enumerate(collections):
+        print(f"→ Processing collection {i+1}/{len(collections)}: {collection['url']}")
+        try:
+            collection_ids = fetch_product_ids_from_collection(collection["url"])
+            all_scraped_ids.extend(collection_ids)
             
-#             print(f"[INFO] Fetching data for {handle} ({i+1}/{len(product_handles)})")
+            # Map each product ID to its source collection
+            for product_id in collection_ids:
+                product_id_to_collection[str(product_id)] = collection
             
-#             response = requests.get(url, headers=headers, timeout=30)
-            
-#             if response.status_code == 200:
-#                 try:
-#                     data = response.json()
-                    
-#                     # Extract description (use from API data since it's already HTML)
-#                     description = data.get('description', f"<p>{data.get('title', 'No description available')}</p>")
-                    
-#                     # Extract all images from images array and media array
-#                     all_images = []
-                    
-#                     # Get images from the images array
-#                     images = data.get('images', [])
-#                     for img_url in images:
-#                         if img_url.startswith('//'):
-#                             img_url = f"https:{img_url}"
-#                         all_images.append(img_url)
-                    
-#                     # Also check media array for additional images
-#                     media = data.get('media', [])
-#                     for media_item in media:
-#                         if media_item.get('media_type') == 'image':
-#                             img_url = media_item.get('src')
-#                             if img_url:
-#                                 if img_url.startswith('//'):
-#                                     img_url = f"https:{img_url}"
-#                                 if img_url not in all_images:
-#                                     all_images.append(img_url)
-                    
-#                     # Remove duplicates while preserving order
-#                     unique_images = []
-#                     for img in all_images:
-#                         if img not in unique_images:
-#                             unique_images.append(img)
-                    
-#                     product_data[handle] = {
-#                         'description': description,
-#                         'images': unique_images,
-#                         'raw_data': data  # Store raw data for cleaning function
-#                     }
-                    
-#                     print(f"[✓] Successfully fetched: {handle} - {len(unique_images)} images")
-                    
-#                 except json.JSONDecodeError as e:
-#                     print(f"[!] JSON decode error for {handle}: {e}")
-#                     product_data[handle] = {
-#                         'description': f"<p>No description available</p>",
-#                         'images': [],
-#                         'raw_data': None
-#                     }
-#             else:
-#                 print(f"[!] Failed to fetch {handle}. Status code: {response.status_code}")
-#                 product_data[handle] = {
-#                     'description': f"<p>No description available</p>",
-#                     'images': [],
-#                     'raw_data': None
-#                 }
-                        
-#         except Exception as e:
-#             print(f"[!] Error scraping data for {handle}: {e}")
-#             product_data[handle] = {
-#                 'description': f"<p>No description available</p>",
-#                 'images': [],
-#                 'raw_data': None
-#             }
-        
-#         time.sleep(0.5)  # Be respectful to the server
+            print(f"✓ Found {len(collection_ids)} product IDs from {collection['url']}")
+        except Exception as e:
+            print(f"✗ Error scraping {collection['url']}: {e}")
+            continue
     
-#     return product_data
+    unique_ids = list(set(all_scraped_ids))
+    print(f"🎯 Total Unique Product IDs across all collections: {len(unique_ids)}")
 
-# def ngrams_from_words(words, n):
-#     return [' '.join(words[i:i+n]) for i in range(len(words)-n+1)]
+    if not unique_ids:
+        print("❌ No product IDs found. Exiting.")
+        return
 
-# def build_title_ngrams(title):
-#     words = title.strip().split()
-#     last3 = words[-3:] if len(words) >= 3 else words
-#     ngram_tags = set()
-#     for n in range(1, min(3, len(last3))+1):
-#         ngram_tags.update(ngrams_from_words(last3, n))
-#     return ngram_tags
+    gids = format_shopify_gids(unique_ids)
 
-# def clean_and_save_product_data_only_available_with_all_images_from_data(data, scraped_data=None):
-#     """Clean Bandit Running product data based on raw_data.json structure"""
-#     cleaned_products = {}
+    print("📦 Fetching product data in batches...")
+    raw_data = fetch_shopify_products_batched(gids)
+
+    # Process products with their correct collection data
+    all_products = []
+    products_by_collection = {}
     
-#     # Use provided scraped data
-#     if scraped_data is None:
-#         scraped_data = {}
-
-#     for handle, product_info in scraped_data.items():
-#         raw_data = product_info.get('raw_data')
-#         if raw_data is None:
-#             continue
-            
-#         title = raw_data.get("title", "")
+    # Group products by their source collection
+    for product in raw_data.get("data", {}).get("nodes", []):
+        if product is None:
+            continue
         
-#         # Get description and images from scraped data
-#         description = product_info.get('description', f"<p>{title}</p>")
-#         all_images = product_info.get('images', [])
+        # Extract product ID from the Shopify GID
+        product_gid = product.get("id", "")
+        product_id = product_gid.split("/")[-1] if "/" in product_gid else product_gid
         
-#         brand = "Bandit Running"  # Set vendor to Bandit Running
-#         product_tags = set(raw_data.get("tags", []))
-
-#         # Determine gender from tags or URL
-#         gender_tags = set()
-#         if any(tag for tag in product_tags if 'women' in tag.lower()):
-#             gender_tags = {"all clothing women", "womens", "women clothing", "women"}
-#         elif any(tag for tag in product_tags if 'men' in tag.lower()):
-#             gender_tags = {"all clothing men", "mens", "men clothing", "men"}
-#         else:
-#             # Default to unisex
-#             gender_tags = {"unisex", "clothing"}
-
-#         # N-grams from last 3 words of title
-#         ngram_tags = build_title_ngrams(title)
-
-#         all_tags = product_tags | gender_tags | ngram_tags
-#         tags_str = ', '.join(sorted(all_tags))
-
-#         # Determine category from gender tags
-#         if "women" in ' '.join(gender_tags).lower():
-#             category_val = "women"
-#         elif "men" in ' '.join(gender_tags).lower():
-#             category_val = "men"
-#         else:
-#             category_val = "unisex"
-        
-#         # Get product type from raw data
-#         type_val = raw_data.get("type", "")
-
-#         if handle not in cleaned_products:
-#             cleaned_products[handle] = {
-#                 "Handle": handle,
-#                 "Title": title,
-#                 "Body (HTML)": description,
-#                 "Vendor": brand,
-#                 "Product Category": category_val,
-#                 "Type": type_val,
-#                 "Tags": tags_str,
-#                 "variants": []
-#             }
-
-#         seen = set()
-#         for variant in raw_data.get("variants", []):
-#             if not variant.get("available", False):
-#                 continue
-
-#             variant_id = variant.get("id", "")
-#             price = float(variant.get("price", 0)) / 100  # Bandit Running prices are in cents
-#             compare_price = float(variant.get("compare_at_price", 0)) / 100 if variant.get("compare_at_price") else 0
-            
-#             # Extract color and size from options array
-#             color, size = "", ""
-#             options = variant.get("options", [])
-#             if len(options) >= 1:
-#                 size = options[0]  # First option is usually size
-#             if len(options) >= 2:
-#                 color = options[1]  # Second option is usually color
-            
-#             # Use SKU if available, otherwise use size
-#             sku = variant.get("sku", "") or size or variant.get("title", "")
-
-#             if (size, variant_id) not in seen:
-#                 # Use all scraped images for every variant
-#                 cleaned_products[handle]["variants"].append({
-#                     "Variant SKU": sku,
-#                     "size": size,
-#                     "color": color,
-#                     "Variant Price": price,
-#                     "Variant Compare At Price": compare_price,
-#                     "images": all_images  # All variants get the complete image set
-#                 })
-#                 seen.add((size, variant_id))
-
-#     # Return as a list of product dicts
-#     return list(cleaned_products.values())
-
-# def complete_workflow_bandi():
-#     print("🔍 Scraping product handles from Bandit Running...")
-#     collections = [
-#         {"url": "https://banditrunning.com/collections/mens?filter.p.tag=filter-type:bottoms&filter.p.tag=filter-type:compression&filter.p.tag=filter-type:crew+necks&filter.p.tag=filter-type:half-tights&filter.p.tag=filter-type:hoodies&filter.p.tag=filter-type:long+sleeves&filter.p.tag=filter-type:longsleeves&filter.p.tag=filter-type:pants&filter.p.tag=filter-type:run+tees&filter.p.tag=filter-type:shorts&filter.p.tag=filter-type:sweatpants&filter.p.tag=filter-type:tanks&filter.p.tag=filter-type:tees&filter.p.tag=filter-type:tops"},
-#         {"url": "https://banditrunning.com/collections/women?filter.p.tag=filter-type:bottoms&filter.p.tag=filter-type:compression&filter.p.tag=filter-type:crew+necks&filter.p.tag=filter-type:crop+singlets&filter.p.tag=filter-type:hoodies&filter.p.tag=filter-type:leggings&filter.p.tag=filter-type:long+sleeves&filter.p.tag=filter-type:outerwear&filter.p.tag=filter-type:run+tees&filter.p.tag=filter-type:run+tights&filter.p.tag=filter-type:shorts&filter.p.tag=filter-type:sweatpants&filter.p.tag=filter-type:tanks&filter.p.tag=filter-type:tees&filter.p.tag=filter-type:tops"}
-#     ]
-#     scraped_handles = scrape_product_ids_from_collections(collections)
-#     unique_handles = list(set(scraped_handles))
+        # Find which collection this product belongs to
+        source_collection = product_id_to_collection.get(str(product_id))
+        if source_collection:
+            collection_key = source_collection["url"]
+            if collection_key not in products_by_collection:
+                products_by_collection[collection_key] = {
+                    "products": [],
+                    "collection_info": source_collection
+                }
+            products_by_collection[collection_key]["products"].append(product)
     
-
-#     print("📄 Scraping product data from .js endpoints...")
-#     scraped_data = scrape_product_descriptions_and_images(unique_handles)
-#     print(f"📄 Scraped data for {len(scraped_data)} products")
-
-#     print(f"🧹 Cleaning data...")
-#     all_products = []
-#     cleaned = clean_and_save_product_data_only_available_with_all_images_from_data(None, scraped_data)
-#     all_products.extend(cleaned)
-
-#     # Remove duplicate products by handle (keep first occurrence)
-#     seen_handles = set()
-#     unique_products = []
-#     for prod in all_products:
-#         if prod["Handle"] not in seen_handles:
-#             unique_products.append(prod)
-#             seen_handles.add(prod["Handle"])
-
-#         # Output JSON instead of uploading to database
-#         print("📄 Outputting JSON data...")
-#         output_data = {"products": unique_products}
+    # Now process each collection's products with the correct gender/type
+    for collection_url, collection_data in products_by_collection.items():
+        products = collection_data["products"]
+        collection_info = collection_data["collection_info"]
         
-#         # Save to file
-#         output_file = "test_output.json"
-#         with open(output_file, 'w', encoding='utf-8') as f:
-#             json.dump(output_data, f, indent=2, ensure_ascii=False)
+        gender_tag = collection_info.get("gender")
+        product_type = collection_info.get("product_type")
         
-#         # Upload directly to database - COMMENTED OUT FOR NOW
-#         print("📤 Uploading to database...")
-#         upsert_all_product_data(unique_products, BASE_URL, "USD")
-#         print(f"✅ {len(unique_products)} products uploaded to database successfully!")
+        print(f"🧹 Cleaning {len(products)} products for {collection_url} (gender: {gender_tag})...")
         
+        # Create a temporary data structure for this collection
+        temp_data = {"data": {"nodes": products}}
+        cleaned = clean_and_save_product_data_only_available_with_all_images_from_data(
+            temp_data, gender_tag, product_type
+        )
+        all_products.extend(cleaned)
 
-# # 🔧 Run Everything
-# if __name__ == "__main__":
-#     # Run on just 5 products for testing and output JSON
-#     complete_workflow_bandi()
+    # Remove duplicate products by handle (keep first occurrence)
+    seen_handles = set()
+    unique_products = []
+    for prod in all_products:
+        if prod["Handle"] not in seen_handles:
+            unique_products.append(prod)
+            seen_handles.add(prod["Handle"])
+
+    # # Write one JSON file
+    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    # Upload all at once
+    upsert_all_product_data(unique_products, BASE_URL, "USD")
+    print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
+    print(f"📊 Total unique products processed: {len(unique_products)}")
+    
+    # # Show breakdown by gender
+    # gender_breakdown = {}
+    # for prod in unique_products:
+    #     category = prod.get("Product Category", "unknown")
+    #     gender_breakdown[category] = gender_breakdown.get(category, 0) + 1
+    
+    # print("📈 Products by gender:")
+    # for gender, count in gender_breakdown.items():
+    #     print(f"   {gender}: {count} products")
+
+
+# 🔧 Run Everything
+if __name__ == "__main__":
+
+
+    complete_workflow_bandit_running()
+
+
