@@ -237,10 +237,12 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
 
         all_images = []
+        seen_images = set()
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
-            if url:
+            if url and url not in seen_images:
                 all_images.append(url)
+            seen_images.add(url)
 
         # Category is just gender
         category_val = gender_tag.lower() if gender_tag else ""
@@ -248,10 +250,12 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         type_val=product.get("productType")
 
         all_images = []
+        seen_images = set()
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
-            if url:
+            if url and url not in seen_images:
                 all_images.append(url)
+            seen_images.add(url)
 
         # Category is just gender
         category_val = gender_tag.lower() if gender_tag else ""
@@ -291,7 +295,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                     "color": color,
                     "Variant Price": price,
                     "Variant Compare At Price": compare_price,
-                    "images": list(set(all_images))
+                    "images": all_images
                 })
                 seen.add((size, sku))
 

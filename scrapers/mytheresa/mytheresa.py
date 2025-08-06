@@ -344,7 +344,14 @@ def clean_mytheresa_data(data, gender_tag=None):
         all_tags = list(set(tags + product_tags + list(gender_tags)))
         tags_str = ', '.join(sorted(all_tags))
 
-        all_images = list(set(product.get("displayImages", [])))
+        # Preserve order while removing duplicates
+        display_images = product.get("displayImages", [])
+        all_images = []
+        seen_images = set()
+        for img in display_images:
+            if img and img not in seen_images:
+                all_images.append(img)
+                seen_images.add(img)
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {

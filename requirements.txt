@@ -8,3 +8,6 @@ flask-cors
 google-genai
 seleniumbase
 matplotlib
+
+
+

@@ -6,20 +6,28 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
 import re
+#https://${p}/api/unstable/graphql.json`
 
-BASE_URL = "https://shop437.com"
+        # <script id="shopify-features" type="application/json">
+        #     {
+        #         "accessToken": "3260355354f75aae395e213ca40bf675",
+        #         "betas": [
+        #             "rich-media-storefront-analytics"
+        #         ],
 
-graphql_url = "https://437swim.myshopify.com/api/2025-04/graphql.json"
 
+BASE_URL = "https://balardi.com"
+
+
+graphql_url = "https://balardi.myshopify.com/api/unstable/graphql.json"
 headers = {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Origin": "https://shop437.com",
-    "Referer": "https://shop437.com/",
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    "x-shopify-storefront-access-token": "c27db60e5d6b9e3a32cef60f40b532c3"
+    "Origin": "https://balardi.com",
+    "Referer": "https://balardi.com",
+    "User-Agent": "Mozilla/5.0",
+    "x-shopify-storefront-access-token": "7538dcaafbb5323afa63f6f4b515ce24"
 }
-
 def extract_handle_from_url(url):
     import re
     match = re.search(r'/collections/([^/?#]+)', url)
@@ -28,7 +36,6 @@ def extract_handle_from_url(url):
 
 def fetch_product_ids_from_collection(url):
     collection_handle = extract_handle_from_url(url)
-    print(collection_handle)
     all_ids = []
     has_next_page = True
     after_cursor = None
@@ -74,6 +81,7 @@ def fetch_product_ids_from_collection(url):
         page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
         has_next_page = page_info["hasNextPage"]
         after_cursor = page_info["endCursor"]
+
     return all_ids
 def format_shopify_gids(product_ids):
     return [f"gid://shopify/Product/{pid}" for pid in product_ids]
@@ -113,7 +121,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 250) {
+          media(first: 100) {
             edges {
               node {
                 id
@@ -122,7 +130,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 250) {
+          images(first: 100) {
             edges {
               node {
                 id
@@ -131,7 +139,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 250) {
+          variants(first: 100) {
             edges {
               node {
                 id
@@ -183,23 +191,13 @@ def fetch_shopify_products_batched(product_ids):
         except Exception as e:
             print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
-    # # # Save the results to a JSON file
+    # Save the results to a JSON file
     # with open("output.json", "w", encoding="utf-8") as f:
     #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
     return all_responses
 
 
 
-def ngrams_from_words(words, n):
-    return [' '.join(words[i:i+n]) for i in range(len(words)-n+1)]
-
-def build_title_ngrams(title):
-    words = title.strip().split()
-    last3 = words[-3:] if len(words) >= 3 else words
-    ngram_tags = set()
-    for n in range(1, min(3, len(last3))+1):
-        ngram_tags.update(ngrams_from_words(last3, n))
-    return ngram_tags
 def clean_and_save_product_data_only_available_with_all_images_from_data(
     data, gender_tag=None, product_type=None
 ):
@@ -212,47 +210,30 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
         if not product.get("availableForSale", True):
             continue
-
         handle = product.get("handle")
         title = product.get("title")
         description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
-        brand = product.get("vendor")
-        product_tags = set(product.get("tags", []))
-
-        # Gender-based tags
+        brand = product.get("vendor", "")
+        product_tags = list(set(product.get("tags", [])))
         gender_tags = set()
+
         if gender_tag:
-            if gender_tag.lower() == "men":
-                gender_tags = {"all clothing men", "mens", "men clothing", "men"}
-            elif gender_tag.lower() == "women":
-                gender_tags = {"all clothing women", "womens", "women clothing", "women"}
-        title_formatted=""
-        if title.startswith("The "):
-            title_formatted = title[4:]
+            gender_lower = gender_tag.lower()
 
-        # remove anything after the first slash
-        title_formatted = title_formatted.split("/")[0].strip()
-        # N-grams from last 3 words of title
-        title_formatted = re.sub(r'\b\d+\s*Pack\b', '', title_formatted, flags=re.IGNORECASE).strip()
-        ngram_tags = build_title_ngrams(title_formatted)
+            if gender_lower == "men":
+                # Normalize tags to lowercase
+                normalized_tags = [tag.lower() for tag in product_tags]
 
-        all_tags = product_tags | gender_tags | ngram_tags
-        tags_str = ', '.join(sorted(all_tags))
+                # Check for any tag that contains 'cloth' as substring
+                if any("cloth" in tag for tag in normalized_tags):
+                    gender_tags = {"all clothing men", "mens", "men clothing", "men"}
+                else:
+                    gender_tags = {"men", "mens", "men's"}
 
-        all_images = []
-        for edge in product.get("images", {}).get("edges", []):
-            url = edge["node"].get("originalSrc")
-            if url:
-                all_images.append(url)
 
-        # Category is just gender
-        category_val = gender_tag.lower() if gender_tag else ""
-        # Use provided product_type if available
-        if title_formatted == "":
-            type_val=product.get("productType")
-        else:
-            words = title_formatted.split()
-            type_val = words[-1] if words else ""
+
+        all_tags = product_tags + list(gender_tags) 
+        product_tags = ", ".join(tag.strip() for tag in all_tags if tag.strip())
 
         all_images = []
         seen_images = set()
@@ -260,11 +241,14 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             url = edge["node"].get("originalSrc")
             if url and url not in seen_images:
                 all_images.append(url)
-                seen_images.add(url)
+            seen_images.add(url)
 
         # Category is just gender
-        category_val = gender_tag.lower() if gender_tag else ""
 
+        category_val = gender_tag.lower() if gender_tag else ""
+        type_val = product.get("productType")
+        type_val = re.sub(r"\bmen'?s?\b", "", type_val, flags=re.IGNORECASE).strip()
+        type_val = re.sub(r"\s{2,}", " ", type_val)
         if handle not in cleaned_products:
             cleaned_products[handle] = {
                 "Handle": handle,
@@ -273,7 +257,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 "Vendor": brand,
                 "Product Category": category_val,
                 "Type": type_val,
-                "Tags": tags_str,
+                "Tags": product_tags,
                 "variants": []
             }
 
@@ -287,10 +271,13 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             price = float(variant.get("price", {}).get("amount", 0))
             compare_price = float(variant.get("compareAtPrice", {}).get("amount", 0)) if variant.get("compareAtPrice") else 0
             color, size = "", ""
+            
+            # Extract color and size from selectedOptions if available
             for opt in variant.get("selectedOptions", []):
-                if opt["name"].lower() == "color":
+                opt_name = opt["name"].lower()
+                if "color" in opt_name.lower():
                     color = opt["value"]
-                elif opt["name"].lower() == "size":
+                elif "size" in opt_name.lower():
                     size = opt["value"]
 
             if (size, sku) not in seen:
@@ -304,13 +291,14 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 })
                 seen.add((size, sku))
 
+
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_437():
+def complete_workflow_balardi():
 
     collections = [
-    {"url": "https://shop437.com/collections/shop-all", "gender": "women"},
+        {"url": "https://balardi.com/collections/sale-for-men", "gender": "men"},
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
@@ -393,7 +381,7 @@ def complete_workflow_437():
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
-    # # # Write one JSON file
+    # # # # Write one JSON file
     # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
     #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # # Upload all at once
@@ -416,6 +404,6 @@ def complete_workflow_437():
 if __name__ == "__main__":
 
 
-    complete_workflow_437()
+    complete_workflow_balardi()
 
 

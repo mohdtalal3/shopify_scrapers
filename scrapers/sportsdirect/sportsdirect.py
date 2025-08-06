@@ -135,7 +135,7 @@ def clean_flat_sportsdirect_data(products, gender_tag=None):
                     "color": color,
                     "Variant Price": selling_price,
                     "Variant Compare At Price": ticket_price,
-                    "images": list(set(all_images))
+                    "images": all_images
                 })
                 seen.add((size, sku))
 

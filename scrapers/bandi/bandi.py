@@ -241,10 +241,12 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         product_tags = list(cleaned_tags)
         product_tags = ", ".join(tag.strip() for tag in product_tags if tag.strip())
         all_images = []
+        seen_images = set()
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
-            if url:
+            if url and url not in seen_images:
                 all_images.append(url)
+            seen_images.add(url)
 
         # Category is just gender
         category_val = gender_lower if gender_tag else ""
@@ -284,7 +286,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                     "color": color,
                     "Variant Price": price,
                     "Variant Compare At Price": compare_price,
-                    "images": list(set(all_images))
+                    "images": all_images
                 })
                 seen.add((size, sku))
 
@@ -381,7 +383,7 @@ def complete_workflow_bandit_running():
     # # Write one JSON file
     # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
     #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
-    # Upload all at once
+    # # Upload all at once
     upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")

@@ -5,21 +5,29 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
-import re
 
-BASE_URL = "https://shop437.com"
+#https://${p}/api/unstable/graphql.json`
 
-graphql_url = "https://437swim.myshopify.com/api/2025-04/graphql.json"
+        # <script id="shopify-features" type="application/json">
+        #     {
+        #         "accessToken": "3260355354f75aae395e213ca40bf675",
+        #         "betas": [
+        #             "rich-media-storefront-analytics"
+        #         ],
 
+
+BASE_URL = "https://www.karllagerfeld.com"
+
+
+graphql_url = "https://karllagerfeld.com/api/unstable/graphql.json"
 headers = {
     "Content-Type": "application/json",
     "Accept": "*/*",
-    "Origin": "https://shop437.com",
-    "Referer": "https://shop437.com/",
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    "x-shopify-storefront-access-token": "c27db60e5d6b9e3a32cef60f40b532c3"
+    "Origin": "https://www.karllagerfeld.com",
+    "Referer": "https://www.karllagerfeld.com",
+    "User-Agent": "Mozilla/5.0",
+    "x-shopify-storefront-access-token": "6202c7ccffbb3d0c7a365be031619902"
 }
-
 def extract_handle_from_url(url):
     import re
     match = re.search(r'/collections/([^/?#]+)', url)
@@ -28,7 +36,6 @@ def extract_handle_from_url(url):
 
 def fetch_product_ids_from_collection(url):
     collection_handle = extract_handle_from_url(url)
-    print(collection_handle)
     all_ids = []
     has_next_page = True
     after_cursor = None
@@ -74,6 +81,7 @@ def fetch_product_ids_from_collection(url):
         page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
         has_next_page = page_info["hasNextPage"]
         after_cursor = page_info["endCursor"]
+
     return all_ids
 def format_shopify_gids(product_ids):
     return [f"gid://shopify/Product/{pid}" for pid in product_ids]
@@ -113,7 +121,7 @@ def fetch_shopify_products_batched(product_ids):
             maxVariantPrice { amount currencyCode }
             minVariantPrice { amount currencyCode }
           }
-          media(first: 250) {
+          media(first: 50) {
             edges {
               node {
                 id
@@ -122,7 +130,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          images(first: 250) {
+          images(first: 50) {
             edges {
               node {
                 id
@@ -131,7 +139,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 250) {
+          variants(first: 50) {
             edges {
               node {
                 id
@@ -166,7 +174,7 @@ def fetch_shopify_products_batched(product_ids):
             "query": query,
             "variables": {
                 "ids": batch,
-                "countryCode": "US",
+                "countryCode": "GB",
                 "languageCode": "EN"
             }
         }
@@ -183,23 +191,13 @@ def fetch_shopify_products_batched(product_ids):
         except Exception as e:
             print(f"[!] Exception in batch {i//250+1}: {e}")
         time.sleep(1.2)
-    # # # Save the results to a JSON file
+    # Save the results to a JSON file
     # with open("output.json", "w", encoding="utf-8") as f:
     #     json.dump(all_responses, f, ensure_ascii=False, indent=4)
     return all_responses
 
 
 
-def ngrams_from_words(words, n):
-    return [' '.join(words[i:i+n]) for i in range(len(words)-n+1)]
-
-def build_title_ngrams(title):
-    words = title.strip().split()
-    last3 = words[-3:] if len(words) >= 3 else words
-    ngram_tags = set()
-    for n in range(1, min(3, len(last3))+1):
-        ngram_tags.update(ngrams_from_words(last3, n))
-    return ngram_tags
 def clean_and_save_product_data_only_available_with_all_images_from_data(
     data, gender_tag=None, product_type=None
 ):
@@ -213,46 +211,71 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         if not product.get("availableForSale", True):
             continue
 
+
         handle = product.get("handle")
         title = product.get("title")
         description = product.get("descriptionHtml") or f"<p>{product.get('description', '')}</p>"
-        brand = product.get("vendor")
-        product_tags = set(product.get("tags", []))
+        brand = product.get("vendor", "")
+        product_tags = list(set(product.get("tags", [])))
+        type_val = (product.get("productType") or "").lower()
+        clothing_keywords = [
+            # Generic
+            "all clothing",
+            "t-shirts", "shirt", "shirts", "tee", "tees",
+            "polo", "polo shirts",
+            "dress", "dresses", "skort", "skorts",
+            "jean", "jeans",
+            "jacket", "jackets", "vest", "vests",
+            "coat", "coats",
+            "blouse", "blouses",
+            "swim", "swimwear", "beachwear",
+            "sweatshirt", "sweatshirts", "hoodie", "hoodies",
+            "knitwear", "knit",
+            "skirt", "skirts",
+            "pant", "pants", "legging", "leggings",
+            "suit", "suits",
+            "underwear", "bra", "bras",
+            "lounge", "sleepwear", "pajama", "pajamas",
+            "sportswear", "activewear", "baselayer",
+            "short", "shorts",
+            "matching", "set", "sets",
+            "shoe", "shoes",
+            "outerwear",
+            "sports bra",
+            "underwear",
+            "swim", "swimwear",
+        ]
 
-        # Gender-based tags
+        def is_clothing_type(ptype: str) -> bool:
+            """Check if productType partially matches any clothing keyword."""
+            for keyword in clothing_keywords:
+                if keyword.replace("&", "").replace("-", "").replace(" ", "") in ptype.replace("&", "").replace("-", "").replace(" ", ""):
+                    return True
+                if keyword in ptype:
+                    return True
+            return False
+
         gender_tags = set()
         if gender_tag:
-            if gender_tag.lower() == "men":
-                gender_tags = {"all clothing men", "mens", "men clothing", "men"}
-            elif gender_tag.lower() == "women":
-                gender_tags = {"all clothing women", "womens", "women clothing", "women"}
-        title_formatted=""
-        if title.startswith("The "):
-            title_formatted = title[4:]
+            gender = gender_tag.lower()
+            clothing_match = is_clothing_type(type_val)
+            if gender == "men":
+                if clothing_match:
+                    gender_tags = {"all clothing men", "mens", "men clothing", "men","men's"}
+                else:
+                    gender_tags = {"mens", "men","men's"}
+            elif gender == "women":
+                if clothing_match:
+                    gender_tags = {"all clothing women", "womens", "women clothing", "women","women's"}
+                else:
+                    gender_tags = {"womens", "women","women's"}
 
-        # remove anything after the first slash
-        title_formatted = title_formatted.split("/")[0].strip()
-        # N-grams from last 3 words of title
-        title_formatted = re.sub(r'\b\d+\s*Pack\b', '', title_formatted, flags=re.IGNORECASE).strip()
-        ngram_tags = build_title_ngrams(title_formatted)
 
-        all_tags = product_tags | gender_tags | ngram_tags
-        tags_str = ', '.join(sorted(all_tags))
-
-        all_images = []
-        for edge in product.get("images", {}).get("edges", []):
-            url = edge["node"].get("originalSrc")
-            if url:
-                all_images.append(url)
-
-        # Category is just gender
-        category_val = gender_tag.lower() if gender_tag else ""
-        # Use provided product_type if available
-        if title_formatted == "":
-            type_val=product.get("productType")
-        else:
-            words = title_formatted.split()
-            type_val = words[-1] if words else ""
+        all_tags = product_tags + list(gender_tags) 
+        type_val = (product.get("productType") or "")
+        if type_val:
+            all_tags.append(type_val)
+        product_tags = ", ".join(tag.strip() for tag in all_tags if tag.strip())
 
         all_images = []
         seen_images = set()
@@ -260,10 +283,12 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             url = edge["node"].get("originalSrc")
             if url and url not in seen_images:
                 all_images.append(url)
-                seen_images.add(url)
+            seen_images.add(url)
 
         # Category is just gender
+
         category_val = gender_tag.lower() if gender_tag else ""
+        #type_val = product.get("productType")
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {
@@ -273,7 +298,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 "Vendor": brand,
                 "Product Category": category_val,
                 "Type": type_val,
-                "Tags": tags_str,
+                "Tags": product_tags,
                 "variants": []
             }
 
@@ -287,11 +312,27 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             price = float(variant.get("price", {}).get("amount", 0))
             compare_price = float(variant.get("compareAtPrice", {}).get("amount", 0)) if variant.get("compareAtPrice") else 0
             color, size = "", ""
+            
+            # Extract color and size from selectedOptions if available
             for opt in variant.get("selectedOptions", []):
-                if opt["name"].lower() == "color":
+                opt_name = opt["name"].lower()
+                if "color" in opt_name.lower():
                     color = opt["value"]
-                elif opt["name"].lower() == "size":
+                elif "size" in opt_name.lower():
                     size = opt["value"]
+
+
+            # # Fallback: try to parse color and size from SKU if missing
+            # if (not color or not size) and sku:
+            #     parts = sku.split("_")
+            #     if len(parts) >= 3:
+            #         # Example: "9937__White_L"
+            #         guessed_color = parts[-2]
+            #         guessed_size = parts[-1]
+            #         if not color:
+            #             color = guessed_color
+            #         if not size:
+            #             size = guessed_size
 
             if (size, sku) not in seen:
                 cleaned_products[handle]["variants"].append({
@@ -304,13 +345,15 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                 })
                 seen.add((size, sku))
 
+
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_437():
+def complete_workflow_uk_polene():
 
     collections = [
-    {"url": "https://shop437.com/collections/shop-all", "gender": "women"},
+        {"url": "https://www.karllagerfeld.com/en-gb/collections/sale-women-all", "gender": "women"},
+        {"url": "https://www.karllagerfeld.com/en-gb/collections/sale-men-all", "gender": "men"},
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
@@ -393,11 +436,11 @@ def complete_workflow_437():
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
-    # # # Write one JSON file
+    # # # # Write one JSON file
     # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
     #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # # Upload all at once
-    upsert_all_product_data(unique_products, BASE_URL, "USD")
+    upsert_all_product_data(unique_products, BASE_URL, "GBP")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
     
@@ -416,6 +459,6 @@ def complete_workflow_437():
 if __name__ == "__main__":
 
 
-    complete_workflow_437()
+    complete_workflow_uk_polene()
 
 

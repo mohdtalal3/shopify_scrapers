@@ -102,7 +102,14 @@ def clean_lululemon_data(products: List[Dict[str, Any]], gender_tag: str = None)
             if color_name:
                 images = carousel.get("imageInfo", [])
                 if images:
-                    color_to_images[color_name] = list(set(images))  # Remove duplicates within color
+                    # Preserve order while removing duplicates
+                    seen_images = set()
+                    ordered_images = []
+                    for img in images:
+                        if img not in seen_images:
+                            ordered_images.append(img)
+                            seen_images.add(img)
+                    color_to_images[color_name] = ordered_images
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {
@@ -279,7 +286,7 @@ def product_data(product_ids):
             return None
 
     all_results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         future_to_pid = {executor.submit(fetch_single_product, pid): pid for pid in product_ids}
         for future in concurrent.futures.as_completed(future_to_pid):
             result = future.result()
@@ -389,6 +396,8 @@ def get_product_ids():
 
 def complete_workflow_lululemon():
     product_ids = get_product_ids()
+    print(len(product_ids))
+    #product_ids = product_ids[:10]
     data = product_data(product_ids)
     cleaned_data = clean_lululemon_data(data, gender_tag="women")
     # with open("lululemon_cleaned_data.json", "w", encoding="utf-8") as f:

@@ -169,7 +169,7 @@ def fetch_shopify_products_batched(product_ids):
               }
             }
           }
-          variants(first: 250) {
+          variants(first: 100) {
             edges {
               node {
                 id
@@ -254,10 +254,12 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
         # Collect all image URLs
         all_images = []
+        seen_images = set()
         for edge in product.get("images", {}).get("edges", []):
             url = edge["node"].get("originalSrc")
-            if url:
+            if url and url not in seen_images:
                 all_images.append(url)
+            seen_images.add(url)
 
         # Skip if no images found
         if not all_images:
@@ -308,7 +310,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
                     "color": color,
                     "Variant Price": price,
                     "Variant Compare At Price": compare_price,
-                    "images": list(set(all_images))
+                    "images": all_images
                 })
                 seen.add((size, sku))
 
@@ -348,7 +350,6 @@ def complete_workflow_aloyoga():
         return
 
     gids = format_shopify_gids(unique_ids)
-    print("hello")
     print("📦 Fetching product data in batches...")
     raw_data = fetch_shopify_products_batched(gids)
 
@@ -365,10 +366,10 @@ def complete_workflow_aloyoga():
     unique_products = group_by_handle_without_color(unique_products)
 
     # # Write one JSON file
-    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
-    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+        json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # # Upload all at once
-    upsert_all_product_data(unique_products, BASE_URL, "USD")
+    #upsert_all_product_data(unique_products, BASE_URL, "USD")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
     print(f"📊 Total unique products processed: {len(unique_products)}")
 # 🔧 Run Everything

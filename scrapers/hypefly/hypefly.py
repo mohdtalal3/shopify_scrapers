@@ -35,18 +35,17 @@ def transform_products_with_description(products, gender_tag=None):
         tags_str = ','.join(sorted(set(filter(None, all_tags))))
         tags_str = tags_str + "," + brand
 
-        # Collect image URLs
-# Collect image URLs
+        # Collect image URLs - only original images, no thumbnails/small/medium
         image_urls = []
-        for image in product.get("images", []):
-            if image.get("url"):
-                image_urls.append(image["url"])
-            formats = image.get("formats")
-            if isinstance(formats, dict):
-                for fmt in formats.values():
-                    if fmt.get("url"):
-                        image_urls.append(fmt["url"])
-        image_urls = list(set(image_urls))
+        seen_images = set()
+        images = product.get("images")
+        if images:  # Check if images is not None and not empty
+            for image in images:
+                if image and image.get("url"):
+                    url = image["url"]
+                    if url not in seen_images:
+                        image_urls.append(url)
+                        seen_images.add(url)
 
         # Full description
         raw_description = product.get("description", "").strip()
@@ -72,8 +71,16 @@ def transform_products_with_description(products, gender_tag=None):
 
             sku = str(variant.get("id"))
             size = variant.get("size", "")
-            price = float(variant.get("salePrice", 0))
-            ticket = float(variant.get("compareAtPrice") or price)
+            
+            # Handle None values for prices
+            sale_price = variant.get("salePrice")
+            compare_price = variant.get("compareAtPrice")
+            
+            if sale_price is None:
+                continue  # Skip variants with no price
+                
+            price = float(sale_price)
+            ticket = float(compare_price) if compare_price is not None else price
 
             if (size, sku) not in seen:
                 product_data["variants"].append({
@@ -135,13 +142,13 @@ def fetch_and_clean_all(search_terms):
 
 def complete_workflow_hypefly():
     search_terms = ["All Sneakers", "All Apparel", "Stanley","On Running"]
-
+    #search_terms = ["Stanley"]
     cleaned_data = fetch_and_clean_all(search_terms)
-    #upsert_all_product_data(cleaned_data, BASE_URL, "INR")
+    upsert_all_product_data(cleaned_data, BASE_URL, "INR")
     
     output_file = "cleaned_products_from_multiple_terms.json"
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
+    # with open(output_file, "w", encoding="utf-8") as f:
+    #     json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Total cleaned products saved: {len(cleaned_data)} to {output_file}")
     
