@@ -205,7 +205,7 @@ def fetch_product(pid):
     return data.get("product", {})
 
 
-def scrape_marc_jacobs_products():
+def complete_workflow_marc_jacobs():
     """Main workflow to scrape Marc Jacobs products."""
     cgid = "The-Leather-Tote-Bag"
     all_products = []
@@ -256,4 +256,4 @@ def scrape_marc_jacobs_products():
 
 
 if __name__ == "__main__":
-    scrape_marc_jacobs_products()
+    complete_workflow_marc_jacobs()

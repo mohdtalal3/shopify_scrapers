@@ -339,7 +339,9 @@ def clean_coachoutlet_data(data, gender_tag=None):
                 src = img.get("src", "")
                 if src and not src.lower().endswith(".mp4"):
                     all_images.append(src)
-        all_images = list(set(all_images))
+        # Remove duplicates while preserving order
+        seen_images = set()
+        all_images = [img for img in all_images if not (img in seen_images or seen_images.add(img))]
 
         if handle not in cleaned_products:
             cleaned_products[handle] = {
@@ -360,6 +362,10 @@ def clean_coachoutlet_data(data, gender_tag=None):
                 continue
 
             sku = variant.get("id", "")
+
+            # Skip variant if SKU doesn't contain the handle
+            if handle and handle not in sku:
+                continue
 
             # Safely access pricing information
             pricing_info = variant.get("pricingInfo")
@@ -402,13 +408,17 @@ def clean_coachoutlet_data(data, gender_tag=None):
                 if not variant_images:
                     variant_images = all_images
 
+                # Remove duplicates while preserving order
+                seen_variant_images = set()
+                variant_images = [img for img in variant_images if not (img in seen_variant_images or seen_variant_images.add(img))]
+
                 cleaned_products[handle]["variants"].append({
                     "Variant SKU": sku,
                     "size": size,
                     "color": color_name,
                     "Variant Price": float(sale_price or 0),
                     "Variant Compare At Price": float(list_price or 0),
-                    "images": list(set(variant_images))
+                    "images": variant_images
                 })
                 seen.add(vkey)
     return list(cleaned_products.values())

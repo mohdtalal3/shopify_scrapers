@@ -79,13 +79,13 @@ def perform_scraping(user_email):
     
     try:
         logger.info(f"Starting scraping process for user: {user_email}")
-        #run_all_scrapers()
+        run_all_scrapers()
         subject = "Shopify Scraping Completed"
         body = f"""
         Hello,
         
         Your Shopify scraping process has been completed successfully.
-        
+        Started at: {scraping_status['started_at']}
         Completed at: {datetime.now().isoformat()}
         
         You can now check your dashboard for the updated data.
@@ -186,5 +186,5 @@ def health_check():
 
 if __name__ == '__main__':
     # Development server
-    app.run(debug=True, host='0.0.0.0', port=5002)
-    #app.run(host='0.0.0.0', port=5000)
+    #app.run(debug=True, host='0.0.0.0', port=5002)
+    app.run(host='0.0.0.0', port=5000)

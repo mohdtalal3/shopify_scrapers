@@ -185,13 +185,13 @@ def upsert_all_product_data(cleaned_list, website_url, currency="USD"):
     )
     print(f"✅ Saved {len(cleaned_list)} products for '{website_url}'")
 
-    # Tags
-    all_tags = set()
-    for product in cleaned_list:
-        tags_str = product.get("Tags", "")
-        tags = [t.strip() for t in tags_str.split(",") if t.strip()]
-        all_tags.update(tags)
-    upsert_tags_row(list(all_tags))
+    # # Tags
+    # all_tags = set()
+    # for product in cleaned_list:
+    #     tags_str = product.get("Tags", "")
+    #     tags = [t.strip() for t in tags_str.split(",") if t.strip()]
+    #     all_tags.update(tags)
+    # upsert_tags_row(list(all_tags))
 
     # Colors
     extracted_colors = extract_colors_from_products({"products": cleaned_list})

@@ -323,7 +323,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_bandit_running():
+def complete_workflow_notorious():
 
     collections = [
         {"url": "https://notorious-plug.com/collections/amiri", "gender": "men"},
@@ -435,6 +435,6 @@ def complete_workflow_bandit_running():
 if __name__ == "__main__":
 
 
-    complete_workflow_bandit_running()
+    complete_workflow_notorious()
 
 

@@ -375,8 +375,8 @@ def complete_workflow_blssdfashion():
             seen_handles.add(prod["Handle"])
 
     # # Write one JSON file
-    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
-    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+        json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
     upsert_all_product_data(unique_products, BASE_URL, "AED")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")

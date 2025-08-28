@@ -298,7 +298,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_uk_polene():
+def complete_workflow_oh_polly_uk():
 
     collections = [
         {"url": "https://www.ohpolly.com/collections/outlet-9975a1", "gender": "women"},
@@ -407,6 +407,6 @@ def complete_workflow_uk_polene():
 if __name__ == "__main__":
 
 
-    complete_workflow_uk_polene()
+    complete_workflow_oh_polly_uk()
 
 

@@ -249,9 +249,8 @@ def format_under_armour_data(raw_products_list):
     print(f"Formatting complete. Cleaned {len(cleaned_products)} unique products.")
     return list(cleaned_products.values())
 
-# --- Main execution ---
-if __name__ == "__main__":
-    # 1. Fetch all product data with pagination
+
+def complete_workflow_underarmour():
     all_product_results = fetch_all_products()
 
     if all_product_results:
@@ -259,6 +258,11 @@ if __name__ == "__main__":
         formatted_data = format_under_armour_data(all_product_results)
         upsert_all_product_data(formatted_data, BASE_URL, "USD")
         print(f"Upserted {len(formatted_data)} products to {BASE_URL}")
+
+# --- Main execution ---
+if __name__ == "__main__":
+    complete_workflow_underarmour()
+
         # # 3. Save the newly formatted data to a file
         # output_filename = 'formatted_products_corrected.json'
         # try:

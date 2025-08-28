@@ -120,7 +120,7 @@ def extract_json_from_response(response: str) -> str:
 
 
 def map_colors_to_html(colors: list[str]) -> str:
-    response = client.models.generate_content(model="gemini-2.5-flash-lite-preview-06-17",contents=PROMPT_TEMPLATE.replace("{colors}", str(colors)))
+    response = client.models.generate_content(model="gemini-2.5-flash-lite",contents=PROMPT_TEMPLATE.replace("{colors}", str(colors)))
     return response.text or ""
 
 
