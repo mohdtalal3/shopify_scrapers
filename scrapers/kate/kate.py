@@ -528,7 +528,7 @@ def complete_workflow_kate():
         ids = fetch_product_ids(config, max_threads=2) # max_threads for page fetching
         print(f"Collected {len(ids)} IDs for {gender}")
         # Send all IDs in batches with threading
-        details = fetch_product_details(ids, max_batch_threads=2) # max_batch_threads for details fetcing
+        details = fetch_product_details(ids, max_batch_threads=1) # max_batch_threads for details fetcing
         if details: # Only proceed if details were successfully fetched
             cleaned = clean_katespade_data(details, gender_tag=gender)
             final_data.extend(cleaned)
