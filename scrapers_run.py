@@ -53,6 +53,7 @@ from color_maps import run_color_mapping
 
 def run_all_scrapers():
     scrapers = [
+        ("Coach Outlet", complete_workflow_coachoutlet),
         ("Lululemon", complete_workflow_lululemon),
         ("Sports Direct", complete_workflow_sportsdirect),
         ("Mytheresa", complete_workflow_mytheresa),
@@ -70,7 +71,6 @@ def run_all_scrapers():
         ("Bandi", complete_workflow_bandi),
         ("BLSSD Fashion", complete_workflow_blssdfashion),
         ("Boohoo", complete_workflow_boohoo),
-        ("Coach Outlet", complete_workflow_coachoutlet),
         ("Cocodemer", complete_workflow_cocodemer),
         ("Cosabella", complete_workflow_cosabella),
         ("Cruise Fashion", complete_workflow_cruise_fashion),

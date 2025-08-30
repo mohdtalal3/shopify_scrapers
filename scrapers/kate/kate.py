@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from db import upsert_all_product_data
 
 # BSS_PL.publicAccessToken = "d2e6ee62da9d5158adadada8c59c4bb1";
-BASE_URL = "https://www.katespadeoutlet.com"
+BASE_URL = "https://www.katespade.com"
 load_dotenv()
 
 proxy_str = os.getenv("PROXY_URL")
@@ -94,7 +94,7 @@ def fetch_page(url, headers, params, page, retries=3, backoff_factor=2):
 
 def fetch_product_ids(url_config, max_threads=5):
     base_headers ={
-        "authority": "www.katespadeoutlet.com",
+        "authority": "www.katespade.com",
         "method": "GET",
         "scheme": "https",
         "accept": "*/*",
@@ -511,21 +511,14 @@ def clean_katespade_data(data, gender_tag=None):
 # ==============================
 
 
-def complete_workflow_kate_outlet():
+def complete_workflow_kate():
     url_configs = [
         {
-            "url": "https://www.katespadeoutlet.com/api/get-shop/deals/todays-deal",
+            "url": "https://www.katespade.com/api/get-shop/sale/view-all",
             "params": {
                        "srule": "price-low-to-high"
             },
-        "referer": "https://www.katespadeoutlet.com/shop/deals/todays-deal?srule=price-low-to-high",
-        },
-                {
-            "url": "https://www.katespadeoutlet.com/api/get-shop/deals/clearance",
-            "params": {
-                       "srule": "price-low-to-high"
-            },
-        "referer": "https://www.katespadeoutlet.com/shop/deals/clearance?srule=price-low-to-high",
+        "referer": "https://www.katespade.com/shop/sale/view-all?srule=price-low-to-high",
         }
     ]
 
@@ -535,7 +528,7 @@ def complete_workflow_kate_outlet():
         ids = fetch_product_ids(config, max_threads=2) # max_threads for page fetching
         print(f"Collected {len(ids)} IDs for {gender}")
         # Send all IDs in batches with threading
-        details = fetch_product_details(ids, max_batch_threads=2) # max_batch_threads for details fetching
+        details = fetch_product_details(ids, max_batch_threads=2) # max_batch_threads for details fetcing
         if details: # Only proceed if details were successfully fetched
             cleaned = clean_katespade_data(details, gender_tag=gender)
             final_data.extend(cleaned)
@@ -549,4 +542,4 @@ def complete_workflow_kate_outlet():
 
 
 if __name__ == "__main__":
-    complete_workflow_kate_outlet()
+    complete_workflow_kate()
