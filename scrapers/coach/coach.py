@@ -1,33 +1,17 @@
+import os
+import sys
 import json
 import time
-import os
+from urllib.parse import urlencode, quote
 from dotenv import load_dotenv
-import sys
-import os
 from seleniumbase import Driver
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
-import re
-# BSS_PL.publicAccessToken = "d2e6ee62da9d5158adadada8c59c4bb1";
+# Add parent folder to sys.path for db import if needed
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 BASE_URL = "https://www.coachoutlet.com"
 load_dotenv()
 
-# ==============================
-# Browser fetcher for JSON pages (SeleniumBase)
-# ==============================
-
-def fetch_json_from_pre(driver, url: str):
-    """Open a JSON endpoint in Chrome and extract JSON from <pre> using a shared SeleniumBase Driver"""
-    driver.get(url)
-    try:
-        raw_json = driver.get_text("pre")
-    except:
-        pass
-    driver.save_screenshot("talal.png")
-
-    #print(json.dumps(json.loads(raw_json), indent=2))
-    input("Heelo")
-    return json.loads(raw_json)
 # ==============================
 # Utility functions
 # ==============================
@@ -56,74 +40,60 @@ def clean_and_extract_product_ids(data):
     return ids
 
 # ==============================
-# Fetch pages of IDs
+# Browser fetcher for JSON pages (SeleniumBase)
 # ==============================
 
-def fetch_page(driver, url, params, page, retries=3, backoff_factor=2):
-    from urllib.parse import urlencode, quote
-    params = params.copy()
-    params["page"] = page
-    
-    query_str = urlencode(params, quote_via=quote, safe="")
-    full_url = f"{url}?{query_str}"
-    
-    for attempt in range(retries):
+def fetch_json_from_pre(driver, url: str, max_retries=3):
+    """Open a JSON endpoint in Chrome and extract JSON from <pre> using a shared SeleniumBase Driver"""
+    for attempt in range(max_retries + 1):
         try:
-            print(f"Fetching page {page + 1}...")
-            data = fetch_json_from_pre(driver, full_url)
-            return clean_and_extract_product_ids(data)
+            driver.get(url)
+            raw_json = driver.get_text("pre")
+            return json.loads(raw_json)
         except Exception as e:
-            print(f"Error fetching page {page + 1} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for page {page + 1}. Skipping.")
-    return []
+            # if "Element {pre} was not present after 10 seconds!" in str(e) and attempt < max_retries:
+            #     print(f"Pre element not found, navigating back to main site and retrying... (attempt {attempt + 1})")
+            driver.get("https://www.coachoutlet.com/")
+            time.sleep(10)
+            continue
+            # else:
+            #     raise e
+
+# ==============================
+# Product ID collection
+# ==============================
 
 def fetch_product_ids(driver, url_config, max_retries=2):
-    from urllib.parse import urlencode, quote
-    
     url = url_config["url"]
     params = url_config["params"]
-    
-    # First page to get totalPages
+
+    # ✅ Proper URL encoding
     query_str = urlencode(params, quote_via=quote, safe="")
     full_url = f"{url}?{query_str}"
-    
-    print(f"Fetching initial page for {url}...")
+
+    print(f"Fetching product IDs from {full_url}")
     ids = []
     failed_pages = []
-    
-    # Try to fetch initial page with retry and proxy rotation
-    data = None
-    total_pages = 1
-    
-    for initial_attempt in range(3):  # Try initial page up to 3 times
-        try:
-            data = fetch_json_from_pre(driver, full_url)
-            total_pages = data.get("pageData", {}).get("totalPages", 1)
-            ids.extend(clean_and_extract_product_ids(data))
-            print(f"Successfully fetched initial page on attempt {initial_attempt + 1}")
-            break
-        except Exception as e:
-            print(f"Error fetching initial page (attempt {initial_attempt + 1}/3): {e}")
-            if initial_attempt < 2:  # Don't recreate driver on last attempt
-                print("Proxy may not be working, creating new driver with rotated proxy...")
-                # Return current driver to caller so they can quit it and create a new one
-                return "RETRY_WITH_NEW_DRIVER", None
-            else:
-                print("Max retries reached for initial page, continuing with limited data")
-                failed_pages.append(0)
-                total_pages = 1
+    try:
+        data = fetch_json_from_pre(driver, full_url)
+        total_pages = data.get("pageData", {}).get("totalPages", 1)
+        ids.extend(clean_and_extract_product_ids(data))
+    except Exception as e:
+        print(f"Error fetching first page: {e}")
+        failed_pages.append(0)
+        total_pages = 1
 
-    print(f"Total pages: {total_pages}")
-    
     # Loop through all pages
     for page in range(1, total_pages):
+        params_with_page = params.copy()
+        params_with_page["page"] = page
+        query_str = urlencode(params_with_page, quote_via=quote, safe="")
+        page_url = f"{url}?{query_str}"
+
+        print(f"Fetching page {page+1}/{total_pages}")
         try:
-            page_ids = fetch_page(driver, url, params, page)
-            if page_ids:
-                ids.extend(page_ids)
+            page_data = fetch_json_from_pre(driver, page_url)
+            ids.extend(clean_and_extract_product_ids(page_data))
         except Exception as e:
             print(f"Error fetching page {page+1}: {e}")
             failed_pages.append(page)
@@ -135,14 +105,14 @@ def fetch_product_ids(driver, url_config, max_retries=2):
         print(f"Retrying failed pages: {failed_pages} (attempt {attempt+1})")
         still_failed = []
         for page in failed_pages:
+            params_with_page = params.copy()
+            if page > 0:
+                params_with_page["page"] = page
+            query_str = urlencode(params_with_page, quote_via=quote, safe="")
+            page_url = f"{url}?{query_str}"
             try:
-                if page == 0:
-                    data = fetch_json_from_pre(driver, full_url)
-                    ids.extend(clean_and_extract_product_ids(data))
-                else:
-                    page_ids = fetch_page(driver, url, params, page)
-                    if page_ids:
-                        ids.extend(page_ids)
+                page_data = fetch_json_from_pre(driver, page_url)
+                ids.extend(clean_and_extract_product_ids(page_data))
             except Exception as e:
                 print(f"Retry failed for page {page+1}: {e}")
                 still_failed.append(page)
@@ -151,55 +121,33 @@ def fetch_product_ids(driver, url_config, max_retries=2):
     if failed_pages:
         print(f"Failed to fetch pages after retries: {failed_pages}")
 
-    return "SUCCESS", list(set(ids))
-
-# ==============================
-# Helper to fetch a single batch of product details
-# ==============================
-def _fetch_product_details_batch(driver, batch, batch_index, base_url, retries=3, backoff_factor=2):
-    from urllib.parse import urlencode, quote
-    
-    params = {
-        "ids": ",".join(batch),
-        "includeInventory": "true"
-    }
-
-    query_str = urlencode(params, quote_via=quote, safe=",")
-    full_url = f"{base_url}?{query_str}"
-
-    for attempt in range(retries):
-        try:
-            print(f"Fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries})... IDs: {batch[0]}...{batch[-1]}")
-            data = fetch_json_from_pre(driver, full_url)
-            return data.get("productsData", [])
-        except Exception as e:
-            print(f"Error fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for batch {batch_index}. Returning empty data for this batch.")
-    return []
+    return list(set(ids))
 
 # ==============================
 # Fetch product details by IDs
 # ==============================
 
-def fetch_product_details(driver, ids_list, batch_size=20, max_retries=2):
-    """Call /api/get-products with ids in batches using SeleniumBase."""
-    all_product_data = []
+def fetch_product_details(driver, ids_list, batch_size=50, max_retries=2):
     base_url = "https://www.coachoutlet.com/api/get-products"
+    all_product_data = []
     failed_batches = []
 
     for i in range(0, len(ids_list), batch_size):
         batch = ids_list[i:i + batch_size]
-        batch_index = i // batch_size + 1
-        
+        params = {
+            "ids": ",".join(batch),
+            "includeInventory": "true"
+        }
+
+        query_str = urlencode(params, quote_via=quote, safe=",")
+        full_url = f"{base_url}?{query_str}"
+
+        print(f"Fetching product details batch {i//batch_size + 1}, size={len(batch)}")
         try:
-            result_data = _fetch_product_details_batch(driver, batch, batch_index, base_url)
-            if result_data:
-                all_product_data.extend(result_data)
+            details_json = fetch_json_from_pre(driver, full_url)
+            all_product_data.extend(details_json.get("productsData", []))
         except Exception as e:
-            print(f"Error fetching batch {batch_index}: {e}")
+            print(f"Error fetching batch {i//batch_size + 1}: {e}")
             failed_batches.append((i, batch))
         time.sleep(1)
 
@@ -210,13 +158,17 @@ def fetch_product_details(driver, ids_list, batch_size=20, max_retries=2):
         print(f"Retrying failed batches: {[i//batch_size+1 for i, _ in failed_batches]} (attempt {attempt+1})")
         still_failed = []
         for i, batch in failed_batches:
-            batch_index = i // batch_size + 1
+            params = {
+                "ids": ",".join(batch),
+                "includeInventory": "true"
+            }
+            query_str = urlencode(params, quote_via=quote, safe=",")
+            full_url = f"{base_url}?{query_str}"
             try:
-                result_data = _fetch_product_details_batch(driver, batch, batch_index, base_url)
-                if result_data:
-                    all_product_data.extend(result_data)
+                details_json = fetch_json_from_pre(driver, full_url)
+                all_product_data.extend(details_json.get("productsData", []))
             except Exception as e:
-                print(f"Retry failed for batch {batch_index}: {e}")
+                print(f"Retry failed for batch {i//batch_size+1}: {e}")
                 still_failed.append((i, batch))
             time.sleep(1)
         failed_batches = still_failed
@@ -225,7 +177,6 @@ def fetch_product_details(driver, ids_list, batch_size=20, max_retries=2):
         print(f"Failed to fetch batches after retries: {[i//batch_size+1 for i, _ in failed_batches]}")
 
     return {"productsData": all_product_data}
-
 # ==============================
 # Clean product data
 # ==============================
@@ -374,6 +325,7 @@ def clean_coachoutlet_data(data, gender_tag=None):
                 seen.add(vkey)
     return list(cleaned_products.values())
 
+
 # ==============================
 # Main
 # ==============================
@@ -386,7 +338,7 @@ def complete_workflow_coachoutlet():
             "params": {
                 "srule": "bestsellers",
                 "index": "0",
-                "filterByDiscount": "50% – 60%|60% – 65%|65% – 70%|70% +"
+              
             },
             "referer": "https://www.coachoutlet.com/shop/women/view-all"
         },
@@ -395,83 +347,34 @@ def complete_workflow_coachoutlet():
             "params": {
                 "srule": "bestsellers",
                 "index": "0",
-                "filterByDiscount": "50% – 60%|60% – 65%|65% – 70%|70% +"
+              
             },
             "referer": "https://www.coachoutlet.com/shop/men/view-all"
         }
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
-    
+    driver = Driver(uc=True, headless=True)
+    driver.get("https://www.coachoutlet.com/")
+    time.sleep(10)
     try:
         for config in url_configs:
             gender = "women" if "women" in config["url"] else "men"
-            
-            # Try to fetch product IDs with retry and proxy rotation
-            max_driver_retries = 3
-            ids = []
-            
-            for driver_attempt in range(max_driver_retries):
-                try:
-                    result = fetch_product_ids(driver, config)
-                    
-                    if isinstance(result, tuple) and result[0] == "RETRY_WITH_NEW_DRIVER":
-                        print(f"Driver retry requested (attempt {driver_attempt + 1}/{max_driver_retries})")
-                        if driver_attempt < max_driver_retries - 1:
-                            # Quit current driver and create new one with rotated proxy
-                            driver.quit()
-                            time.sleep(2)  # Brief pause before creating new driver
-                            driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
-                            continue
-                        else:
-                            print("Max driver retries reached, proceeding with empty IDs")
-                            ids = []
-                            break
-                    elif isinstance(result, tuple) and result[0] == "SUCCESS":
-                        ids = result[1]
-                        print(f"Collected {len(ids)} IDs for {gender}")
-                        break
-                    else:
-                        # Handle legacy return format (just in case)
-                        ids = result if isinstance(result, list) else []
-                        print(f"Collected {len(ids)} IDs for {gender}")
-                        break
-                        
-                except Exception as e:
-                    print(f"Unexpected error in driver attempt {driver_attempt + 1}: {e}")
-                    if driver_attempt < max_driver_retries - 1:
-                        try:
-                            driver.quit()
-                        except:
-                            pass
-                        time.sleep(2)
-                        driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
-                    else:
-                        ids = []
-                        break
+            ids = fetch_product_ids(driver, config)
+            print(f"Collected {len(ids)} IDs for {gender}")
 
-            # Only proceed if we have IDs
-            if ids:
-                # Send all IDs in batches
-                details = fetch_product_details(driver, ids)
-                if details: # Only proceed if details were successfully fetched
-                    cleaned = clean_coachoutlet_data(details, gender_tag=gender)
-                    final_data.extend(cleaned)
-            
-            time.sleep(1)
-            
+            details = fetch_product_details(driver, ids)
+            if details:
+                cleaned = clean_coachoutlet_data(details, gender_tag=gender)
+                final_data.extend(cleaned)
+
         upsert_all_product_data(final_data, BASE_URL, "USD")
         with open("coachoutlet_cleaned.json", "w", encoding="utf-8") as f:
-           json.dump(final_data, f, indent=2, ensure_ascii=False)
+            json.dump(final_data, f, indent=2, ensure_ascii=False)
 
         print(f"✅ Saved {len(final_data)} cleaned products to coachoutlet_cleaned.json")
     finally:
-        try:
-            driver.quit()
-        except:
-            pass   
-
+        driver.quit()
 
 if __name__ == "__main__":
     complete_workflow_coachoutlet()
