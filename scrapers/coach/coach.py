@@ -20,6 +20,7 @@ def fetch_json_from_pre(driver, url: str):
     """Open a JSON endpoint in Chrome and extract JSON from <pre> using a shared SeleniumBase Driver"""
     driver.get(url)
     raw_json = driver.get_text("pre")
+    driver.save_screenshot("talal.png")
     return json.loads(raw_json)
 # ==============================
 # Utility functions
