@@ -15,7 +15,7 @@ load_dotenv()
 
 proxy_str = os.getenv("PROXY_URL")
 proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
-
+print(proxies)
 # ==============================
 # Utility functions
 # ==============================
@@ -96,7 +96,7 @@ def fetch_product_ids(url_config, max_threads=5):
         "scheme": "https",
         "accept": "*/*",
         "accept-encoding": "gzip, deflate, br, zstd",
-        "accept-language": "en-US,en;q=0.9,fr;q=0.8",
+        "accept-language": "en-US,en;q=0.1,fr;q=0.8",
         "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"macOS"',
@@ -106,7 +106,6 @@ def fetch_product_ids(url_config, max_threads=5):
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
         "referer": url_config["referer"],
     }
-
     url = url_config["url"]
     params = url_config["params"]
 
@@ -457,7 +456,7 @@ def complete_workflow_coachoutlet():
         print(f"Collected {len(ids)} IDs for {gender}")
 
         # Send all IDs in batches with threading
-        details = fetch_product_details(ids, max_batch_threads=1) # max_batch_threads for details fetching
+        details = fetch_product_details(ids, max_batch_threads=2) # max_batch_threads for details fetching
         if details: # Only proceed if details were successfully fetched
             cleaned = clean_coachoutlet_data(details, gender_tag=gender)
             final_data.extend(cleaned)
