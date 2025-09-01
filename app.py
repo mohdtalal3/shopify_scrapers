@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 import logging
 from dotenv import load_dotenv
-from scrapers_run import run_all_scrapers
+from scrapers_run import run_all_scrapers, run_selected_scrapers, get_available_scrapers
 # Load environment variables
 load_dotenv()
 
@@ -25,7 +25,9 @@ logger = logging.getLogger(__name__)
 scraping_status = {
     'is_running': False,
     'started_at': None,
-    'user_email': None
+    'user_email': None,
+    'scraper_ids': None,
+    'scraper_count': 0
 }
 
 def send_email(to_email, subject, body, cc_emails=None):
@@ -73,20 +75,52 @@ def send_email(to_email, subject, body, cc_emails=None):
 
         # Started at: {scraping_status['started_at']}
         # 
-def perform_scraping(user_email):
-    """Simulate scraping process"""
+def perform_scraping(user_email, scraper_ids=None):
+    """Perform scraping process with optional specific scrapers"""
     global scraping_status
     
     try:
-        logger.info(f"Starting scraping process for user: {user_email}")
-        run_all_scrapers()
+        if scraper_ids:
+            logger.info(f"Starting scraping process for user: {user_email}, scrapers: {scraper_ids}")
+            results = run_selected_scrapers(scraper_ids)
+        else:
+            logger.info(f"Starting scraping process for user: {user_email} (all scrapers)")
+            results = run_all_scrapers()
+        
+        # Prepare email body with results
+        completed_count = len(results.get('completed', []))
+        failed_count = len(results.get('failed', []))
+        total_count = results.get('total', 0)
+        
         subject = "Shopify Scraping Completed"
         body = f"""
         Hello,
         
-        Your Shopify scraping process has been completed successfully.
+        Your Shopify scraping process has been completed.
+        
         Started at: {scraping_status['started_at']}
         Completed at: {datetime.now().isoformat()}
+        
+        Results Summary:
+        - Total scrapers: {total_count}
+        - Successfully completed: {completed_count}
+        - Failed: {failed_count}
+        """
+        
+        if results.get('completed'):
+            body += f"\n\nSuccessfully completed scrapers:\n"
+            for scraper in results['completed']:
+                body += f"✅ {scraper['name']}\n"
+        
+        if results.get('failed'):
+            body += f"\n\nFailed scrapers:\n"
+            for scraper in results['failed']:
+                body += f"❌ {scraper['name']}: {scraper.get('error', 'Unknown error')}\n"
+        
+        color_mapping_status = results.get('color_mapping', 'not run')
+        body += f"\nColor mapping: {color_mapping_status}"
+        
+        body += f"""
         
         You can now check your dashboard for the updated data.
         
@@ -94,7 +128,7 @@ def perform_scraping(user_email):
         ELYPTRA
         """
         
-        send_email(user_email, subject, body,["eashan.shah@themirage.store","themirageseo@gmail.com"])
+        send_email(user_email, subject, body, ["eashan.shah@themirage.store", "themirageseo@gmail.com"])
         logger.info(f"Scraping completed for user: {user_email}")
         
     except Exception as e:
@@ -124,10 +158,12 @@ def perform_scraping(user_email):
         scraping_status['is_running'] = False
         scraping_status['started_at'] = None
         scraping_status['user_email'] = None
+        scraping_status['scraper_ids'] = None
+        scraping_status['scraper_count'] = 0
 
 @app.route('/api/scrape', methods=['POST'])
 def start_scraping():
-    """Start the scraping process"""
+    """Start the scraping process (all scrapers or selected ones)"""
     global scraping_status
     
     try:
@@ -136,32 +172,49 @@ def start_scraping():
             return jsonify({
                 'error': 'Another scraping process is already running',
                 'started_at': scraping_status['started_at'],
-                'user_email': scraping_status['user_email']
+                'user_email': scraping_status['user_email'],
+                'scraper_count': scraping_status['scraper_count']
             }), 409
         
         # Get request data
         data = request.get_json()
         user_email = data.get('user_email')
+        scraper_ids = data.get('scraper_ids')  # Optional: list of specific scraper IDs
         
         if not user_email:
             return jsonify({'error': 'user_email is required'}), 400
+        
+        # Validate scraper IDs if provided
+        if scraper_ids:
+            available_scrapers = get_available_scrapers()
+            invalid_ids = [sid for sid in scraper_ids if sid not in available_scrapers]
+            if invalid_ids:
+                return jsonify({
+                    'error': f'Invalid scraper IDs: {invalid_ids}',
+                    'available_scrapers': list(available_scrapers.keys())
+                }), 400
         
         # Update scraping status
         scraping_status['is_running'] = True
         scraping_status['started_at'] = datetime.now().isoformat()
         scraping_status['user_email'] = user_email
+        scraping_status['scraper_ids'] = scraper_ids
+        scraping_status['scraper_count'] = len(scraper_ids) if scraper_ids else len(get_available_scrapers())
         
         # Start scraping in background thread
-        scraping_thread = threading.Thread(target=perform_scraping, args=(user_email,))
+        scraping_thread = threading.Thread(target=perform_scraping, args=(user_email, scraper_ids))
         scraping_thread.daemon = True
         scraping_thread.start()
         
-        logger.info(f"Scraping started for user: {user_email}")
+        scraper_type = f"{len(scraper_ids)} selected scrapers" if scraper_ids else "all scrapers"
+        logger.info(f"Scraping started for user: {user_email}, type: {scraper_type}")
         
         return jsonify({
             'message': 'Scraping started successfully',
             'user_email': user_email,
-            'started_at': scraping_status['started_at']
+            'started_at': scraping_status['started_at'],
+            'scraper_count': scraping_status['scraper_count'],
+            'scraper_type': scraper_type
         }), 200
         
     except Exception as e:
@@ -171,8 +224,105 @@ def start_scraping():
         scraping_status['is_running'] = False
         scraping_status['started_at'] = None
         scraping_status['user_email'] = None
+        scraping_status['scraper_ids'] = None
+        scraping_status['scraper_count'] = 0
         
         return jsonify({'error': f'Failed to start scraping: {str(e)}'}), 500
+
+@app.route('/api/scrapers', methods=['GET'])
+def get_scrapers():
+    """Get list of all available scrapers"""
+    try:
+        available_scrapers = get_available_scrapers()
+        scrapers_list = [
+            {
+                'id': scraper_id,
+                'name': scraper_name,
+                'display_name': scraper_name
+            }
+            for scraper_id, (scraper_name, _) in available_scrapers.items()
+        ]
+        
+        return jsonify({
+            'scrapers': scrapers_list,
+            'total_count': len(scrapers_list)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting scrapers: {str(e)}")
+        return jsonify({'error': f'Failed to get scrapers: {str(e)}'}), 500
+
+
+@app.route('/api/scrape/selected', methods=['POST'])
+def start_selected_scraping():
+    """Start scraping for selected scrapers only"""
+    global scraping_status
+    
+    try:
+        # Check if scraping is already running
+        if scraping_status['is_running']:
+            return jsonify({
+                'error': 'Another scraping process is already running',
+                'started_at': scraping_status['started_at'],
+                'user_email': scraping_status['user_email'],
+                'scraper_count': scraping_status['scraper_count']
+            }), 409
+        
+        # Get request data
+        data = request.get_json()
+        user_email = data.get('user_email')
+        scraper_ids = data.get('scraper_ids', [])
+        
+        if not user_email:
+            return jsonify({'error': 'user_email is required'}), 400
+        
+        if not scraper_ids:
+            return jsonify({'error': 'scraper_ids is required and must be a non-empty list'}), 400
+        
+        # Validate scraper IDs
+        available_scrapers = get_available_scrapers()
+        invalid_ids = [sid for sid in scraper_ids if sid not in available_scrapers]
+        if invalid_ids:
+            return jsonify({
+                'error': f'Invalid scraper IDs: {invalid_ids}',
+                'available_scrapers': list(available_scrapers.keys())
+            }), 400
+        
+        # Update scraping status
+        scraping_status['is_running'] = True
+        scraping_status['started_at'] = datetime.now().isoformat()
+        scraping_status['user_email'] = user_email
+        scraping_status['scraper_ids'] = scraper_ids
+        scraping_status['scraper_count'] = len(scraper_ids)
+        
+        # Start scraping in background thread
+        scraping_thread = threading.Thread(target=perform_scraping, args=(user_email, scraper_ids))
+        scraping_thread.daemon = True
+        scraping_thread.start()
+        
+        selected_names = [available_scrapers[sid][0] for sid in scraper_ids]
+        logger.info(f"Selected scraping started for user: {user_email}, scrapers: {selected_names}")
+        
+        return jsonify({
+            'message': 'Selected scrapers started successfully',
+            'user_email': user_email,
+            'started_at': scraping_status['started_at'],
+            'scraper_count': len(scraper_ids),
+            'selected_scrapers': selected_names
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error starting selected scraping: {str(e)}")
+        
+        # Reset status on error
+        scraping_status['is_running'] = False
+        scraping_status['started_at'] = None
+        scraping_status['user_email'] = None
+        scraping_status['scraper_ids'] = None
+        scraping_status['scraper_count'] = 0
+        
+        return jsonify({'error': f'Failed to start selected scraping: {str(e)}'}), 500
+
 
 @app.route('/api/scrape/status', methods=['GET'])
 def get_scraping_status():
