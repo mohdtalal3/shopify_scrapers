@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import os
@@ -7,7 +6,7 @@ import sys
 import time
 
 from dotenv import load_dotenv
-import requests
+from seleniumbase import Driver
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from db import upsert_all_product_data
@@ -15,9 +14,6 @@ from db import upsert_all_product_data
 # BSS_PL.publicAccessToken = "d2e6ee62da9d5158adadada8c59c4bb1";
 BASE_URL = "https://www.katespade.com"
 load_dotenv()
-
-proxy_str = os.getenv("PROXY_URL")
-proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
 
 # ==============================
 # Utility functions
@@ -47,238 +43,170 @@ def clean_and_extract_product_ids(data):
     return ids
 
 # ==============================
+# Browser fetcher for JSON pages (SeleniumBase)
+# ==============================
+
+def fetch_json_from_pre(driver, url: str):
+    """Open a JSON endpoint in Chrome and extract JSON from <pre> using a shared SeleniumBase Driver"""
+    driver.get(url)
+    raw_json = driver.get_text("pre")
+    return json.loads(raw_json)
+
+# ==============================
 # Fetch pages of IDs
 # ==============================
 
-def fetch_page(url, headers, params, page, retries=3, backoff_factor=2):
+def fetch_page(driver, url, params, page, retries=3, backoff_factor=2):
+    from urllib.parse import urlencode, quote
     params = params.copy()
     params["page"] = page
+    
+    query_str = urlencode(params, quote_via=quote, safe="")
+    full_url = f"{url}?{query_str}"
+    
     for attempt in range(retries):
         try:
-            print(f"Fetching page {page + 1}...") # Added print statement for page fetching
-            r = requests.get(url, headers=headers, params=params, proxies=proxies, timeout=10)
-            r.raise_for_status()
-            return clean_and_extract_product_ids(r.json())
-        except requests.exceptions.Timeout as e:
-            print(f"Timeout fetching page {page + 1} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for page {page + 1}. Skipping.")
-        except requests.exceptions.HTTPError as e:
-            print(f"HTTP Error fetching page {page + 1}: {e}. Status Code: {e.response.status_code}")
-            if e.response.status_code == 429 and attempt < retries - 1:
-                retry_after = int(e.response.headers.get("Retry-After", "5"))
-                print(f"Rate limited. Retrying after {retry_after} seconds for page {page + 1}.")
-                time.sleep(retry_after)
-            elif e.response.status_code >= 500 and attempt < retries - 1:
-                # Retry on server errors
-                print(f"Server error {e.response.status_code}. Retrying page {page + 1}.")
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Skipping page {page + 1} due to unrecoverable HTTP error.")
-                break
-        except requests.exceptions.ConnectionError as e:
-            print(f"Connection error fetching page {page + 1} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for page {page + 1}. Skipping.")
+            print(f"Fetching page {page + 1}...")
+            data = fetch_json_from_pre(driver, full_url)
+            return clean_and_extract_product_ids(data)
         except Exception as e:
-            print(f"Unexpected error fetching page {page + 1} (attempt {attempt + 1}/{retries}): {e}")
+            print(f"Error fetching page {page + 1} (attempt {attempt + 1}/{retries}): {e}")
             if attempt < retries - 1:
                 time.sleep(backoff_factor ** attempt)
             else:
                 print(f"Max retries reached for page {page + 1}. Skipping.")
     return []
 
-def fetch_product_ids(url_config, max_threads=5):
-    base_headers ={
-        "authority": "www.katespade.com",
-        "method": "GET",
-        "scheme": "https",
-        "accept": "*/*",
-        "accept-encoding": "gzip, deflate, br, zstd",
-        "accept-language": "en-US,en;q=0.9,fr;q=0.8,af;q=0.7,ar;q=0.6,be;q=0.5,de;q=0.4",
-        "referer": url_config["referer"],
-        "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-        #"x-sid": "0a7139ad-ccdb-48f1-beb1-291ca2bf5dbb",
-        # Cookies: paste the full cookie string exactly as captured
-       #"cookie": "akacd_kate-na-prod-new=2147483647~rv=76~id=7ae92db87f1322a97440e9fc6e047940; opt_user=5540f2f9-3a10-4836-b462-3cf7f9e5ffc3; ..."  # shortened for clarity
-    }
-
+def fetch_product_ids(driver, url_config, max_retries=2):
+    from urllib.parse import urlencode, quote
+    
     url = url_config["url"]
     params = url_config["params"]
+    
     # First page to get totalPages
+    query_str = urlencode(params, quote_via=quote, safe="")
+    full_url = f"{url}?{query_str}"
+    
     print(f"Fetching initial page for {url}...")
-    for attempt in range(3):  # Retry initial page up to 3 times
-        try:
-            r = requests.get(url, headers=base_headers, params=params, timeout=10)
-            r.raise_for_status()
-            #print(r.text)
-            data = r.json()
-            break  # Success, exit retry loop
-        except requests.exceptions.Timeout as e:
-            print(f"Timeout fetching initial page (attempt {attempt + 1}/3): {e}")
-            if attempt < 2:
-                time.sleep(2 ** attempt)
-            else:
-                print("Max retries reached for initial page. Exiting.")
-                return []
-        except requests.exceptions.HTTPError as e:
-            print(f"HTTP Error fetching initial page: {e}. Status Code: {e.response.status_code}")
-            if e.response.status_code == 429 and attempt < 2:
-                retry_after = int(e.response.headers.get("Retry-After", "5"))
-                print(f"Rate limited. Retrying after {retry_after} seconds.")
-                time.sleep(retry_after)
-            elif e.response.status_code >= 500 and attempt < 2:
-                print(f"Server error {e.response.status_code}. Retrying initial page.")
-                time.sleep(2 ** attempt)
-            else:
-                print("Unrecoverable HTTP error for initial page. Exiting.")
-                return []
-        except requests.exceptions.ConnectionError as e:
-            print(f"Connection error fetching initial page (attempt {attempt + 1}/3): {e}")
-            if attempt < 2:
-                time.sleep(2 ** attempt)
-            else:
-                print("Max retries reached for initial page. Exiting.")
-                return []
-        except Exception as e:
-            print(f"Unexpected error fetching initial page (attempt {attempt + 1}/3): {e}")
-            if attempt < 2:
-                time.sleep(2 ** attempt)
-            else:
-                print("Max retries reached for initial page. Exiting.")
-                return []
+    ids = []
+    failed_pages = []
+    
+    try:
+        data = fetch_json_from_pre(driver, full_url)
+        total_pages = data.get("pageData", {}).get("totalPages", 1)
+        ids.extend(clean_and_extract_product_ids(data))
+    except Exception as e:
+        print(f"Error fetching first page: {e}")
+        failed_pages.append(0)
+        total_pages = 1
 
-    total_pages = data.get("pageData", {}).get("totalPages", 1)
-    ids = clean_and_extract_product_ids(data)
     print(f"Total pages: {total_pages}")
-    # Concurrently fetch rest
-    with ThreadPoolExecutor(max_workers=max_threads) as ex:
-        futures = {
-            ex.submit(fetch_page, url, base_headers, params, p): p
-            for p in range(1, total_pages)
-        }
-        for f in as_completed(futures):
+    
+    # Loop through all pages
+    for page in range(1, total_pages):
+        try:
+            page_ids = fetch_page(driver, url, params, page)
+            if page_ids:
+                ids.extend(page_ids)
+        except Exception as e:
+            print(f"Error fetching page {page+1}: {e}")
+            failed_pages.append(page)
+
+    # Retry failed pages
+    for attempt in range(max_retries):
+        if not failed_pages:
+            break
+        print(f"Retrying failed pages: {failed_pages} (attempt {attempt+1})")
+        still_failed = []
+        for page in failed_pages:
             try:
-                result_ids = f.result()
-                if result_ids:
-                    ids.extend(result_ids)
+                if page == 0:
+                    data = fetch_json_from_pre(driver, full_url)
+                    ids.extend(clean_and_extract_product_ids(data))
+                else:
+                    page_ids = fetch_page(driver, url, params, page)
+                    if page_ids:
+                        ids.extend(page_ids)
             except Exception as e:
-                print(f"Exception in page fetch: {e}")
+                print(f"Retry failed for page {page+1}: {e}")
+                still_failed.append(page)
+        failed_pages = still_failed
+
+    if failed_pages:
+        print(f"Failed to fetch pages after retries: {failed_pages}")
 
     return list(set(ids))
 
 # ==============================
 # Helper to fetch a single batch of product details
 # ==============================
-def _fetch_product_details_batch(batch, batch_index, base_url, headers, proxies, retries, backoff_factor):
+def _fetch_product_details_batch(driver, batch, batch_index, base_url, retries=3, backoff_factor=2):
+    from urllib.parse import urlencode, quote
+    
     params = {
         "ids": ",".join(batch),
         "includeInventory": "true"
     }
 
+    query_str = urlencode(params, quote_via=quote, safe=",")
+    full_url = f"{base_url}?{query_str}"
+
     for attempt in range(retries):
         try:
             print(f"Fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries})... IDs: {batch[0]}...{batch[-1]}")
-            r = requests.get(base_url, headers=headers, params=params, proxies=proxies, timeout=15)
-            #print(r.text)
-            r.raise_for_status()
-            return r.json().get("productsData", [])
-        except requests.exceptions.Timeout as e:
-            print(f"Timeout fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for batch {batch_index}. Returning empty data for this batch.")
-        except requests.exceptions.HTTPError as e:
-            print(f"HTTP Error fetching product details for batch {batch_index}: {e}. Status Code: {e.response.status_code}")
-            if e.response.status_code == 429 and attempt < retries - 1:
-                retry_after = int(e.response.headers.get("Retry-After", "5"))
-                print(f"Rate limited. Retrying after {retry_after} seconds for batch {batch_index}.")
-                time.sleep(retry_after)
-            elif e.response.status_code >= 500 and attempt < retries - 1:
-                # Retry on server errors
-                print(f"Server error {e.response.status_code}. Retrying batch {batch_index}.")
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Skipping batch {batch_index} due to unrecoverable HTTP error.")
-                break
-        except requests.exceptions.ConnectionError as e:
-            print(f"Connection error fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries}): {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                print(f"Max retries reached for batch {batch_index}. Returning empty data for this batch.")
+            data = fetch_json_from_pre(driver, full_url)
+            return data.get("productsData", [])
         except Exception as e:
-            print(f"Unexpected error fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries}): {e}")
+            print(f"Error fetching product details for batch {batch_index} (attempt {attempt + 1}/{retries}): {e}")
             if attempt < retries - 1:
                 time.sleep(backoff_factor ** attempt)
             else:
                 print(f"Max retries reached for batch {batch_index}. Returning empty data for this batch.")
-    return [] # Return empty list if all retries fail or unrecoverable error
+    return []
 
 # ==============================
 # Fetch product details by IDs
 # ==============================
 
-def fetch_product_details(ids_list, batch_size=20, max_batch_threads=5, retries=3, backoff_factor=2):
-    """Call /api/get-products with ids in concurrent batches."""
+def fetch_product_details(driver, ids_list, batch_size=20, max_retries=2):
+    """Call /api/get-products with ids in batches using SeleniumBase."""
     all_product_data = []
     base_url = "https://www.katespadeoutlet.com/api/get-products"
-    headers = {
-        "authority": "www.katespadeoutlet.com",
-        "method": "GET",
-        "scheme": "https",
-        "accept": "*/*",
-        "accept-encoding": "gzip, deflate, br, zstd",
-        "accept-language": "en-US,en;q=0.9,fr;q=0.8",
-        "referer": "https://www.katespadeoutlet.com",
-        "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-        # This is important, extracted from your browser request:
-        #"cookie": "opt_user=b1fd4a23-6a01-4352-ada0-65f89ff84cd0; akacd_coach-na-prd-new-us=2147483647~rv=10~id=adf3dc842c599c46477cfef4a2557533; optimizelyEndUserId=oeu1752042994485r0.10466429737259508; FPID=FPID2.2.1xpNMqA2atpKzjNM%2FQty1tCwMc6Swe9zZ13odofRXa0%3D.1752042996; ..."  # (paste full cookie string from your browser)
-    }
-    batches_to_process = []
+    failed_batches = []
+
     for i in range(0, len(ids_list), batch_size):
-        batches_to_process.append((ids_list[i:i + batch_size], i // batch_size + 1))
+        batch = ids_list[i:i + batch_size]
+        batch_index = i // batch_size + 1
+        
+        try:
+            result_data = _fetch_product_details_batch(driver, batch, batch_index, base_url)
+            if result_data:
+                all_product_data.extend(result_data)
+        except Exception as e:
+            print(f"Error fetching batch {batch_index}: {e}")
+            failed_batches.append((i, batch))
+        time.sleep(1)
 
-    with ThreadPoolExecutor(max_workers=max_batch_threads) as executor:
-        futures = {
-            executor.submit(
-                _fetch_product_details_batch,
-                batch,
-                batch_index,
-                base_url,
-                headers,
-                proxies,
-                retries,
-                backoff_factor
-            ): (batch, batch_index)
-            for batch, batch_index in batches_to_process
-        }
-
-        for future in as_completed(futures):
-            batch, batch_index = futures[future]
+    # Retry failed batches
+    for attempt in range(max_retries):
+        if not failed_batches:
+            break
+        print(f"Retrying failed batches: {[i//batch_size+1 for i, _ in failed_batches]} (attempt {attempt+1})")
+        still_failed = []
+        for i, batch in failed_batches:
+            batch_index = i // batch_size + 1
             try:
-                result_data = future.result()
+                result_data = _fetch_product_details_batch(driver, batch, batch_index, base_url)
                 if result_data:
                     all_product_data.extend(result_data)
             except Exception as e:
-                print(f"Exception processing batch {batch_index}: {e}")
+                print(f"Retry failed for batch {batch_index}: {e}")
+                still_failed.append((i, batch))
+            time.sleep(1)
+        failed_batches = still_failed
+
+    if failed_batches:
+        print(f"Failed to fetch batches after retries: {[i//batch_size+1 for i, _ in failed_batches]}")
 
     return {"productsData": all_product_data}
 
@@ -523,21 +451,27 @@ def complete_workflow_kate():
     ]
 
     final_data = []
-    for config in url_configs:
-        gender = "women" if "women" in config["url"] else "women"
-        ids = fetch_product_ids(config, max_threads=2) # max_threads for page fetching
-        print(f"Collected {len(ids)} IDs for {gender}")
-        # Send all IDs in batches with threading
-        details = fetch_product_details(ids, max_batch_threads=2) # max_batch_threads for details fetcing
-        if details: # Only proceed if details were successfully fetched
-            cleaned = clean_katespade_data(details, gender_tag=gender)
-            final_data.extend(cleaned)
-        time.sleep(1)
-    upsert_all_product_data(final_data, BASE_URL, "USD")
-    with open("kate_outlet_cleaned.json", "w", encoding="utf-8") as f:
-       json.dump(final_data, f, indent=2, ensure_ascii=False)
+    driver = Driver(uc=True, headless=True)
+    try:
+        for config in url_configs:
+            gender = "women" if "women" in config["url"] else "women"
+            ids = fetch_product_ids(driver, config)
+            print(f"Collected {len(ids)} IDs for {gender}")
+            
+            # Send all IDs in batches
+            details = fetch_product_details(driver, ids)
+            if details: # Only proceed if details were successfully fetched
+                cleaned = clean_katespade_data(details, gender_tag=gender)
+                final_data.extend(cleaned)
+            time.sleep(1)
+            
+        upsert_all_product_data(final_data, BASE_URL, "USD")
+        with open("kate_outlet_cleaned.json", "w", encoding="utf-8") as f:
+           json.dump(final_data, f, indent=2, ensure_ascii=False)
 
-    #print(f"✅ Saved {len(final_data)} cleaned products to coachoutlet_cleaned.json")   
+        print(f"✅ Saved {len(final_data)} cleaned products to kate_outlet_cleaned.json")
+    finally:
+        driver.quit()   
 
 
 
