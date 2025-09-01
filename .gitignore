@@ -13,9 +13,41 @@ run.py
 
 .env
 sample.py
-kate.py
 
 text.txt
-
+c.py
 company
 t.py
+
+command.txt
+
+#PROXY_URL=http://abcc369ade8d7b3721e8__cr.de,in,pk:bd78aebb5825f219@gw.dataimpulse.com:823
+PROXY_URL=http://1677e38a529d4fcc0b48__cr.de,in,pk:5bcb09e95de0a518@gw.dataimpulse.com:823
+# Email configuration for notifications
+SMTP_SERVER=smtp.hostinger.com
+SMTP_PORT=587
+FROM_EMAIL=info@elyptra.com
+EMAIL_PASSWORD=2105264@tT
+
+# Flask configuration
+FLASK_ENV=development
+FLASK_DEBUG=True
+
+
+# Initialize Supabase client with service key
+SUPABASE_URL = "https://hvpwpdijecshkclmyydq.supabase.co"
+SUPABASE_SERVICE_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cHdwZGlqZWNzaGtjbG15eWRxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjU0Nzk0MCwiZXhwIjoyMDcyMTIzOTQwfQ.csRENUk2MWJOgcQA-Cv78stGtEo6bp6W6eDKIamRGxw"
+
+
+GEMINI_API_KEY=AIzaSyBfowQqLGwhAM78c8znf_Fd2XJ84447aMI
+
+
+
+DATABASE_URL="postgresql://postgres.hvpwpdijecshkclmyydq:12YlLJmMgwrIrU4A@aws-1-ap-south-1.pooler.supabase.com:5432/postgres"
+
+
+
+
+
+SHOPIFY_SHOP_DOMAIN="themiragestore1234.myshopify.com"
+SHOPIFY_ADMIN_TOKEN="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"
