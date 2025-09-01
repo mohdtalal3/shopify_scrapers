@@ -64,7 +64,7 @@ def fetch_json_from_pre(driver, url: str, max_retries=3):
 
 def create_new_driver():
     """Create a new driver instance with fresh proxy"""
-    return Driver(uc=True, headless=False, proxy=proxy)
+    return Driver(uc=True, headless=True, proxy=proxy)
 
 # ==============================
 # Product ID collection
