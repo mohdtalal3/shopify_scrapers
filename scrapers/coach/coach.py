@@ -382,7 +382,7 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True)
+    driver = Driver(uc=True, headless=True,proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
     try:
         for config in url_configs:
             gender = "women" if "women" in config["url"] else "men"
@@ -403,7 +403,6 @@ def complete_workflow_coachoutlet():
         print(f"✅ Saved {len(final_data)} cleaned products to coachoutlet_cleaned.json")
     finally:
         driver.quit()   
-
 
 
 if __name__ == "__main__":
