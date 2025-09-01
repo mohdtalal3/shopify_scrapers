@@ -6,6 +6,11 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import *
+from dotenv import load_dotenv
+load_dotenv()
+proxy_str = os.getenv("PROXY_URL")
+proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
+print(proxies)
 BASE_URL = "https://sportsdirect.com"
 def fetch_all_sportsdirect_products():
     base_url = "https://us.sportsdirect.com/product/getforcategory"
@@ -52,7 +57,7 @@ def fetch_all_sportsdirect_products():
         params = base_params.copy()
         params["page"] = page
 
-        response = requests.get(base_url, params=params, headers=headers)
+        response = requests.get(base_url, params=params, headers=headers, proxies=proxies)
         if response.status_code != 200:
             print(f"Failed to fetch page {page}: {response.status_code}")
             break
