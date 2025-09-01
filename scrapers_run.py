@@ -51,7 +51,7 @@ from scrapers.victoria.victoria import complete_workflow_victoria
 try:
     from color_maps import run_color_mapping
 except ImportError:
-    print("Warning: color_maps module not found. Color mapping will be skipped.")
+    print("Warning: color_maps module not found. Color mapping will be skipped")
     def run_color_mapping():
         print("Color mapping skipped - module not available")
         pass

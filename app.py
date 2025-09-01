@@ -20,7 +20,7 @@ CORS(app)  # Enable CORS for all domains
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# In-memory store for tracking scraping status
+# In-memory store for tracking scraping statu
 # In production, you should use Redis or a database
 scraping_status = {
     'is_running': False,
