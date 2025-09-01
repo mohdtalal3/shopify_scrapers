@@ -355,7 +355,7 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=False)
+    driver = Driver(uc=True, headless=False,proxy=proxy)
     driver.get("https://www.coachoutlet.com/")
     time.sleep(10)
     try:
