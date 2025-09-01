@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 BASE_URL = "https://www.coachoutlet.com"
 load_dotenv()
 
+proxy=os.getenv("PROXY_CHROME")
 # ==============================
 # Utility functions
 # ==============================
@@ -354,7 +355,7 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True)
+    driver = Driver(uc=True, headless=True,proxy=proxy)
     driver.get("https://www.coachoutlet.com/")
     time.sleep(10)
     try:
