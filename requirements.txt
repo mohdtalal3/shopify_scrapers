@@ -8,4 +8,4 @@ flask-cors
 google-genai
 seleniumbase
 matplotlib
-psycopg2
+psycopg2-binary
