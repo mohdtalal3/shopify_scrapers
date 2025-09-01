@@ -396,7 +396,7 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+    driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
     
     try:
         for config in url_configs:
@@ -416,7 +416,7 @@ def complete_workflow_coachoutlet():
                             # Quit current driver and create new one with rotated proxy
                             driver.quit()
                             time.sleep(2)  # Brief pause before creating new driver
-                            driver = Driver(uc=True, headless=True, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+                            driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
                             continue
                         else:
                             print("Max driver retries reached, proceeding with empty IDs")
@@ -440,7 +440,7 @@ def complete_workflow_coachoutlet():
                         except:
                             pass
                         time.sleep(2)
-                        driver = Driver(uc=True, headless=True, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+                        driver = Driver(uc=True, headless=True, proxy="gw.dataimpulse.com:823")
                     else:
                         ids = []
                         break
