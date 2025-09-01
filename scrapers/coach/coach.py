@@ -88,14 +88,27 @@ def fetch_product_ids(driver, url_config, max_retries=2):
     ids = []
     failed_pages = []
     
-    try:
-        data = fetch_json_from_pre(driver, full_url)
-        total_pages = data.get("pageData", {}).get("totalPages", 1)
-        ids.extend(clean_and_extract_product_ids(data))
-    except Exception as e:
-        print(f"Error fetching first page: {e}")
-        failed_pages.append(0)
-        total_pages = 1
+    # Try to fetch initial page with retry and proxy rotation
+    data = None
+    total_pages = 1
+    
+    for initial_attempt in range(3):  # Try initial page up to 3 times
+        try:
+            data = fetch_json_from_pre(driver, full_url)
+            total_pages = data.get("pageData", {}).get("totalPages", 1)
+            ids.extend(clean_and_extract_product_ids(data))
+            print(f"Successfully fetched initial page on attempt {initial_attempt + 1}")
+            break
+        except Exception as e:
+            print(f"Error fetching initial page (attempt {initial_attempt + 1}/3): {e}")
+            if initial_attempt < 2:  # Don't recreate driver on last attempt
+                print("Proxy may not be working, creating new driver with rotated proxy...")
+                # Return current driver to caller so they can quit it and create a new one
+                return "RETRY_WITH_NEW_DRIVER", None
+            else:
+                print("Max retries reached for initial page, continuing with limited data")
+                failed_pages.append(0)
+                total_pages = 1
 
     print(f"Total pages: {total_pages}")
     
@@ -132,7 +145,7 @@ def fetch_product_ids(driver, url_config, max_retries=2):
     if failed_pages:
         print(f"Failed to fetch pages after retries: {failed_pages}")
 
-    return list(set(ids))
+    return "SUCCESS", list(set(ids))
 
 # ==============================
 # Helper to fetch a single batch of product details
@@ -383,18 +396,63 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True,proxy="gw.dataimpulse.com:823")
+    driver = Driver(uc=True, headless=False, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+    
     try:
         for config in url_configs:
             gender = "women" if "women" in config["url"] else "men"
-            ids = fetch_product_ids(driver, config)
-            print(f"Collected {len(ids)} IDs for {gender}")
+            
+            # Try to fetch product IDs with retry and proxy rotation
+            max_driver_retries = 3
+            ids = []
+            
+            for driver_attempt in range(max_driver_retries):
+                try:
+                    result = fetch_product_ids(driver, config)
+                    
+                    if isinstance(result, tuple) and result[0] == "RETRY_WITH_NEW_DRIVER":
+                        print(f"Driver retry requested (attempt {driver_attempt + 1}/{max_driver_retries})")
+                        if driver_attempt < max_driver_retries - 1:
+                            # Quit current driver and create new one with rotated proxy
+                            driver.quit()
+                            time.sleep(2)  # Brief pause before creating new driver
+                            driver = Driver(uc=True, headless=False, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+                            continue
+                        else:
+                            print("Max driver retries reached, proceeding with empty IDs")
+                            ids = []
+                            break
+                    elif isinstance(result, tuple) and result[0] == "SUCCESS":
+                        ids = result[1]
+                        print(f"Collected {len(ids)} IDs for {gender}")
+                        break
+                    else:
+                        # Handle legacy return format (just in case)
+                        ids = result if isinstance(result, list) else []
+                        print(f"Collected {len(ids)} IDs for {gender}")
+                        break
+                        
+                except Exception as e:
+                    print(f"Unexpected error in driver attempt {driver_attempt + 1}: {e}")
+                    if driver_attempt < max_driver_retries - 1:
+                        try:
+                            driver.quit()
+                        except:
+                            pass
+                        time.sleep(2)
+                        driver = Driver(uc=True, headless=False, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+                    else:
+                        ids = []
+                        break
 
-            # Send all IDs in batches
-            details = fetch_product_details(driver, ids)
-            if details: # Only proceed if details were successfully fetched
-                cleaned = clean_coachoutlet_data(details, gender_tag=gender)
-                final_data.extend(cleaned)
+            # Only proceed if we have IDs
+            if ids:
+                # Send all IDs in batches
+                details = fetch_product_details(driver, ids)
+                if details: # Only proceed if details were successfully fetched
+                    cleaned = clean_coachoutlet_data(details, gender_tag=gender)
+                    final_data.extend(cleaned)
+            
             time.sleep(1)
             
         upsert_all_product_data(final_data, BASE_URL, "USD")
@@ -403,7 +461,10 @@ def complete_workflow_coachoutlet():
 
         print(f"✅ Saved {len(final_data)} cleaned products to coachoutlet_cleaned.json")
     finally:
-        driver.quit()   
+        try:
+            driver.quit()
+        except:
+            pass   
 
 
 if __name__ == "__main__":
