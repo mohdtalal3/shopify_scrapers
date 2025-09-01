@@ -396,7 +396,7 @@ def complete_workflow_coachoutlet():
     ]
 
     final_data = []
-    driver = Driver(uc=True, headless=True, proxy="abcc369ade8db3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
+    driver = Driver(uc=True, headless=True, proxy="abcc369ade8d7b3721e8:bd78aebb5825f219@gw.dataimpulse.com:823")
     
     try:
         for config in url_configs:
