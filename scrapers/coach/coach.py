@@ -21,6 +21,9 @@ def fetch_json_from_pre(driver, url: str):
     driver.get(url)
     raw_json = driver.get_text("pre")
     driver.save_screenshot("talal.png")
+
+    print(json.dumps(json.loads(raw_json), indent=2))
+    input("Heelo")
     return json.loads(raw_json)
 # ==============================
 # Utility functions
