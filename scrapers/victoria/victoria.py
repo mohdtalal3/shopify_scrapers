@@ -195,7 +195,15 @@ def fetch_all_product_ids():
             print(f"❌ Failed at offset {offset}: {resp.status_code}")
             break
         page = resp.json()
-        for item in page.get("list", []):
+        # Handle both list and dict responses
+        if isinstance(page, list):
+            items = page
+        elif isinstance(page, dict):
+            items = page.get("list", [])
+        else:
+            items = []
+            
+        for item in items:
             if "id" in item:
                 product_ids.append(item["id"])
         print(f"   ✔ Fetched {len(product_ids)} / {total_items}")
