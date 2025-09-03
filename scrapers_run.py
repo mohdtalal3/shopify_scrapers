@@ -23,7 +23,7 @@ from scrapers.eberjey.eberjey import complete_workflow_eberjey
 from scrapers.fruitybooty.fruitybooty import complete_workflow_fruitybooty
 from scrapers.gemopticians.gemopticians import complete_workflow_gemopticians
 from scrapers.hustle_culture.hustle_culture import complete_workflow_hustle_culture
-from scrapers.karl.karl import complete_workflow_uk_polene as complete_workflow_karl
+from scrapers.karl.karl import complete_workflow_karl
 from scrapers.kate.kate import complete_workflow_kate
 from scrapers.katspade_outlet.kateoutlet import complete_workflow_kate_outlet
 from scrapers.laperla.laperla import complete_workflow_laperla
