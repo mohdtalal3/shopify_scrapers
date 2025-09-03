@@ -20,7 +20,7 @@ company
 t.py
 
 command.txt
-
+new_test
 #PROXY_URL=http://abcc369ade8d7b3721e8__cr.de,in,pk:bd78aebb5825f219@gw.dataimpulse.com:823
 PROXY_URL=http://1677e38a529d4fcc0b48__cr.de,in,pk:5bcb09e95de0a518@gw.dataimpulse.com:823
 # Email configuration for notifications
