@@ -70,6 +70,7 @@ def fetch_product_ids_from_collection(url):
         }
 
         response = requests.post(graphql_url, headers=headers, json=payload)
+        print(response.text)
         data = response.json()
 
         edges = data["data"]["collectionByHandle"]["products"]["edges"]
@@ -349,11 +350,11 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     # Return as a list of product dicts
     return list(cleaned_products.values())
 
-def complete_workflow_uk_polene():
+def complete_workflow_karl():
 
     collections = [
-        {"url": "https://www.karllagerfeld.com/en-gb/collections/sale-women-all", "gender": "women"},
-        {"url": "https://www.karllagerfeld.com/en-gb/collections/sale-men-all", "gender": "men"},
+        {"url": "https://www.karllagerfeld.com/en-gb/collections/women-clothing-all", "gender": "women"},
+        {"url": "https://www.karllagerfeld.com/en-gb/collections/men-clothing-all", "gender": "men"},
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
@@ -459,6 +460,6 @@ def complete_workflow_uk_polene():
 if __name__ == "__main__":
 
 
-    complete_workflow_uk_polene()
+    complete_workflow_karl()
 
 
