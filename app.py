@@ -17,8 +17,16 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all domains
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,  # Only show INFO and above by default
+    format="%(levelname)s: %(message)s"
+)
 logger = logging.getLogger(__name__)
+
+# Silence noisy libraries
+noisy_loggers = ["httpx", "httpcore", "urllib3", "supabase"]
+for lib in noisy_loggers:
+    logging.getLogger(lib).setLevel(logging.WARNING)
 
 # In-memory store for tracking scraping statu
 # In production, you should use Redis or a database
