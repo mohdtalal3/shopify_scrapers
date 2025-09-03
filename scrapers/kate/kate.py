@@ -81,7 +81,7 @@ def _fetch_product_details_batch(batch, batch_index, base_url, headers, proxies,
 # Fetch product details by IDs
 # ==============================
 
-def fetch_product_details(ids_list, batch_size=20, max_batch_threads=5, retries=3, backoff_factor=2):
+def fetch_product_details(ids_list, batch_size=20, max_batch_threads=5, retries=7, backoff_factor=3):
     """Call /api/get-products with ids in concurrent batches."""
     all_product_data = []
     base_url = "https://www.katespadeoutlet.com/api/get-products"
@@ -268,7 +268,7 @@ def complete_workflow_kate():
     ids = [normalize_product_id(i) for i in ids if i]
     ids = list({i for i in ids if i})  # unique + non-empty
     print(f"Extracted {len(ids)} normalized product IDs")
-    ids=ids[:10]
+   # ids=ids[:10]
     details = fetch_product_details(ids, max_batch_threads=1)
     cleaned = clean_katespade_data(details)
 

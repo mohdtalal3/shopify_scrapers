@@ -60,7 +60,7 @@ def extract_urls_from_sitemap(sitemap_url, proxies=None):
 # Helper to fetch a single batch of product details
 # ==============================
 
-def _fetch_product_details_batch(batch, batch_index, base_url, headers, proxies, retries=3, backoff_factor=2):
+def _fetch_product_details_batch(batch, batch_index, base_url, headers, proxies, retries=7, backoff_factor=3):
     params = {
         "ids": ",".join(batch),
         "includeInventory": "true"
@@ -268,7 +268,7 @@ def complete_workflow_kate_outlet():
     ids = [normalize_product_id(i) for i in ids if i]
     ids = list({i for i in ids if i})  # unique normalized IDs
     print(f"Extracted {len(ids)} normalized product IDs")
-    ids=ids[:10]
+   # ids=ids[:10]
     details = fetch_product_details(ids, max_batch_threads=1)
     cleaned = clean_katespade_outlet_data(details)
 
