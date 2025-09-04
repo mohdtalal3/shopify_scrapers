@@ -1,6 +1,28 @@
+"""
+The Reformation Product Scraper
+
+This scraper fetches product data from The Reformation using a two-step process:
+1. Fetch category pages to collect product IDs
+2. Fetch detailed product data for each ID
+
+RETRY MECHANISMS:
+- All HTTP requests have configurable retry logic with exponential backoff
+- Page fetching retries if zero products are found
+- Product detail requests retry on failure or zero products
+- Failed pages/products are retried once more with single threading
+- Configurable retry parameters: DEFAULT_RETRIES, DEFAULT_BACKOFF_FACTOR, timeouts
+
+CONFIGURATION:
+- DEFAULT_RETRIES: Number of retry attempts (default: 3)
+- DEFAULT_BACKOFF_FACTOR: Exponential backoff multiplier (default: 2)
+- DEFAULT_TIMEOUT: Request timeout for page scraping (default: 100s)
+- DEFAULT_PRODUCT_TIMEOUT: Request timeout for product details (default: 100s)
+"""
+
 import requests
 import re
 import json
+import time
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -17,6 +39,12 @@ proxy_str = os.getenv("PROXY_URL")
 proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
 print(proxies)
 BASE_URL = "https://www.thereformation.com"
+
+# Retry Configuration
+DEFAULT_RETRIES = 4
+DEFAULT_BACKOFF_FACTOR = 2
+DEFAULT_TIMEOUT = 100
+DEFAULT_PRODUCT_TIMEOUT = 100
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
@@ -60,36 +88,62 @@ def extract_product_ids(html_content):
     
     return product_ids
 
-def fetch_page_product_ids(base_url, start, page_size):
-    """Fetch a category page and extract product IDs."""
+def fetch_page_product_ids(base_url, start, page_size, retries=DEFAULT_RETRIES, backoff_factor=DEFAULT_BACKOFF_FACTOR):
+    """Fetch a category page and extract product IDs with retry mechanism."""
     url = f"{base_url}&start={start}&sz={page_size}"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
+    page_num = start // page_size + 1
     
-    try:
-        response = requests.get(url, headers=HEADERS, proxies=proxies, timeout=100)
-        response.raise_for_status()
-        product_ids = extract_product_ids(response.text)
-        return start // page_size + 1, product_ids
-    except requests.RequestException as e:
-        print(f"Error fetching page {start // page_size + 1}: {e}")
-        return start // page_size + 1, set()
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response.raise_for_status()
+            product_ids = extract_product_ids(response.text)
+            
+            # Check if page has zero products and retry if it's not the last attempt
+            if len(product_ids) == 0:
+                print(f"[⚠️] Zero products found on page {page_num}, attempt {attempt+1}")
+                if attempt < retries - 1:
+                    time.sleep(backoff_factor ** attempt)
+                    continue
+                else:
+                    print(f"[⚠️] Zero products found on page {page_num} after {retries} attempts")
+            
+            return page_num, product_ids
+        except requests.RequestException as e:
+            print(f"[!] Error fetching page {page_num}, attempt {attempt+1}: {e}")
+            if attempt < retries - 1:
+                time.sleep(backoff_factor ** attempt)
+            else:
+                print(f"[❌] Failed to fetch page {page_num} after {retries} attempts")
+                return page_num, set()
 
-def fetch_product_details(base_url, pid):
-    """Fetch product details from the Product-ShowQuickAdd endpoint."""
+def fetch_product_details(base_url, pid, retries=DEFAULT_RETRIES, backoff_factor=DEFAULT_BACKOFF_FACTOR):
+    """Fetch product details from the Product-ShowQuickAdd endpoint with retry mechanism."""
     quick_add_url = urljoin(base_url, f"/on/demandware.store/Sites-reformation-us-Site/en_US/Product-ShowQuickAdd?pid={pid}&gtmListAttribute=Category%3A%20Shorts&pageTypeContext=Search-Show")
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
     
-    try:
-        response = requests.get(quick_add_url, headers=HEADERS, proxies=proxies, timeout=100)
-        response.raise_for_status()
-        return pid, response.json()
-    except (requests.RequestException, json.JSONDecodeError) as e:
-        print(f"Error fetching product details for {pid}: {e}")
-        return pid, None
+    for attempt in range(retries):
+        try:
+            response = requests.get(quick_add_url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_PRODUCT_TIMEOUT)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Check if response contains valid product data
+            if not data or not data.get('product'):
+                print(f"[⚠️] No product data for {pid}, attempt {attempt+1}")
+                if attempt < retries - 1:
+                    time.sleep(backoff_factor ** attempt)
+                    continue
+                else:
+                    print(f"[⚠️] No product data for {pid} after {retries} attempts")
+            
+            return pid, data
+        except (requests.RequestException, json.JSONDecodeError) as e:
+            print(f"[!] Error fetching product details for {pid}, attempt {attempt+1}: {e}")
+            if attempt < retries - 1:
+                time.sleep(backoff_factor ** attempt)
+            else:
+                print(f"[❌] Failed to fetch product details for {pid} after {retries} attempts")
+                return pid, None
 
 def format_product_data(product_data, base_url):
     """Format product data according to the specified structure, excluding out-of-stock variants."""
@@ -208,6 +262,7 @@ def extract_and_format_all_products(category_url, output_file, max_pages=100, ma
     base_url = "https://www.thereformation.com"
     all_product_ids = set()
     page_size = 24
+    failed_pages = []
     
     # Step 1: Fetch category pages concurrently to collect product IDs
     print("Starting to fetch category pages...")
@@ -217,18 +272,39 @@ def extract_and_format_all_products(category_url, output_file, max_pages=100, ma
             for page in range(max_pages)
         ]
         for future in as_completed(page_futures):
-            page_num, product_ids = future.result()
-            if product_ids:
-                all_product_ids.update(product_ids)
-                print(f"Page {page_num} completed: Found {len(product_ids)} product IDs")
-            else:
-                print(f"Page {page_num} completed: No product IDs found")
+            try:
+                page_num, product_ids = future.result()
+                if product_ids:
+                    all_product_ids.update(product_ids)
+                    print(f"[✓] Page {page_num} completed: Found {len(product_ids)} product IDs")
+                else:
+                    failed_pages.append(page_num)
+                    print(f"[!] Page {page_num} completed: No product IDs found")
+            except Exception as e:
+                print(f"[!] Error processing page future: {e}")
     
-    print(f"Total unique product IDs collected: {len(all_product_ids)}")
+    # Retry failed pages one more time with single threading
+    if failed_pages:
+        print(f"[i] Retrying {len(failed_pages)} failed pages with single threading...")
+        for page_num in failed_pages:
+            try:
+                start = (page_num - 1) * page_size
+                _, product_ids = fetch_page_product_ids(category_url, start, page_size)
+                if product_ids:
+                    all_product_ids.update(product_ids)
+                    print(f"[✓] Retry successful: Page {page_num} found {len(product_ids)} product IDs")
+                else:
+                    print(f"[!] Retry failed: Page {page_num} still has no product IDs")
+            except Exception as e:
+                print(f"[!] Retry failed for page {page_num}: {e}")
+    
+    print(f"✅ Total unique product IDs collected: {len(all_product_ids)}")
     
     # Step 2: Fetch product details concurrently
     formatted_data = []
+    failed_products = []
     print("Starting to fetch product details...")
+    
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_pid = {executor.submit(fetch_product_details, base_url, pid): pid for pid in all_product_ids}
         for future in as_completed(future_to_pid):
@@ -239,13 +315,33 @@ def extract_and_format_all_products(category_url, output_file, max_pages=100, ma
                     formatted_product = format_product_data(product_data, base_url)
                     if formatted_product:
                         formatted_data.append(formatted_product)
-                        print(f"Processed product {pid}")
+                        print(f"[✓] Processed product {pid}")
                     else:
-                        print(f"No in-stock variants for product {pid}")
+                        print(f"[!] No in-stock variants for product {pid}")
                 else:
-                    print(f"No data returned for product {pid}")
+                    failed_products.append(pid)
+                    print(f"[!] No data returned for product {pid}")
             except Exception as e:
-                print(f"Error processing product {pid}: {e}")
+                failed_products.append(pid)
+                print(f"[!] Error processing product {pid}: {e}")
+    
+    # Retry failed products one more time with single threading
+    if failed_products:
+        print(f"[i] Retrying {len(failed_products)} failed products with single threading...")
+        for pid in failed_products:
+            try:
+                _, product_data = fetch_product_details(base_url, pid)
+                if product_data:
+                    formatted_product = format_product_data(product_data, base_url)
+                    if formatted_product:
+                        formatted_data.append(formatted_product)
+                        print(f"[✓] Retry successful: Processed product {pid}")
+                    else:
+                        print(f"[!] Retry failed: No in-stock variants for product {pid}")
+                else:
+                    print(f"[!] Retry failed: No data returned for product {pid}")
+            except Exception as e:
+                print(f"[!] Retry failed for product {pid}: {e}")
 
     upsert_all_product_data(formatted_data, BASE_URL, "USD")
     # Save to output JSON file
@@ -254,10 +350,12 @@ def extract_and_format_all_products(category_url, output_file, max_pages=100, ma
     
     print(f"Formatted data for {len(formatted_data)} products written to {output_file}")
 
-def complete_workflow_thereformation():
+def complete_workflow_thereformation(max_pages=100, max_workers=30, retries=DEFAULT_RETRIES):
+    """Run the complete The Reformation scraping workflow with configurable parameters."""
     category_url = "https://www.thereformation.com/on/demandware.store/Sites-reformation-us-Site/en_US/Search-ShowAjax?cgid=clothing&pmpt=qualifying&prefn1=subclass&prefv1=Dresses%7cTops%7cTees%7cJeans%7cJumpsuits%7cPants%7cTwo%20pieces%7cSweatshirts%7cSweaters%7cSkirts%7cOuterwear%7cOne%2bPiece&srule=Best%20of"
     output_file = "all_products.json"
-    extract_and_format_all_products(category_url, output_file)
+    print(f"[i] Starting The Reformation scraper with {retries} retries, {max_workers} workers, max {max_pages} pages")
+    extract_and_format_all_products(category_url, output_file, max_pages, max_workers)
 
 
 # Example usage
