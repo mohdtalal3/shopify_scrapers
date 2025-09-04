@@ -1,3 +1,24 @@
+"""
+Cruise Fashion Product Scraper
+
+This scraper fetches product data from Cruise Fashion using a two-step process:
+1. Scrape color codes from product listing pages
+2. Fetch detailed product data using GraphQL API
+
+RETRY MECHANISMS:
+- All HTTP requests have configurable retry logic with exponential backoff
+- Page scraping retries if zero products are found
+- GraphQL batch requests retry on failure or zero products
+- Failed pages/batches are retried once more with single threading
+- Configurable retry parameters: DEFAULT_RETRIES, DEFAULT_BACKOFF_FACTOR, timeouts
+
+CONFIGURATION:
+- DEFAULT_RETRIES: Number of retry attempts (default: 3)
+- DEFAULT_BACKOFF_FACTOR: Exponential backoff multiplier (default: 2)
+- DEFAULT_TIMEOUT: Request timeout for page scraping (default: 30s)
+- DEFAULT_BATCH_TIMEOUT: Request timeout for GraphQL batches (default: 60s)
+"""
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
@@ -9,9 +30,8 @@ from dotenv import load_dotenv
 import pandas as pd
 import requests
 
-from db import upsert_all_product_data
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
+from db import upsert_all_product_data
 load_dotenv()
 proxy_str = os.getenv("PROXY_URL")
 
@@ -25,6 +45,12 @@ proxies = {
 # Constants
 BASE_URL = "https://www.cruisefashion.com"
 GRAPHQL_URL = "https://api.prd-brands.services.frasers.io/graphql?op=getProducts"
+
+# Retry Configuration
+DEFAULT_RETRIES = 5
+DEFAULT_BACKOFF_FACTOR = 2
+DEFAULT_TIMEOUT = 30
+DEFAULT_BATCH_TIMEOUT = 60
 
 # Default headers for web requests
 DEFAULT_HEADERS = {
@@ -190,28 +216,57 @@ fragment featuredAttribute on FeaturedAttribute {
 
 
 # ===== WEB SCRAPING MODULE =====
-def get_last_page_from_url(url, headers=DEFAULT_HEADERS):
+def get_last_page_from_url(url, headers=DEFAULT_HEADERS, retries=DEFAULT_RETRIES, backoff_factor=DEFAULT_BACKOFF_FACTOR):
     """Get the last page number from pagination for a given full URL (page 1)"""
-    response = requests.get(url, headers=headers, proxies=proxies)
-    soup = BeautifulSoup(response.text, "html.parser")
-    pagination_links = soup.select('[data-testid="pagination-item"]')
-    page_numbers = [int(link.get_text()) for link in pagination_links if link.get_text().isdigit()]
-    return max(page_numbers, default=1)
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            pagination_links = soup.select('[data-testid="pagination-item"]')
+            page_numbers = [int(link.get_text()) for link in pagination_links if link.get_text().isdigit()]
+            return max(page_numbers, default=1)
+        except Exception as e:
+            print(f"[!] Error getting last page from {url}, attempt {attempt+1}: {e}")
+            if attempt < retries - 1:
+                time.sleep(backoff_factor ** attempt)
+            else:
+                print(f"[❌] Failed to get last page from {url} after {retries} attempts")
+                return 1
 
 
-def extract_color_codes_from_page(url, headers=DEFAULT_HEADERS):
-    """Extract color codes from a single page (URL)"""
-    response = requests.get(url, headers=headers, proxies=proxies)
-    soup = BeautifulSoup(response.text, "html.parser")
-    color_codes = []
+def extract_color_codes_from_page(url, headers=DEFAULT_HEADERS, retries=DEFAULT_RETRIES, backoff_factor=DEFAULT_BACKOFF_FACTOR):
+    """Extract color codes from a single page (URL) with retry mechanism and zero products check"""
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            color_codes = []
 
-    for a in soup.find_all("a", href=True):
-        href = a["href"]
-        if "#colcode=" in href:
-            color_code = href.split("#colcode=")[-1]
-            color_codes.append(color_code)
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                if "#colcode=" in href:
+                    color_code = href.split("#colcode=")[-1]
+                    color_codes.append(color_code)
 
-    return color_codes
+            # Check if page has zero products and retry if it's not the last attempt
+            if len(color_codes) == 0:
+                print(f"[⚠️] Zero products found on {url}, attempt {attempt+1}")
+                if attempt < retries - 1:
+                    time.sleep(backoff_factor ** attempt)
+                    continue
+                else:
+                    print(f"[⚠️] Zero products found on {url} after {retries} attempts")
+            
+            return color_codes
+        except Exception as e:
+            print(f"[!] Error extracting color codes from {url}, attempt {attempt+1}: {e}")
+            if attempt < retries - 1:
+                time.sleep(backoff_factor ** attempt)
+            else:
+                print(f"[❌] Failed to extract color codes from {url} after {retries} attempts")
+                return []
 
 
 def scrape_all_pages_from_urls(urls, headers=DEFAULT_HEADERS, delay=1, max_workers=15):
@@ -234,17 +289,38 @@ def scrape_all_pages_from_urls(urls, headers=DEFAULT_HEADERS, delay=1, max_worke
         print(f"[i] Total pages for this URL: {last_page}")
         page_urls = [f"{base_url}{separator}{page}" for page in range(1, last_page + 1)]
         codes = []
+        failed_pages = []
+        
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(extract_color_codes_from_page, page_url, headers): page_url for page_url in page_urls}
             for future in as_completed(future_to_url):
                 page_url = future_to_url[future]
                 try:
                     result = future.result()
-                    codes.extend(result)
-                    print(f"[✓] Scraped {len(result)} codes from {page_url}")
+                    if result:  # Only extend if we got results
+                        codes.extend(result)
+                        print(f"[✓] Scraped {len(result)} codes from {page_url}")
+                    else:
+                        failed_pages.append(page_url)
+                        print(f"[!] No codes scraped from {page_url}")
                 except Exception as exc:
+                    failed_pages.append(page_url)
                     print(f"[!] Error scraping {page_url}: {exc}")
-                #time.sleep(delay)
+        
+        # Retry failed pages one more time with single threading
+        if failed_pages:
+            print(f"[i] Retrying {len(failed_pages)} failed pages with single threading...")
+            for page_url in failed_pages:
+                try:
+                    result = extract_color_codes_from_page(page_url, headers)
+                    if result:
+                        codes.extend(result)
+                        print(f"[✓] Retry successful: Scraped {len(result)} codes from {page_url}")
+                    else:
+                        print(f"[!] Retry failed: No codes from {page_url}")
+                except Exception as exc:
+                    print(f"[!] Retry failed for {page_url}: {exc}")
+        
         all_codes.extend(codes)
     return all_codes
 
@@ -256,7 +332,7 @@ def fetch_product_data(color_codes, currency="GBP", locale="en-GB", store_key="C
     batches = [color_codes[i:i+batch_size] for i in range(0, len(color_codes), batch_size)]
     print(f"[i] Total batches: {len(batches)}")
 
-    def fetch_batch(batch, batch_num):
+    def fetch_batch(batch, batch_num, retries=DEFAULT_RETRIES, backoff_factor=DEFAULT_BACKOFF_FACTOR):
         print(f"[→] Processing batch {batch_num}/{len(batches)} ({len(batch)} color codes)")
         payload = {
             "query": GRAPHQL_QUERY,
@@ -267,29 +343,82 @@ def fetch_product_data(color_codes, currency="GBP", locale="en-GB", store_key="C
                 "storeKey": store_key
             }
         }
-        response = requests.post(GRAPHQL_URL, headers=headers, json=payload, proxies=proxies)
-        if response.ok:
-            data = response.json()
-            if "data" in data and "products" in data["data"]:
-                print(f"✅ Batch {batch_num} successful: {len(data['data']['products'])} products fetched")
-                return data["data"]["products"]
-            else:
-                print(f"⚠️ Batch {batch_num} returned no products or unexpected format")
-                return []
-        else:
-            print(f"❌ Batch {batch_num} failed: {response.status_code}")
-            print(response.text)
-            return []
+        
+        for attempt in range(retries):
+            try:
+                response = requests.post(GRAPHQL_URL, headers=headers, json=payload, proxies=proxies, timeout=DEFAULT_BATCH_TIMEOUT)
+                if response.ok:
+                    data = response.json()
+                    if "data" in data and "products" in data["data"]:
+                        products = data["data"]["products"]
+                        print(f"✅ Batch {batch_num} successful: {len(products)} products fetched")
+                        
+                        # Check if batch returned zero products and retry if it's not the last attempt
+                        if len(products) == 0:
+                            print(f"⚠️ Batch {batch_num} returned zero products, attempt {attempt+1}")
+                            if attempt < retries - 1:
+                                time.sleep(backoff_factor ** attempt)
+                                continue
+                            else:
+                                print(f"⚠️ Batch {batch_num} returned zero products after {retries} attempts")
+                        
+                        return products
+                    else:
+                        print(f"⚠️ Batch {batch_num} returned no products or unexpected format, attempt {attempt+1}")
+                        if attempt < retries - 1:
+                            time.sleep(backoff_factor ** attempt)
+                            continue
+                        else:
+                            print(f"⚠️ Batch {batch_num} returned no products after {retries} attempts")
+                            return []
+                else:
+                    print(f"❌ Batch {batch_num} failed: {response.status_code}, attempt {attempt+1}")
+                    if attempt < retries - 1:
+                        time.sleep(backoff_factor ** attempt)
+                        continue
+                    else:
+                        print(f"❌ Batch {batch_num} failed after {retries} attempts")
+                        print(response.text)
+                        return []
+            except Exception as e:
+                print(f"[!] Error in batch {batch_num}, attempt {attempt+1}: {e}")
+                if attempt < retries - 1:
+                    time.sleep(backoff_factor ** attempt)
+                else:
+                    print(f"[❌] Batch {batch_num} failed after {retries} attempts due to exception")
+                    return []
 
+    failed_batches = []
+    
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_batchnum = {executor.submit(fetch_batch, batch, i+1): i+1 for i, batch in enumerate(batches)}
-        for future in as_completed(future_to_batchnum):
-            batch_num = future_to_batchnum[future]
+        future_to_batch_info = {executor.submit(fetch_batch, batch, i+1): (batch, i+1) for i, batch in enumerate(batches)}
+        for future in as_completed(future_to_batch_info):
+            batch, batch_num = future_to_batch_info[future]
             try:
                 products = future.result()
-                all_data["data"]["products"].extend(products)
+                if products:  # Only extend if we got products
+                    all_data["data"]["products"].extend(products)
+                else:
+                    failed_batches.append((batch, batch_num))
+                    print(f"[!] No products from batch {batch_num}")
             except Exception as exc:
+                failed_batches.append((batch, batch_num))
                 print(f"[!] Error in batch {batch_num}: {exc}")
+    
+    # Retry failed batches one more time with single threading
+    if failed_batches:
+        print(f"[i] Retrying {len(failed_batches)} failed batches with single threading...")
+        for batch, batch_num in failed_batches:
+            try:
+                products = fetch_batch(batch, batch_num)
+                if products:
+                    all_data["data"]["products"].extend(products)
+                    print(f"[✓] Retry successful: Batch {batch_num} fetched {len(products)} products")
+                else:
+                    print(f"[!] Retry failed: No products from batch {batch_num}")
+            except Exception as exc:
+                print(f"[!] Retry failed for batch {batch_num}: {exc}")
+    
     print(f"✅ Total products fetched: {len(all_data['data']['products'])}")
     # with open("response_data.json", "w", encoding="utf-8") as f:
     #     json.dump(all_data, f, indent=2, ensure_ascii=False)
@@ -427,14 +556,14 @@ def clean_and_save_product_data_from_data(data, cleaned_json_file="cleaned_produ
     return list(cleaned_products.values())
 
 # ===== MAIN WORKFLOW FUNCTIONS =====
-def scrape_color_codes_from_urls(urls):
+def scrape_color_codes_from_urls(urls, max_workers=15, retries=3):
     """Scrape color codes from a list of URLs and return them as a list (no file saving)."""
-    return scrape_all_pages_from_urls(urls)
+    return scrape_all_pages_from_urls(urls, max_workers=max_workers)
 
 
-def fetch_product_data_in_memory(color_codes):
+def fetch_product_data_in_memory(color_codes, batch_size=25, max_workers=15, retries=3):
     """Fetch product data from color codes and return the data (no file saving)."""
-    return fetch_product_data(color_codes)
+    return fetch_product_data(color_codes, batch_size=batch_size, max_workers=max_workers)
 
 
 def complete_workflow_cruise_fashion():
