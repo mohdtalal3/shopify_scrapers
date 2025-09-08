@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
 
-BASE_URL = "https://www.coacho1utlet.com"
+BASE_URL = "https://www.coachoutlet.com"
 SITEMAP_URL = "https://www.coachoutlet.com/sitemap_0-product.xml"
 load_dotenv()
 
