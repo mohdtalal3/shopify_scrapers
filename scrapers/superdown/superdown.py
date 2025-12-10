@@ -142,50 +142,94 @@ def clean_and_save_product_from_html(html, gender_tag=None):
 
 
 # === SCRAPER ===
-def fetch_listing_page(page_num):
+def fetch_listing_page(page_num, retries=3):
     url = f"{BASE_URL}&pageNum={page_num}" if page_num > 1 else BASE_URL
     links = []
-    try:
-        r = requests.get(url, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        for li in soup.select("li.gc a[href*='/product/']"):
-            link = "https://www.superdown.com" + li.get("href").split("?")[0]
-            links.append(link)
-    except Exception as e:
-        print(f"[!] Error fetching listing page {page_num}: {e}")
+    
+    for attempt in range(retries):
+        try:
+            r = requests.get(url, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, "html.parser")
+            for li in soup.select("li.gc a[href*='/product/']"):
+                link = "https://www.superdown.com" + li.get("href").split("?")[0]
+                links.append(link)
+            
+            # If we found links, return them
+            if links:
+                return links
+            
+            # If no links found and not last attempt, retry
+            if attempt < retries - 1:
+                print(f"[⚠️] No links found on page {page_num}, attempt {attempt + 1}/{retries}. Retrying...")
+                continue
+            else:
+                print(f"[!] No links found on page {page_num} after {retries} attempts")
+                
+        except Exception as e:
+            print(f"[!] Error fetching listing page {page_num}, attempt {attempt + 1}/{retries}: {e}")
+            if attempt < retries - 1:
+                continue
+    
     return links
 
 
-def get_total_pages():
-    try:
-        r = requests.get(BASE_URL, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
-        r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        pages = [
-            int(a["data-page-num"])
-            for a in soup.select("#productsList a[data-page-num]")
-        ]
-        print(pages)
-        return max(pages) if pages else 1
-    except Exception as e:
-        print(f"[!] Failed to fetch total pages: {e}")
-        return 1
+def get_total_pages(retries=3):
+    for attempt in range(retries):
+        try:
+            r = requests.get(BASE_URL, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, "html.parser")
+            pages = [
+                int(a["data-page-num"])
+                for a in soup.select("#productsList a[data-page-num]")
+            ]
+            
+            if pages:
+                print(f"[✓] Found pages: {pages}")
+                return max(pages)
+            
+            # If no pages found and not last attempt, retry
+            if attempt < retries - 1:
+                print(f"[⚠️] No pages found, attempt {attempt + 1}/{retries}. Retrying...")
+                continue
+            else:
+                print(f"[!] No pages found after {retries} attempts, defaulting to 1")
+                return 1
+                
+        except Exception as e:
+            print(f"[!] Failed to fetch total pages, attempt {attempt + 1}/{retries}: {e}")
+            if attempt < retries - 1:
+                continue
+    
+    return 1
 
 
-def fetch_product(link, gender_tag="women"):
-    try:
-        r = requests.get(link, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
-        r.raise_for_status()
-        product = clean_and_save_product_from_html(r.text, gender_tag)
-        if product:
-            print(f"✅ Done extracting product: {link}")
-        else:
-            print(f"⚠️ No product data found: {link}")
-        return product
-    except Exception as e:
-        print(f"❌ Failed to extract product: {link} - {e}")
-        return None
+def fetch_product(link, gender_tag="women", retries=3):
+    for attempt in range(retries):
+        try:
+            r = requests.get(link, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
+            r.raise_for_status()
+            product = clean_and_save_product_from_html(r.text, gender_tag)
+            
+            if product and product.get('variants'):
+                print(f"✅ Done extracting product: {link}")
+                return product
+            
+            # If no product data or no variants found and not last attempt, retry
+            if attempt < retries - 1:
+                print(f"⚠️ No product data found: {link}, attempt {attempt + 1}/{retries}. Retrying...")
+                continue
+            else:
+                print(f"⚠️ No product data found: {link} after {retries} attempts")
+                return None
+                
+        except Exception as e:
+            print(f"❌ Failed to extract product: {link}, attempt {attempt + 1}/{retries} - {e}")
+            if attempt < retries - 1:
+                continue
+    
+    return None
 
 
 def complete_workflow_superdown():
