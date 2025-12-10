@@ -1,6 +1,6 @@
 import os
 import json
-import requests
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -146,7 +146,7 @@ def fetch_listing_page(page_num):
     url = f"{BASE_URL}&pageNum={page_num}" if page_num > 1 else BASE_URL
     links = []
     try:
-        r = requests.get(url, headers=headers, proxies=proxies, timeout=20)
+        r = requests.get(url, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for li in soup.select("li.gc a[href*='/product/']"):
@@ -159,10 +159,14 @@ def fetch_listing_page(page_num):
 
 def get_total_pages():
     try:
-        r = requests.get(BASE_URL, headers=headers, proxies=proxies, timeout=20)
+        r = requests.get(BASE_URL, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
-        pages = [int(a["data-page-num"]) for a in soup.select("div.pagination a[data-page-num]")]
+        pages = [
+            int(a["data-page-num"])
+            for a in soup.select("#productsList a[data-page-num]")
+        ]
+        print(pages)
         return max(pages) if pages else 1
     except Exception as e:
         print(f"[!] Failed to fetch total pages: {e}")
@@ -171,7 +175,7 @@ def get_total_pages():
 
 def fetch_product(link, gender_tag="women"):
     try:
-        r = requests.get(link, headers=headers, proxies=proxies, timeout=20)
+        r = requests.get(link, headers=headers, proxies=proxies, timeout=20, impersonate="chrome131")
         r.raise_for_status()
         product = clean_and_save_product_from_html(r.text, gender_tag)
         if product:
