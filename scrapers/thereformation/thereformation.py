@@ -19,7 +19,7 @@ CONFIGURATION:
 - DEFAULT_PRODUCT_TIMEOUT: Request timeout for product details (default: 100s)
 """
 
-import requests
+from curl_cffi import requests
 import re
 import json
 import time
@@ -95,7 +95,7 @@ def fetch_page_product_ids(base_url, start, page_size, retries=DEFAULT_RETRIES, 
     
     for attempt in range(retries):
         try:
-            response = requests.get(url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response = requests.get(url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_TIMEOUT, impersonate="chrome131")
             response.raise_for_status()
             product_ids = extract_product_ids(response.text)
             
@@ -109,7 +109,7 @@ def fetch_page_product_ids(base_url, start, page_size, retries=DEFAULT_RETRIES, 
                     print(f"[⚠️] Zero products found on page {page_num} after {retries} attempts")
             
             return page_num, product_ids
-        except requests.RequestException as e:
+        except Exception as e:
             print(f"[!] Error fetching page {page_num}, attempt {attempt+1}: {e}")
             if attempt < retries - 1:
                 time.sleep(backoff_factor ** attempt)
@@ -123,7 +123,7 @@ def fetch_product_details(base_url, pid, retries=DEFAULT_RETRIES, backoff_factor
     
     for attempt in range(retries):
         try:
-            response = requests.get(quick_add_url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_PRODUCT_TIMEOUT)
+            response = requests.get(quick_add_url, headers=HEADERS, proxies=proxies, timeout=DEFAULT_PRODUCT_TIMEOUT, impersonate="chrome131")
             response.raise_for_status()
             data = response.json()
             
@@ -137,7 +137,7 @@ def fetch_product_details(base_url, pid, retries=DEFAULT_RETRIES, backoff_factor
                     print(f"[⚠️] No product data for {pid} after {retries} attempts")
             
             return pid, data
-        except (requests.RequestException, json.JSONDecodeError) as e:
+        except (Exception, json.JSONDecodeError) as e:
             print(f"[!] Error fetching product details for {pid}, attempt {attempt+1}: {e}")
             if attempt < retries - 1:
                 time.sleep(backoff_factor ** attempt)
