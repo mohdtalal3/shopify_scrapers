@@ -261,6 +261,8 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
             sku = variant.get("sku", "")
             price = float(variant.get("price", {}).get("amount", 0))
+            # Apply 20% discount
+            price = price * 0.8
             compare_price = float(variant.get("compareAtPrice", {}).get("amount", 0)) if variant.get("compareAtPrice") else 0
             color, size = "", ""
             

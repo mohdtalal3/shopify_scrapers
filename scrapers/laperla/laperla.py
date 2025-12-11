@@ -4,7 +4,8 @@ import json
 from dotenv import load_dotenv
 import os
 import sys
-import os
+import time
+from seleniumbase import SB
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
 
@@ -13,6 +14,93 @@ load_dotenv()
 proxy_str = os.getenv("PROXY_URL")
 proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
 BASE_URL="https://laperla.com"
+
+def extract_authorization_token(json_file_path):
+    """Extract Authorization token from CDP performance logs"""
+    authorization_token = None
+
+    with open(json_file_path, "r", encoding="utf-8") as f:
+        cdp_logs = json.load(f)
+
+    for entry in cdp_logs:
+        msg_str = entry.get("message")
+        if not msg_str:
+            continue
+
+        try:
+            parsed = json.loads(msg_str)
+        except:
+            continue
+
+        if not parsed or "message" not in parsed:
+            continue
+
+        message = parsed["message"]
+        params = message.get("params", {})
+
+        # Check request headers
+        if "request" in params and isinstance(params["request"], dict):
+            headers = params["request"].get("headers", {})
+            for key, value in headers.items():
+                if key.lower() == "authorization":
+                    authorization_token = value
+                    break
+
+        # Check extra request headers
+        if message.get("method") == "Network.requestWillBeSentExtraInfo":
+            headers = params.get("headers", {})
+            for key, value in headers.items():
+                if key.lower() == "authorization":
+                    authorization_token = value
+                    break
+
+        # Check response headers
+        if "response" in params and isinstance(params["response"], dict):
+            headers = params["response"].get("headers", {})
+            for key, value in headers.items():
+                if key.lower() == "authorization":
+                    authorization_token = value
+                    break
+
+        if authorization_token:
+            break
+
+    return authorization_token
+
+
+def get_authorization_from_browser(url="https://us.laperla.com/?setCurrencyId=2"):
+    """Open browser and extract authorization token"""
+    try:
+        sb_kwargs = {"uc": True, "headless": True, "log_cdp_events": True}
+        with SB(**sb_kwargs) as sb:
+            sb.open(url)
+            sb.wait_for_element("select#gle_selectedCountry", timeout=300)
+            sb.select_option_by_value("select#gle_selectedCountry", "US")
+            time.sleep(4)
+            sb.click("#saveNcloseBtn")
+            time.sleep(4)
+            sb.open("https://us.laperla.com/lingerie/")
+            time.sleep(4)
+            
+            # Get CDP logs
+            cdp_logs = sb.driver.get_log("performance")
+            logs_file_path = os.path.abspath("cdp_logs.json")
+            with open(logs_file_path, "w", encoding="utf-8") as f:
+                json.dump(cdp_logs, f, indent=2, ensure_ascii=False)
+
+            # Extract token
+            token = extract_authorization_token(logs_file_path)
+            
+            # Clean up log file
+            if os.path.exists(logs_file_path):
+                os.remove(logs_file_path)
+            
+            return token
+            
+    except Exception as e:
+        print(f"Failed to extract authorization token: {str(e)}")
+        return None
+
 # Define comprehensive headers to mimic a browser
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
@@ -29,10 +117,7 @@ HEADERS = {
     'sec-ch-ua-platform': '"macOS"',
     'sec-fetch-dest': 'empty',
     'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-origin',
-    'x-sf-csrf-token': 'd7356059-19ee-4663-a55a-fb40fcd70862',
-    'x-xsrf-token': 'a715b5619f338de3fb421d834aa4d0ea58cda08eb8841c92f207051dba36a84f',
-    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjaWQiOlsxXSwiY29ycyI6WyJodHRwczovL3VzLmxhcGVybGEuY29tIl0sImVhdCI6MTc1NTg1ODY1NSwiaWF0IjoxNzU1Njg1ODU1LCJpc3MiOiJCQyIsInNpZCI6MTAwMDkxNTE3MSwic3ViIjoiQkMiLCJzdWJfdHlwZSI6MCwidG9rZW5fdHlwZSI6MX0.qpM6HC7ds_BAR0TWfolW578tWCDJImtLdB-qCcMuOVw11BxRTfPt_arY5gVuYEgqyMx_hLuysE0C83SMc_n0eA'  # Replace with your actual token
+    'sec-fetch-site': 'same-origin'
 }
 
 # GraphQL query (provided)
@@ -267,6 +352,19 @@ def extract_and_format_all_products(graphql_url, output_file):
 
 
 def complete_workflow_laperla():
+    # Extract authorization token
+    print("Extracting authorization token...")
+    token = get_authorization_from_browser()
+    
+    if not token:
+        print("Failed to extract authorization token. Exiting.")
+        return
+    
+    print(f"✓ Authorization token extracted: {token[:50]}...")
+    
+    # Add token to headers
+    HEADERS['Authorization'] = token
+    
     graphql_url = "https://us.laperla.com/graphql"
     output_file = "formatted_products.json"
     extract_and_format_all_products(graphql_url, output_file)

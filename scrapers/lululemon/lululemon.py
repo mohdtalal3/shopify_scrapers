@@ -1,4 +1,4 @@
-import requests
+from curl_cffi import requests
 import json
 import time
 import json
@@ -272,7 +272,7 @@ def product_data(product_ids):
             #     print("Failed to check IP:", e)
             # input("Press Enter to continue...")
             
-            response = requests.post(graphql_url, json=payload, headers=headers, proxies=proxies)
+            response = requests.post(graphql_url, json=payload, headers=headers, proxies=proxies, impersonate="chrome131")
             if response.status_code == 200:
                 data = response.json()
                 print(f"Fetched data for {pid}")
@@ -369,7 +369,7 @@ def get_product_ids():
     for page_num in range(1, 1000):
         variables["page"] = page_num
         try:
-            response = requests.post(url, headers=headers, json={"query": query, "variables": variables},proxies=proxies)
+            response = requests.post(url, headers=headers, json={"query": query, "variables": variables},proxies=proxies, impersonate="chrome131")
             response.raise_for_status()
             data = response.json()
             page_data = data["data"]["categoryPageData"]

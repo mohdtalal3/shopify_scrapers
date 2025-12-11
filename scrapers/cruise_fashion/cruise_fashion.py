@@ -28,7 +28,7 @@ import time
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import pandas as pd
-import requests
+from curl_cffi import requests
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
@@ -220,7 +220,7 @@ def get_last_page_from_url(url, headers=DEFAULT_HEADERS, retries=DEFAULT_RETRIES
     """Get the last page number from pagination for a given full URL (page 1)"""
     for attempt in range(retries):
         try:
-            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT, impersonate="chrome131")
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
             pagination_links = soup.select('[data-testid="pagination-item"]')
@@ -239,7 +239,7 @@ def extract_color_codes_from_page(url, headers=DEFAULT_HEADERS, retries=DEFAULT_
     """Extract color codes from a single page (URL) with retry mechanism and zero products check"""
     for attempt in range(retries):
         try:
-            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT)
+            response = requests.get(url, headers=headers, proxies=proxies, timeout=DEFAULT_TIMEOUT, impersonate="chrome131")
             response.raise_for_status()
             soup = BeautifulSoup(response.text, "html.parser")
             color_codes = []
@@ -346,7 +346,7 @@ def fetch_product_data(color_codes, currency="GBP", locale="en-GB", store_key="C
         
         for attempt in range(retries):
             try:
-                response = requests.post(GRAPHQL_URL, headers=headers, json=payload, proxies=proxies, timeout=DEFAULT_BATCH_TIMEOUT)
+                response = requests.post(GRAPHQL_URL, headers=headers, json=payload, proxies=proxies, timeout=DEFAULT_BATCH_TIMEOUT, impersonate="chrome131")
                 if response.ok:
                     data = response.json()
                     if "data" in data and "products" in data["data"]:
@@ -569,7 +569,7 @@ def fetch_product_data_in_memory(color_codes, batch_size=25, max_workers=15, ret
 def complete_workflow_cruise_fashion():
     urls = [
       # Put your URLs here
-      "https://www.cruisefashion.com/sale-highlights/swarovski?webgender.en-GB=Womens%2CMens&webbrand.en-GB=Off+White%2CBoss%2CPolo+Ralph+Lauren%2CBalenciaga%2CRepresent%2CTom+Ford%2CAlexander+McQueen%2CPalm+Angels%2CDSquared2%2CHeron+Preston%2CGucci%2CValentino+Garavani%2CJacquemus%2CHugo%2CVersace%2CDolce+and+Gabbana%2CNew+Balance%2CAmi+Paris%2CMoschino%2CAmiri%2CCasablanca%2CAxel+Arigato%2CValentino%2CJimmy+Choo%2CBalmain%2CKenzo%2CMarcelo+Burlon%2CVersace+Jeans+Couture%2CLove+Moschino%2CRepresent+247%2CNeil+Barrett%2CMarc+Jacobs%2CPurple+Brand%2CRhude%2CGiuseppe+Zanotti%2CLongchamp%2CGolden+Goose%2CTory+Burch+Jewellery%2CTory+Burch%2CFiorucci%2CUgg"
+      "https://www.cruisefashion.com/sale-highlights/chloe?webgender.en-GB=Mens%2CWomens%2CUnisex+Adults&webbrand.en-GB=Off+White%2CPolo+Ralph+Lauren%2CBalenciaga%2CVivienne+Westwood%2CRepresent%2CBoss%2CTom+Ford%2CAlexander+McQueen%2CEmporio+Armani%2CDSquared2%2CBurberry%2CPalm+Angels%2CGucci%2CValentino+Garavani%2CDolce+and+Gabbana%2CAxel+Arigato%2CJacquemus%2CCasablanca%2CAmiri%2CMoschino%2CGIVENCHY%2CVersace%2CHeron+Preston%2CValentino%2CAmi+Paris%2CRalph+Lauren%2CDiesel%2COn%2CBillionaire+Boys+Club%2CJimmy+Choo%2CMaison+Margiela%2CTory+Burch%2CBalmain%2CSaint+Laurent%2CRepresent+247%2CKenzo%2CLove+Moschino%2CStella+McCartney%2CMarcelo+Burlon%2CVersace+Icon%2CVersace+Jeans+Couture%2CLanvin%2CRhude%2CPurple+Brand%2CNaked+Wolfe%2CLongchamp"
       # "https://www.cruisefashion.com/ami-paris?sort=DISCOUNT_PERCENTAGE&sortDirection=DESC&category.en-GB=Clothing",
       # "https://www.cruisefashion.com/outlet/sandals?sort=DISCOUNT_PERCENTAGE&sortDirection=DESC&webgender.en-GB=Womens%2CMens&webbrand.en-GB=Off+White&webcat.en-GB=Earrings%2CTops+and+T-Shirts%2CHoodies+and+Sweatshirts%2CTrousers%2CCoats+and+Jackets%2CDresses%2CTrainers%2CShorts%2CShirts%2CHandbags%2CJeans%2CShoes%2CHats+and+Caps",
       # "https://www.cruisefashion.com/outlet/hats-and-caps?sort=DISCOUNT_PERCENTAGE&sortDirection=DESC&webgender.en-GB=Mens%2CWomens&webbrand.en-GB=Palm+Angels&webcat.en-GB=Hoodies+and+Sweatshirts%2CTops+and+T-Shirts%2CCoats+and+Jackets%2CTracksuits%2CShirts%2CTrainers%2CShorts%2CJeans%2CShoes",

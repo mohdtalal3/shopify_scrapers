@@ -100,15 +100,7 @@ async def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
             headless=True,
             browser_type='chromium',
             max_requests_per_crawl=len(session_urls) + 20,
-            request_handler_timeout=timedelta(seconds=60),
-            concurrency_settings=ConcurrencySettings(
-                max_concurrency=2,
-                min_concurrency=1
-            ),
-            browser_launch_options={
-                'args': ['--no-sandbox', '--disable-setuid-sandbox'],
-                'proxy': proxy_config
-            },
+            request_handler_timeout=timedelta(seconds=60)
         )
         
         # Define the request handler for this session
