@@ -83,6 +83,12 @@ async def fetch_product_details(ids_list, batch_size=50):
     
     print(f"Created {len(urls_to_crawl)} batch URLs to crawl")
     
+    # Configure proxy if available
+    proxy_config = None
+    if proxy_str:
+        # Parse proxy URL (format: http://user:pass@host:port)
+        proxy_config = {'server': proxy_str}
+    
     # Configure the crawler
     crawler = PlaywrightCrawler(
         headless=True,
@@ -90,7 +96,8 @@ async def fetch_product_details(ids_list, batch_size=50):
         max_requests_per_crawl=len(urls_to_crawl) + 10,
         request_handler_timeout=timedelta(seconds=60),
         browser_launch_options={
-            'args': ['--no-sandbox', '--disable-setuid-sandbox']
+            'args': ['--no-sandbox', '--disable-setuid-sandbox'],
+            'proxy': proxy_config
         }
     )
     
