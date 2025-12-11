@@ -89,9 +89,15 @@ async def fetch_product_details(ids_list, batch_size=50):
         browser_type='chromium',
         max_requests_per_crawl=len(urls_to_crawl) + 10,
         request_handler_timeout=timedelta(seconds=60),
-        launch_options={
-            'args': ['--no-sandbox', '--disable-setuid-sandbox'],
-            "chromiumSandbox": False
+        browser_pool_options={
+            "browser_plugin_config": {
+                "launch_options": {
+                    # REQUIRED FIX FOR ROOT USER
+                    "args": ["--no-sandbox", "--disable-setuid-sandbox"],
+                    "chromiumSandbox": False,
+                    "headless": True
+                }
+            }
         }
     )
     
