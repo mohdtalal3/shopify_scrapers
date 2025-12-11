@@ -1,3 +1,5 @@
+import asyncio
+import inspect
 from scrapers.lululemon.lululemon import complete_workflow_lululemon
 from scrapers.sportsdirect.sportsdirect import complete_workflow_sportsdirect
 from scrapers.mytheresa.mytheresa import complete_workflow_mytheresa
@@ -152,7 +154,11 @@ def run_selected_scrapers(scraper_ids=None, run_color_mapping_after=True):
         
         try:
             print(f"\n🔄 Starting {scraper_name} scraper...")
-            scraper_function()
+            # Check if the scraper function is async (coroutine)
+            if inspect.iscoroutinefunction(scraper_function):
+                asyncio.run(scraper_function())
+            else:
+                scraper_function()
             print(f"✅ {scraper_name} scraper completed successfully")
             results['completed'].append({
                 'id': scraper_id,
