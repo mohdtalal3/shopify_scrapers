@@ -5,9 +5,12 @@ import re
 import sys
 import time
 import xml.etree.ElementTree as ET
+import asyncio
 
 from dotenv import load_dotenv
 import requests
+from crawlee.crawlers import PlaywrightCrawler, PlaywrightCrawlingContext
+from crawlee.http_clients import HttpxHttpClient
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
@@ -57,81 +60,79 @@ def extract_urls_from_sitemap(sitemap_url, proxies=None):
 
 
 # ==============================
-# Helper to fetch a single batch of product details
+# Fetch product details using Crawlee + Playwright
 # ==============================
 
-def _fetch_product_details_batch(batch, batch_index, base_url, headers, proxies, retries=7, backoff_factor=3):
-    params = {
-        "ids": ",".join(batch),
-        "includeInventory": "true"
-    }
-    for attempt in range(retries):
-        try:
-            print(f"Fetching product details for batch {batch_index}, IDs: {batch[0]}...{batch[-1]}")
-            r = requests.get(base_url, headers=headers, params=params, proxies=proxies, timeout=15)
-            r.raise_for_status()
-            return r.json().get("productsData", [])
-        except Exception as e:
-            print(f"Error fetching batch {batch_index} attempt {attempt+1}: {e}")
-            if attempt < retries - 1:
-                time.sleep(backoff_factor ** attempt)
-            else:
-                return []
-    return []
-
-
-# ==============================
-# Fetch product details by IDs
-# ==============================
-
-def fetch_product_details(ids_list, batch_size=20, max_batch_threads=5, retries=3, backoff_factor=2):
-    """Call /api/get-products with ids in concurrent batches."""
+async def fetch_product_details(ids_list, batch_size=50):
+    """Fetch product details using Crawlee with Playwright for better bot detection handling."""
+    from datetime import timedelta
+    
     all_product_data = []
-    base_url = "https://www.katespadeoutlet.com/api/get-products"
-    headers = {
-        "authority": "www.katespadeoutlet.com",
-        "method": "GET",
-        "scheme": "https",
-        "accept": "*/*",
-        "accept-encoding": "gzip, deflate, br, zstd",
-        "accept-language": "en-US,en;q=0.9,fr;q=0.8",
-        "referer": "https://www.katespadeoutlet.com",
-        "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    }
-
+    
+    # Create batches of IDs
     batches = []
     for i in range(0, len(ids_list), batch_size):
-        batches.append((ids_list[i:i + batch_size], i // batch_size + 1))
-
-    with ThreadPoolExecutor(max_workers=max_batch_threads) as executor:
-        futures = {
-            executor.submit(
-                _fetch_product_details_batch,
-                batch,
-                batch_index,
-                base_url,
-                headers,
-                proxies,
-                retries,
-                backoff_factor
-            ): (batch, batch_index)
-            for batch, batch_index in batches
-        }
-
-        for future in as_completed(futures):
+        batch_ids = ids_list[i:i + batch_size]
+        batches.append(",".join(batch_ids))
+    
+    # Create URLs for each batch
+    urls_to_crawl = []
+    for batch_ids_str in batches:
+        url = f"https://www.katespadeoutlet.com/api/get-products?ids={batch_ids_str}&includeInventory=true"
+        urls_to_crawl.append(url)
+    
+    print(f"Created {len(urls_to_crawl)} batch URLs to crawl")
+    
+    # Configure the crawler
+    crawler = PlaywrightCrawler(
+        headless=True,
+        browser_type='chromium',
+        max_requests_per_crawl=len(urls_to_crawl) + 10,
+        request_handler_timeout=timedelta(seconds=60),
+    )
+    
+    # Define the request handler
+    @crawler.router.default_handler
+    async def request_handler(context: PlaywrightCrawlingContext) -> None:
+        context.log.info(f'Processing {context.request.url}...')
+        
+        try:
+            # Wait for the page to load
+            await context.page.wait_for_load_state('domcontentloaded', timeout=30000)
+            
+            # Get the page content
+            content = await context.page.content()
+            
+            # Try to extract JSON from the page
             try:
-                result_data = future.result()
-                if result_data:
-                    all_product_data.extend(result_data)
-            except Exception as e:
-                print(f"Exception processing batch: {e}")
-
+                # Check if it's a JSON response
+                json_text = await context.page.locator('pre').inner_text()
+                data = json.loads(json_text)
+            except:
+                # If not in <pre>, try to parse the entire body
+                try:
+                    json_text = await context.page.locator('body').inner_text()
+                    data = json.loads(json_text)
+                except:
+                    context.log.warning(f'Could not parse JSON from {context.request.url}')
+                    return
+            
+            # Extract product data
+            products_data = data.get("productsData", [])
+            if products_data:
+                context.log.info(f'Found {len(products_data)} products in batch')
+                all_product_data.extend(products_data)
+            else:
+                context.log.warning(f'No products found in response from {context.request.url}')
+                
+        except Exception as e:
+            context.log.error(f'Error processing {context.request.url}: {e}')
+    
+    # Run the crawler
+    await crawler.run(urls_to_crawl)
+    
+    print(f"✅ Crawled {len(all_product_data)} total products")
+    
     return {"productsData": all_product_data}
 
 
@@ -188,13 +189,28 @@ def clean_katespade_outlet_data(data):
 
         tags = ", ".join(sorted([t.strip() for t in tags_set if t.strip()]))
 
-        # Collect images
+        # Collect images - try master imageGroups first, then fall back to variationGroup
         all_images = []
+        seen_images = set()
         for group in product.get("imageGroups", []):
             for img in group.get("images", []):
                 src = img.get("src", "")
-                if src and not src.lower().endswith(".mp4"):
+                if src and not src.lower().endswith(".mp4") and src not in seen_images:
                     all_images.append(src)
+                    seen_images.add(src)
+        
+        # If no images found at master level, try variationGroup
+        if not all_images:
+            for vg in product.get("variationGroup", []):
+                for group in vg.get("imageGroups", []):
+                    for img in group.get("images", []):
+                        src = img.get("src", "")
+                        if src and not src.lower().endswith(".mp4") and src not in seen_images:
+                            all_images.append(src)
+                            seen_images.add(src)
+                # Once we find images in one variation group, use those
+                if all_images:
+                    break
 
         cleaned_products[handle] = {
             "Handle": handle,
@@ -259,7 +275,7 @@ def clean_katespade_outlet_data(data):
 # Main
 # ==============================
 
-def complete_workflow_kate_outlet():
+async def complete_workflow_kate_outlet():
     print("Extracting URLs from sitemap...")
     urls = extract_urls_from_sitemap(SITEMAP_URL)
     print(f"Found {len(urls)} product URLs")
@@ -268,8 +284,9 @@ def complete_workflow_kate_outlet():
     ids = [normalize_product_id(i) for i in ids if i]
     ids = list({i for i in ids if i})  # unique normalized IDs
     print(f"Extracted {len(ids)} normalized product IDs")
-   # ids=ids[:10]
-    details = fetch_product_details(ids, max_batch_threads=1)
+    # ids=ids[:10]  # Uncomment to test with fewer products
+    
+    details = await fetch_product_details(ids, batch_size=50)
     cleaned = clean_katespade_outlet_data(details)
 
     upsert_all_product_data(cleaned, BASE_URL, "USD")
@@ -280,4 +297,4 @@ def complete_workflow_kate_outlet():
 
 
 if __name__ == "__main__":
-    complete_workflow_kate_outlet()
+    asyncio.run(complete_workflow_kate_outlet())
