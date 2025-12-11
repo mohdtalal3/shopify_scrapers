@@ -98,7 +98,8 @@ async def fetch_product_details(ids_list, batch_size=50):
         browser_launch_options={
             'args': ['--no-sandbox', '--disable-setuid-sandbox'],
             'proxy': proxy_config
-        }
+        },
+        use_incognito_pages=True
     )
     
     # Define the request handler
