@@ -22,7 +22,7 @@ load_dotenv()
 
 proxy_str = os.getenv("PROXY_URL")
 proxies = {"http": proxy_str, "https": proxy_str} if proxy_str else None
-
+print(proxy_str)
 
 # ==============================
 # Utility functions
