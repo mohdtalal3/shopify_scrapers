@@ -64,7 +64,7 @@ def extract_urls_from_sitemap(sitemap_url, proxies=None):
 # Fetch product details using Crawlee + Playwright
 # ==============================
 
-async def fetch_product_details(ids_list, batch_size=50):
+async def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
     """Fetch product details using Crawlee with Playwright for better bot detection handling."""
     from datetime import timedelta
     
@@ -90,64 +90,69 @@ async def fetch_product_details(ids_list, batch_size=50):
         # Parse proxy URL (format: http://user:pass@host:port)
         proxy_config = {'server': proxy_str}
     
-    # Configure the crawler
-    crawler = PlaywrightCrawler(
-        headless=True,
-        browser_type='chromium',
-        max_requests_per_crawl=len(urls_to_crawl) + 10,
-        request_handler_timeout=timedelta(seconds=60),
-        concurrency_settings=ConcurrencySettings(
-        max_concurrency=2,  # limit parallelism
-        min_concurrency=1
-    ),
-        browser_launch_options={
-            'args': ['--no-sandbox', '--disable-setuid-sandbox'],
-            'proxy': proxy_config
-        },
-        #use_incognito_pages=True
-    )
-    
-    # Define the request handler
-    @crawler.router.default_handler
-    async def request_handler(context: PlaywrightCrawlingContext) -> None:
-        context.log.info(f'Processing {context.request.url}...')
+    # Process batches in groups (new session every N batches)
+    for session_num in range(0, len(urls_to_crawl), batches_per_session):
+        session_urls = urls_to_crawl[session_num:session_num + batches_per_session]
+        print(f"\n🔄 Starting new session {session_num//batches_per_session + 1} with {len(session_urls)} batches")
         
-        try:
-            # Wait for the page to load
-            await context.page.wait_for_load_state('domcontentloaded', timeout=30000)
+        # Create a new crawler for each session (fresh browser context)
+        crawler = PlaywrightCrawler(
+            headless=True,
+            browser_type='chromium',
+            max_requests_per_crawl=len(session_urls) + 20,
+            request_handler_timeout=timedelta(seconds=60),
+            concurrency_settings=ConcurrencySettings(
+                max_concurrency=2,
+                min_concurrency=1
+            ),
+            browser_launch_options={
+                'args': ['--no-sandbox', '--disable-setuid-sandbox'],
+                'proxy': proxy_config
+            },
+        )
+        
+        # Define the request handler for this session
+        @crawler.router.default_handler
+        async def request_handler(context: PlaywrightCrawlingContext) -> None:
+            context.log.info(f'Processing {context.request.url}...')
             
-            # Get the page content
-            content = await context.page.content()
-            
-            # Try to extract JSON from the page
             try:
-                # Check if it's a JSON response
-                json_text = await context.page.locator('pre').inner_text()
-                data = json.loads(json_text)
-            except:
-                # If not in <pre>, try to parse the entire body
+                # Wait for the page to load
+                await context.page.wait_for_load_state('domcontentloaded', timeout=30000)
+                
+                # Get the page content
+                content = await context.page.content()
+                
+                # Try to extract JSON from the page
                 try:
-                    json_text = await context.page.locator('body').inner_text()
+                    # Check if it's a JSON response
+                    json_text = await context.page.locator('pre').inner_text()
                     data = json.loads(json_text)
                 except:
-                    context.log.warning(f'Could not parse JSON from {context.request.url}')
-                    return
-            
-            # Extract product data
-            products_data = data.get("productsData", [])
-            if products_data:
-                context.log.info(f'Found {len(products_data)} products in batch')
-                all_product_data.extend(products_data)
-            else:
-                context.log.warning(f'No products found in response from {context.request.url}')
+                    # If not in <pre>, try to parse the entire body
+                    try:
+                        json_text = await context.page.locator('body').inner_text()
+                        data = json.loads(json_text)
+                    except:
+                        context.log.warning(f'Could not parse JSON from {context.request.url}')
+                        return
                 
-        except Exception as e:
-            context.log.error(f'Error processing {context.request.url}: {e}')
+                # Extract product data
+                products_data = data.get("productsData", [])
+                if products_data:
+                    context.log.info(f'Found {len(products_data)} products in batch')
+                    all_product_data.extend(products_data)
+                else:
+                    context.log.warning(f'No products found in response from {context.request.url}')
+                    
+            except Exception as e:
+                context.log.error(f'Error processing {context.request.url}: {e}')
+        
+        # Run the crawler for this session
+        await crawler.run(session_urls)
+        print(f"✅ Session {session_num//batches_per_session + 1} completed, total products so far: {len(all_product_data)}")
     
-    # Run the crawler
-    await crawler.run(urls_to_crawl)
-    
-    print(f"✅ Crawled {len(all_product_data)} total products")
+    print(f"\n✅ All sessions completed! Crawled {len(all_product_data)} total products")
     
     return {"productsData": all_product_data}
 
