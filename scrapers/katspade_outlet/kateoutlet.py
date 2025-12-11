@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import requests
 from crawlee.crawlers import PlaywrightCrawler, PlaywrightCrawlingContext
 from crawlee.http_clients import HttpxHttpClient
-from crawlee.proxy_configuration import ProxyConfiguration
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
 
@@ -89,7 +89,7 @@ async def fetch_product_details(ids_list, batch_size=50):
     if proxy_str:
         # Parse proxy URL (format: http://user:pass@host:port)
         proxy_config = {'server': proxy_str}
-    proxy_configuration = ProxyConfiguration(proxy_urls=[proxy_str])
+    
     # Configure the crawler
     crawler = PlaywrightCrawler(
         headless=True,
@@ -97,12 +97,12 @@ async def fetch_product_details(ids_list, batch_size=50):
         max_requests_per_crawl=len(urls_to_crawl) + 10,
         request_handler_timeout=timedelta(seconds=60),
         concurrency_settings=ConcurrencySettings(
-        max_concurrency=3,  # limit parallelism
+        max_concurrency=2,  # limit parallelism
         min_concurrency=1
     ),
-        proxy_configuration=proxy_configuration ,
         browser_launch_options={
-            'args': ['--no-sandbox', '--disable-setuid-sandbox']
+            'args': ['--no-sandbox', '--disable-setuid-sandbox'],
+            'proxy': proxy_config
         },
         #use_incognito_pages=True
     )
