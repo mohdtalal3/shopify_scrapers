@@ -1,10 +1,11 @@
-import requests
+from curl_cffi import requests
 import json
 from bs4 import BeautifulSoup
 import re
 import os
 from dotenv import load_dotenv
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Add parent directory to path for db import
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -76,7 +77,7 @@ def clean_product_data(data, gender_tag=None, product_type_override=None):
 
     # Set category and type
     category_val = gender_tag.lower() if gender_tag else data.get("productParentCategory", "")
-    type_val = "Tote"
+    type_val = product_type_override if product_type_override else data.get("productType", "")
 
     # Extract images
     all_images = []
@@ -146,8 +147,8 @@ def process_product_data(data, output_file_path="cleaned_product_data.json", gen
                 print(f"Error processing product #{idx}: {e}")
         
         # # # Save to file
-        # with open(output_file_path, 'w', encoding='utf-8') as outfile:
-        #     json.dump(cleaned_results, outfile, indent=4, ensure_ascii=False)
+        with open(output_file_path, 'w', encoding='utf-8') as outfile:
+            json.dump(cleaned_results, outfile, indent=4, ensure_ascii=False)
         
         # Save to database
         upsert_all_product_data(cleaned_results, BASE_URL, "USD")
@@ -186,7 +187,7 @@ def fetch_grid_page(cgid, start=0, sz=18, pgNo=1):
         "pgNo": pgNo,
         "enableInfiniteScroll": "true"
     }
-    response = requests.get(GRID_URL, params=params)
+    response = requests.get(GRID_URL, params=params, impersonate="chrome131")
     response.raise_for_status()
     return response.text
 
@@ -199,58 +200,81 @@ def fetch_product(pid):
         "isQuickView": "false",
         "isEditCart": "false"
     }
-    response = requests.get(PRODUCT_URL, params=params, proxies=proxies)
+    response = requests.get(PRODUCT_URL, params=params, proxies=proxies, impersonate="chrome131")
     response.raise_for_status()
     data = response.json()
     return data.get("product", {})
 
 
+def fetch_product_wrapper(pid):
+    """Wrapper function for threading with error handling."""
+    try:
+        product_data = fetch_product(pid)
+        if product_data:
+            print(f"Fetched product: {product_data.get('productName', 'Unknown')}")
+            return product_data
+    except Exception as e:
+        print(f"Failed to fetch product {pid}: {e}")
+    return None
+
+
 def complete_workflow_marc_jacobs():
     """Main workflow to scrape Marc Jacobs products."""
-    cgid = "The-Leather-Tote-Bag"
+    categories = [
+        {"cgid": "wallets", "type": "Wallet"},
+        {"cgid": "bags", "type": "Bag"},
+       # {"cgid": "marcdown", "type": "Markdown"}
+    ]
+    
     all_products = []
-    last_batch = None
-    start = 0
-    pgNo = 1
-    page_size = 100
 
     print("Starting Marc Jacobs product scraping...")
     
-    while True:
-        try:
-            html = fetch_grid_page(cgid, start=start, sz=page_size, pgNo=pgNo)
-            batch_ids = extract_product_ids(html)
-            
-            if not batch_ids:
-                print("No IDs found, stopping.")
-                break
-
-            if batch_ids == last_batch:
-                print("Batch repeated, stopping.")
-                break
+    for category in categories:
+        cgid = category["cgid"]
+        product_type = category["type"]
+        print(f"\nScraping category: {cgid} ({product_type})...")
+        
+        last_batch = None
+        start = 0
+        pgNo = 1
+        page_size = 100
+        
+        while True:
+            try:
+                html = fetch_grid_page(cgid, start=start, sz=page_size, pgNo=pgNo)
+                batch_ids = extract_product_ids(html)
                 
-            last_batch = batch_ids
-            
-            for pid in batch_ids:
-                try:
-                    product_data = fetch_product(pid)
-                    if product_data:
-                        all_products.append(product_data)
-                        print(f"Fetched product: {product_data.get('productName', 'Unknown')}")
-                except Exception as e:
-                    print(f"Failed to fetch product {pid}: {e}")
+                if not batch_ids:
+                    print(f"No IDs found for {cgid}, moving to next category.")
+                    break
 
-            start += page_size
-            pgNo += 1
-            
-        except Exception as e:
-            print(f"Error fetching grid page: {e}")
-            break
+                if batch_ids == last_batch:
+                    print(f"Batch repeated for {cgid}, moving to next category.")
+                    break
+                    
+                last_batch = batch_ids
+                
+                # Use ThreadPoolExecutor to fetch products concurrently
+                with ThreadPoolExecutor(max_workers=10) as executor:
+                    future_to_pid = {executor.submit(fetch_product_wrapper, pid): pid for pid in batch_ids}
+                    
+                    for future in as_completed(future_to_pid):
+                        product_data = future.result()
+                        if product_data:
+                            all_products.append(product_data)
+
+                start += page_size
+                pgNo += 1
+                
+            except Exception as e:
+                print(f"Error fetching grid page for {cgid}: {e}")
+                break
 
     # Process and save results
     if all_products:
         process_product_data(all_products, "cleaned_output.json", "Women")
-        print(f"Successfully processed {len(all_products)} products.")
+        print(f"\nSuccessfully processed {len(all_products)} products across all categories.")
     else:
         print("No products were fetched.")
 

@@ -291,8 +291,8 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 def complete_workflow_fruitybooty():
 
     collections = [
-        {"url": "https://fruitybooty.co.uk/collections/underwear", "gender": "women"},
-        {"url": "https://fruitybooty.co.uk/collections/swim", "gender": "women"}
+        {"url": "https://fruitybooty.co.uk/collections/shop-all", "gender": "women"},
+        #{"url": "https://fruitybooty.co.uk/collections/swim", "gender": "women"}
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []

@@ -341,7 +341,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 def complete_workflow_stanley():
 
     collections = [
-        {"url": "https://www.stanley1913.com/collections/adventure-quencher-travel-tumblers", "gender": "women"},
+        {"url": "https://www.stanley1913.com/collections/drinkware", "gender": "women"},
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []

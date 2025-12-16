@@ -291,7 +291,7 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 def complete_workflow_eberjey():
 
     collections = [
-        {"url": "https://eberjey.com/collections/women-lingerie", "gender": "women"}
+        {"url": "https://eberjey.com/collections/womens-shop-all", "gender": "women"}
     ]
     print("🔍 Scraping product IDs from all collections...")
     all_scraped_ids = []
