@@ -9,3 +9,4 @@ google-genai
 seleniumbase
 matplotlib
 psycopg2-binary
+curl-cffi
