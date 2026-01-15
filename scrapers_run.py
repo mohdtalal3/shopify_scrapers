@@ -17,7 +17,9 @@ from scrapers.balardi.balardi import complete_workflow_balardi
 from scrapers.bandi.bandi import complete_workflow_bandit_running as complete_workflow_bandi
 from scrapers.blssdfashion.blssdfashion import complete_workflow_blssdfashion
 from scrapers.boohoo.boohoo import complete_workflow_boohoo
-#from extras.coach import complete_workflow_coachoutlet
+from scrapers.kate.kate import complete_workflow_kate
+from scrapers.katspade_outlet.kateoutlet import complete_workflow_kate_outlet
+from scrapers.coach.coach import complete_workflow_coachoutlet
 from scrapers.cocodemer.cocodemer import complete_workflow_fruitybooty as complete_workflow_cocodemer
 from scrapers.cosabella.cosabella import complete_workflow_cosabella
 from scrapers.cruise_fashion.cruise_fashion import complete_workflow_cruise_fashion
@@ -26,8 +28,6 @@ from scrapers.fruitybooty.fruitybooty import complete_workflow_fruitybooty
 from scrapers.gemopticians.gemopticians import complete_workflow_gemopticians
 from scrapers.hustle_culture.hustle_culture import complete_workflow_hustle_culture
 from scrapers.karl.karl import complete_workflow_karl
-# from extras.kate import complete_workflow_kate
-# from extras.kateoutlet import complete_workflow_kate_outlet
 from scrapers.laperla.laperla import complete_workflow_laperla
 from scrapers.livetheprocess.livetheprocess import complete_workflow_livetheprocess
 from scrapers.lounge.lounge import complete_workflow_lounge
@@ -62,7 +62,7 @@ except ImportError:
 def get_available_scrapers():
     """Return a dictionary of all available scrapers"""
     return {
-        # "coach_outlet": ("Coach Outlet", complete_workflow_coachoutlet),
+        "coach_outlet": ("Coach Outlet"),
         "lululemon": ("Lululemon", complete_workflow_lululemon),
         "sports_direct": ("Sports Direct", complete_workflow_sportsdirect),
         "mytheresa": ("Mytheresa", complete_workflow_mytheresa),
@@ -88,8 +88,8 @@ def get_available_scrapers():
         "gemopticians": ("Gem Opticians", complete_workflow_gemopticians),
         "hustle_culture": ("Hustle Culture", complete_workflow_hustle_culture),
         "karl": ("Karl", complete_workflow_karl),
-        # "kate": ("Kate", complete_workflow_kate),
-        # "kate_outlet": ("Kate Spade Outlet", complete_workflow_kate_outlet),
+        "kate": ("Kate"),
+        "kate_outlet": ("Kate Spade Outlet"),
         "laperla": ("La Perla", complete_workflow_laperla),
         "livetheprocess": ("Live The Process", complete_workflow_livetheprocess),
         "lounge": ("Lounge", complete_workflow_lounge),
