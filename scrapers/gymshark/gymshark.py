@@ -17,14 +17,14 @@ import re
 
 BASE_URL = "https://www.gymshark.com"
 
-url = "https://gymshark.myshopify.com/api/2025-01/graphql.json"
+url = "https://gymsharkusa.myshopify.com/api/2025-01/graphql.json"
 headers = {
     "Content-Type": "application/json",
     "Accept": "*/*",
     "Origin": "https://www.gymshark.com",
     "Referer": "https://www.gymshark.com",
     "User-Agent": "Mozilla/5.0",
-    "x-shopify-storefront-access-token": "b65646444b3639704a6ecb270cd28ce7"
+    "x-shopify-storefront-access-token": "527c7a1ab34f53ca4dc301924baee65d"
 }
 
 

@@ -1,17 +1,13 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import re
 import sys
 import time
 import xml.etree.ElementTree as ET
-import asyncio
-from crawlee import ConcurrencySettings
-from datetime import timedelta
+
 from dotenv import load_dotenv
 import requests
-from crawlee.crawlers import PlaywrightCrawler, PlaywrightCrawlingContext
-from crawlee.http_clients import HttpxHttpClient
+from seleniumbase import SB
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from db import upsert_all_product_data
@@ -59,15 +55,12 @@ def extract_urls_from_sitemap(sitemap_url, proxies=None):
     return [loc.text for loc in root.findall(".//ns:url/ns:loc", ns)]
 
 
-
 # ==============================
-# Fetch product details using Crawlee + Playwright
+# Fetch product details using SeleniumBase
 # ==============================
 
-async def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
-    """Fetch product details using Crawlee with Playwright for better bot detection handling."""
-    from datetime import timedelta
-    
+def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
+    """Fetch product details using SeleniumBase with undetectable mode."""
     all_product_data = []
     
     # Create batches of IDs
@@ -84,67 +77,84 @@ async def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
     
     print(f"Created {len(urls_to_crawl)} batch URLs to crawl")
     
-    # Configure proxy if available
-    proxy_config = None
-    if proxy_str:
-        # Parse proxy URL (format: http://user:pass@host:port)
-        proxy_config = {'server': proxy_str}
-    
     # Process batches in groups (new session every N batches)
     for session_num in range(0, len(urls_to_crawl), batches_per_session):
         session_urls = urls_to_crawl[session_num:session_num + batches_per_session]
         print(f"\n🔄 Starting new session {session_num//batches_per_session + 1} with {len(session_urls)} batches")
         
-        # Create a new crawler for each session (fresh browser context)
-        crawler = PlaywrightCrawler(
-            headless=True,
-            browser_type='chromium',
-            max_requests_per_crawl=len(session_urls) + 20,
-            request_handler_timeout=timedelta(seconds=60)
-        )
+        # Configure SB parameters
+        sb_kwargs = {
+            'uc': True,  # Undetectable mode
+            'headless': True,
+        }
         
-        # Define the request handler for this session
-        @crawler.router.default_handler
-        async def request_handler(context: PlaywrightCrawlingContext) -> None:
-            context.log.info(f'Processing {context.request.url}...')
+        # # Add proxy if available
+        # if proxy_str:
+        #     sb_kwargs['proxy'] = proxy_str
+        
+        # Create a new browser session for this batch group
+        with SB(**sb_kwargs) as sb:
+            # First, open homepage to bypass CPR challenge
+            print("🏠 Opening homepage first to bypass CPR challenge...")
+            sb.open(BASE_URL)
+            print("⏳ Waiting 10 seconds for challenge to complete...")
+            sb.sleep(10)
+            print("✓ Homepage loaded, challenge bypassed")
             
-            try:
-                # Wait for the page to load
-                await context.page.wait_for_load_state('domcontentloaded', timeout=30000)
+            for idx, url in enumerate(session_urls, 1):
+                print(f'Processing batch {idx}/{len(session_urls)}: {url}')
                 
-                # Get the page content
-                content = await context.page.content()
-                
-                # Try to extract JSON from the page
                 try:
-                    # Check if it's a JSON response
-                    json_text = await context.page.locator('pre').inner_text()
-                    data = json.loads(json_text)
-                except:
-                    # If not in <pre>, try to parse the entire body
-                    try:
-                        json_text = await context.page.locator('body').inner_text()
-                        data = json.loads(json_text)
-                    except:
-                        context.log.warning(f'Could not parse JSON from {context.request.url}')
-                        return
-                
-                # Extract product data
-                products_data = data.get("productsData", [])
-                if products_data:
-                    context.log.info(f'Found {len(products_data)} products in batch')
-                    all_product_data.extend(products_data)
-                else:
-                    context.log.warning(f'No products found in response from {context.request.url}')
+                    # Open the URL
+                    sb.open(url)
                     
-            except Exception as e:
-                context.log.error(f'Error processing {context.request.url}: {e}')
+                    # Wait for page to load
+                    sb.sleep(1)
+                    
+                    # Get the page source
+                    page_source = sb.get_page_source()
+                    
+                    # Try to extract JSON from the page
+                    try:
+                        # Try to get text from <pre> tag (common for JSON APIs)
+                        if sb.is_element_visible('pre'):
+                            json_text = sb.get_text('pre')
+                        elif sb.is_element_visible('body'):
+                            json_text = sb.get_text('body')
+                        else:
+                            # Fallback: extract from page source
+                            json_text = page_source
+                        
+                        # Parse JSON
+                        data = json.loads(json_text)
+                        
+                        # Extract product data
+                        products_data = data.get("productsData", [])
+                        if products_data:
+                            print(f'✓ Found {len(products_data)} products in batch')
+                            all_product_data.extend(products_data)
+                        else:
+                            print(f'⚠ No products found in response')
+                            
+                    except json.JSONDecodeError as e:
+                        print(f'❌ Could not parse JSON from {url}: {e}')
+                        continue
+                        
+                except Exception as e:
+                    print(f'❌ Error processing {url}: {e}')
+                    continue
+                
+                # Small delay between requests
+                time.sleep(0.5)
         
-        # Run the crawler for this session
-        await crawler.run(session_urls)
         print(f"✅ Session {session_num//batches_per_session + 1} completed, total products so far: {len(all_product_data)}")
+        
+        # Delay between sessions to avoid rate limiting
+        if session_num + batches_per_session < len(urls_to_crawl):
+            print("⏳ Waiting 2 seconds before next session...")
+            time.sleep(2)
     
-    print(f"\n✅ All sessions completed! Crawled {len(all_product_data)} total products")
+    print(f"\n✅ All sessions completed! Fetched {len(all_product_data)} total products")
     
     return {"productsData": all_product_data}
 
@@ -186,7 +196,7 @@ def clean_katespade_outlet_data(data):
         if master_custom_attributes.get("c_aIMetaDataSynonyms"):
             tags_set.update(master_custom_attributes["c_aIMetaDataSynonyms"].split(","))
 
-        # Always add women tags (outlet is women’s only)
+        # Always add women tags (outlet is women's only)
         is_clothing = any("clothing" in bc.get("htmlValue", "").lower() for bc in product.get("breadcrumbs", []))
         gender_tags = {"women", "women's"}
         if is_clothing:
@@ -288,7 +298,7 @@ def clean_katespade_outlet_data(data):
 # Main
 # ==============================
 
-async def complete_workflow_kate_outlet():
+def complete_workflow_kate_outlet():
     print("Extracting URLs from sitemap...")
     urls = extract_urls_from_sitemap(SITEMAP_URL)
     print(f"Found {len(urls)} product URLs")
@@ -297,17 +307,17 @@ async def complete_workflow_kate_outlet():
     ids = [normalize_product_id(i) for i in ids if i]
     ids = list({i for i in ids if i})  # unique normalized IDs
     print(f"Extracted {len(ids)} normalized product IDs")
-    # ids=ids[:10]  # Uncomment to test with fewer products
+    # ids = ids[:10]  # Uncomment to test with fewer products
     
-    details = await fetch_product_details(ids, batch_size=50)
+    details = fetch_product_details(ids, batch_size=50, batches_per_session=40)
     cleaned = clean_katespade_outlet_data(details)
 
     upsert_all_product_data(cleaned, BASE_URL, "USD")
-    with open("kate_outlet_cleaned.json", "w", encoding="utf-8") as f:
+    with open("kate_outlet_cleaned_sb.json", "w", encoding="utf-8") as f:
         json.dump(cleaned, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ Saved {len(cleaned)} cleaned products to kate_outlet_cleaned.json")
+    print(f"✅ Saved {len(cleaned)} cleaned products to kate_outlet_cleaned_sb.json")
 
 
 if __name__ == "__main__":
-    asyncio.run(complete_workflow_kate_outlet())
+    complete_workflow_kate_outlet()

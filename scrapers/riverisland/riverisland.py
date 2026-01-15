@@ -52,7 +52,7 @@ variables = {
 extensions = {
     "persistedQuery": {
         "version": 1,
-        "sha256Hash": "c54537610d9304cc8c5177e82c5676e64dbaf2bce31d43d297a5ae853331fa0f"
+        "sha256Hash": "f019cee3e1d99efbaec7743e347843b23c3979b10c3ebdc3e505eb2ed4258fdc"
     }
 }
 
@@ -99,7 +99,7 @@ def get_all_product_urls():
         proxies=proxies,
         timeout=20
     ).json()["data"]["productsAndFacets"]["totalCount"]
-
+    #print(total_count.text)
     total_pages = math.ceil(total_count / variables["pageSize"])
     logger.info(f"📦 Total products: {total_count}, Pages: {total_pages}")
 
