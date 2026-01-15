@@ -39,46 +39,7 @@ scraping_status = {
 }
 
 def send_email(to_email, subject, body, cc_emails=None):
-    """Send email notification with optional CC"""
-    try:
-        smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-        smtp_port = int(os.getenv('SMTP_PORT', '587'))
-        sender_email = os.getenv('FROM_EMAIL')
-        sender_password = os.getenv('EMAIL_PASSWORD')
-
-        if not sender_email or not sender_password:
-            logger.error("Email credentials not configured")
-            return False
-
-        # Ensure cc_emails is a list
-        cc_emails = cc_emails or []
-        # Combine recipients for sending
-        recipients = [to_email] + cc_emails
-
-        # Create message
-        message = MIMEMultipart()
-        message["From"] = sender_email
-        message["To"] = to_email
-        if cc_emails:
-            message["Cc"] = ", ".join(cc_emails)
-        message["Subject"] = subject
-
-        # Add body
-        message.attach(MIMEText(body, "plain"))
-
-        # SMTP session
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.sendmail(sender_email, recipients, message.as_string())
-        server.quit()
-
-        logger.info(f"Email sent successfully to {recipients}")
-        return True
-
-    except Exception as e:
-        logger.error(f"Failed to send email: {str(e)}")
-        return False
+   print("sent")
 
 
         # Started at: {scraping_status['started_at']}

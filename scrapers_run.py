@@ -17,9 +17,6 @@ from scrapers.balardi.balardi import complete_workflow_balardi
 from scrapers.bandi.bandi import complete_workflow_bandit_running as complete_workflow_bandi
 from scrapers.blssdfashion.blssdfashion import complete_workflow_blssdfashion
 from scrapers.boohoo.boohoo import complete_workflow_boohoo
-from scrapers.kate.kate import complete_workflow_kate
-from scrapers.katspade_outlet.kateoutlet import complete_workflow_kate_outlet
-from scrapers.coach.coach import complete_workflow_coachoutlet
 from scrapers.cocodemer.cocodemer import complete_workflow_fruitybooty as complete_workflow_cocodemer
 from scrapers.cosabella.cosabella import complete_workflow_cosabella
 from scrapers.cruise_fashion.cruise_fashion import complete_workflow_cruise_fashion
@@ -58,11 +55,13 @@ except ImportError:
         print("Color mapping skipped - module not available")
         pass
 
-
+def not_run():
+    """Placeholder for scrapers not to be run"""
+    pass
 def get_available_scrapers():
     """Return a dictionary of all available scrapers"""
     return {
-        "coach_outlet": ("Coach Outlet"),
+        "coach_outlet": ("Coach Outlet",not_run),
         "lululemon": ("Lululemon", complete_workflow_lululemon),
         "sports_direct": ("Sports Direct", complete_workflow_sportsdirect),
         "mytheresa": ("Mytheresa", complete_workflow_mytheresa),
@@ -88,8 +87,8 @@ def get_available_scrapers():
         "gemopticians": ("Gem Opticians", complete_workflow_gemopticians),
         "hustle_culture": ("Hustle Culture", complete_workflow_hustle_culture),
         "karl": ("Karl", complete_workflow_karl),
-        "kate": ("Kate"),
-        "kate_outlet": ("Kate Spade Outlet"),
+        "kate": ("Kate",not_run),
+        "kate_outlet": ("Kate Spade Outlet",not_run),
         "laperla": ("La Perla", complete_workflow_laperla),
         "livetheprocess": ("Live The Process", complete_workflow_livetheprocess),
         "lounge": ("Lounge", complete_workflow_lounge),
