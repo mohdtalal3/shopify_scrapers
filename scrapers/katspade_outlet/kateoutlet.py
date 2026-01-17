@@ -109,7 +109,7 @@ def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
                     sb.open(url)
                     
                     # Wait for page to load
-                    sb.sleep(1)
+                    sb.sleep(5)
                     
                     # Get the page source
                     page_source = sb.get_page_source()
