@@ -291,6 +291,40 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
     return list(cleaned_products.values())
 
 def complete_workflow_gemopticians():
+    # Define allowed vendors (case-insensitive matching)
+    ALLOWED_VENDORS = {
+        "alexander mcqueen",
+        "balenciaga",
+        "bottega veneta",
+        "burberry",
+        "chloe",
+        "coach",
+        "dolce & gabbana",
+        "fendi",
+        "ferragamo",
+        "gucci",
+        "jacquemus",
+        "jimmy choo",
+        "kate spade",
+        "loewe",
+        "marc jacobs",
+        "maui jim",
+        "maybach",
+        "michael kors",
+        "miu miu",
+        "montblanc",
+        "moschino",
+        "off-white",
+        "prada",
+        "prada sports",
+        "saint laurent",
+        "swarovski",
+        "tiffany & co",
+        "tiffany & co.",
+        "tory burch",
+        "valentino",
+        "versace"
+    }
 
     collections = [
         {"url": "https://gemopticians.com/collections/mens-sunglasses", "gender": "men"},
@@ -377,13 +411,24 @@ def complete_workflow_gemopticians():
             unique_products.append(prod)
             seen_handles.add(prod["Handle"])
 
+    # Filter products by allowed vendors (case-insensitive)
+    print(f"🔍 Filtering products by allowed vendors...")
+    products_before_filter = len(unique_products)
+    filtered_products = []
+    for prod in unique_products:
+        vendor = prod.get("Vendor", "").lower().strip()
+        if vendor in ALLOWED_VENDORS:
+            filtered_products.append(prod)
+    
+    print(f"✓ Filtered from {products_before_filter} to {len(filtered_products)} products")
+    
     # # Write one JSON file
-    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
-    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+        json.dump({"products": filtered_products}, f, ensure_ascii=False, indent=4)
     # Upload all at once
-    upsert_all_product_data(unique_products, BASE_URL, "INR")
+    upsert_all_product_data(filtered_products, BASE_URL, "INR")
     print(f"✅ Cleaned data saved to database and written to cleaned_products_new.json.")
-    print(f"📊 Total unique products processed: {len(unique_products)}")
+    print(f"📊 Total unique products processed: {len(filtered_products)}")
     
     # # Show breakdown by gender
     # gender_breakdown = {}
