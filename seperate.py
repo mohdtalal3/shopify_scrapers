@@ -1,4 +1,3 @@
-import asyncio
 from scrapers.kate.kate import complete_workflow_kate
 from scrapers.katspade_outlet.kateoutlet import complete_workflow_kate_outlet
 from scrapers.coach.coach import complete_workflow_coachoutlet
@@ -24,50 +23,50 @@ def display_menu():
     print("="*50)
 
 
-async def run_kate():
+def run_kate():
     """Run Kate Spade scraper"""
     print("\n🔄 Running Kate Spade scraper...")
-    await complete_workflow_kate()
+    complete_workflow_kate()
     print("✓ Kate Spade scraper completed\n")
 
 
-async def run_kate_outlet():
+def run_kate_outlet():
     """Run Kate Spade Outlet scraper"""
     print("\n🔄 Running Kate Spade Outlet scraper...")
-    await complete_workflow_kate_outlet()
+    complete_workflow_kate_outlet()
     print("✓ Kate Spade Outlet scraper completed\n")
 
 
-async def run_coach_outlet():
+def run_coach_outlet():
     """Run Coach Outlet scraper"""
     print("\n🔄 Running Coach Outlet scraper...")
-    await complete_workflow_coachoutlet()
+    complete_workflow_coachoutlet()
     print("✓ Coach Outlet scraper completed\n")
 
 
-async def run_all_scrapers():
+def run_all_scrapers():
     """Run all scrapers sequentially"""
     print("\n🔄 Running all scrapers...\n")
-    await run_kate()
-    await run_kate_outlet()
-    await run_coach_outlet()
+    run_kate()
+    run_kate_outlet()
+    run_coach_outlet()
 
 
 
-async def main():
+def main():
     """Main function to handle user input"""
     while True:
         display_menu()
         choice = input("Enter your choice (0-4): ").strip()
         
         if choice == "1":
-            await run_kate()
+            run_kate()
         elif choice == "2":
-            await run_kate_outlet()
+            run_kate_outlet()
         elif choice == "3":
-            await run_coach_outlet()
+            run_coach_outlet()
         elif choice == "4":
-            await run_all_scrapers()
+            run_all_scrapers()
         elif choice == "0":
             print("\n👋 Exiting... Goodbye!\n")
             break
@@ -79,4 +78,4 @@ async def main():
     print("✓ All scrapers completed!\n")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
