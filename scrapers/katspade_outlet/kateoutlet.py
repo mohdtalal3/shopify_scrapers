@@ -109,7 +109,7 @@ def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
                     sb.open(url)
                     
                     # Wait for page to load
-                    sb.sleep(5)
+                    sb.sleep(1)
                     
                     # Get the page source
                     page_source = sb.get_page_source()
@@ -126,7 +126,6 @@ def fetch_product_details(ids_list, batch_size=50, batches_per_session=5):
                             json_text = page_source
                         
                         # Parse JSON
-                        print(json_text)
                         data = json.loads(json_text)
                         
                         # Extract product data

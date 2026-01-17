@@ -84,7 +84,7 @@ def fetch_product_details(ids_list, batch_size=20, batches_per_session=20):
         # Configure SB parameters
         sb_kwargs = {
             'uc': True,  # Undetectable mode
-            'headless': False,
+            'headless': True,
         }
         
         # # Add proxy if available
