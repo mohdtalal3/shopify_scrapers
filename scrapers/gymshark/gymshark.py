@@ -32,26 +32,25 @@ headers = {
 def format_shopify_gids(product_ids):
     return [f"gid://shopify/Product/{pid}" for pid in product_ids]
 
-def fetch_product_ids_by_type(product_types):
-    all_ids = set()
+def fetch_product_ids_from_collection(collection_handle):
+    all_ids = []
     has_next_page = True
     after_cursor = None
-    print(product_types)
-
-    type_query = " OR ".join(f"product_type:'{ptype}'" for ptype in product_types)
 
     while has_next_page:
         query = """
-        query ($queryStr: String!, $cursor: String) {
-          products(first: 250, after: $cursor, query: $queryStr) {
-            pageInfo {
-              hasNextPage
-              endCursor
-            }
-            edges {
-              node {
-                id
-                availableForSale
+        query ($handle: String!, $cursor: String) {
+          collectionByHandle(handle: $handle) {
+            products(first: 250, after: $cursor) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+              edges {
+                node {
+                  id
+                  availableForSale
+                }
               }
             }
           }
@@ -59,7 +58,7 @@ def fetch_product_ids_by_type(product_types):
         """
 
         variables = {
-            "queryStr": type_query,
+            "handle": collection_handle,
             "cursor": after_cursor
         }
 
@@ -70,20 +69,20 @@ def fetch_product_ids_by_type(product_types):
 
         response = requests.post(url, headers=headers, json=payload)
         data = response.json()
-        edges = data["data"]["products"]["edges"]
 
+        edges = data["data"]["collectionByHandle"]["products"]["edges"]
         for edge in edges:
             node = edge["node"]
-            if node["availableForSale"]:
-                gid = node["id"]
+            if node.get("availableForSale", True):
+                gid = edge["node"]["id"]
                 numeric_id = gid.split("/")[-1]
-                all_ids.add(numeric_id)
+                all_ids.append(numeric_id)
 
-        page_info = data["data"]["products"]["pageInfo"]
+        page_info = data["data"]["collectionByHandle"]["products"]["pageInfo"]
         has_next_page = page_info["hasNextPage"]
         after_cursor = page_info["endCursor"]
-
-    return list(all_ids)
+        
+    return all_ids
 
 
 def fetch_shopify_products_batched(product_ids):
@@ -204,6 +203,16 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
         brand = product.get("vendor", "")
         product_tags = list(set(product.get("tags", [])))
 
+        # Detect gender from product tags (check womens first to avoid substring match)
+        gender_detected = None
+        for tag in product_tags:
+            tag_lower = tag.lower()
+            if "womens" in tag_lower or "women's" in tag_lower:
+                gender_detected = "women"
+                break
+            elif "mens" in tag_lower or "men's" in tag_lower:
+                gender_detected = "men"
+                break
 
         all_images = []
         seen_images = set()
@@ -214,17 +223,17 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
             seen_images.add(url)
 
         # Category is just gender
-        category_val = gender_tag.lower() if gender_tag else ""
+        category_val = gender_detected.lower() if gender_detected else ""
         type_val = product.get("productType")
         type_val = re.sub(r'\bwomens\b', '', type_val, flags=re.IGNORECASE).strip()
+        type_val = re.sub(r'\bmens\b', '', type_val, flags=re.IGNORECASE).strip()
+        
         gender_tags = set()
-        if gender_tag:
-            if gender_tag.lower() == "men":
+        if gender_detected:
+            if gender_detected.lower() == "men":
                 gender_tags = {"all clothing men", "mens", "men clothing", "men"}
-            elif gender_tag.lower() == "women":
+            elif gender_detected.lower() == "women":
                 gender_tags = {"all clothing women", "womens", "women clothing", "women"}
-            else:
-                gender_tags = {"men", "women", "unisex","shoes", "unisex"}
 
         all_tags = product_tags + list(gender_tags)
         tags_str = ', '.join(sorted(all_tags))
@@ -274,23 +283,45 @@ def clean_and_save_product_data_only_available_with_all_images_from_data(
 
 
 def complete_workflow_gymshark():
-    product_types = ["Womens T-Shirt", "Womens Crop Top", "Womens Shorts", "Womens Sports Bra", "Womens Tank","Womens One Piece","Womens Leggings","Womens Hoodie","Womens Jacket"]
+    # All collection handles (both men's and women's)
+    all_collections = [
+        # Women's collections
+        "bottoms-leggings", "crop-tops", "hoodies-jackets", "shorts", "sports-bras", 
+        "t-shirts-tops", "all-in-one", "dress", "vests", "skorts",
+        # Men's collections
+        "stringers", "base-layers", "bottoms", "tanks", "tracksuits"
+    ]
 
-    print("🔍 Scraping product IDs from all collections...")
-    unique_ids = fetch_product_ids_by_type(product_types)
-
-    print(f"🎯 Total Unique Product IDs across all collections: {len(unique_ids)}")
+    # Scrape all collections
+    print("🔍 Scraping all collections...")
+    all_ids = []
+    for collection_handle in all_collections:
+        print(f"→ Processing collection: {collection_handle}")
+        try:
+            collection_ids = fetch_product_ids_from_collection(collection_handle)
+            all_ids.extend(collection_ids)
+            print(f"✓ Found {len(collection_ids)} products from {collection_handle}")
+        except Exception as e:
+            print(f"✗ Error scraping {collection_handle}: {e}")
+            continue
+    
+    unique_ids = list(set(all_ids))  # Remove duplicates
+    print(f"🎯 Total Unique Product IDs: {len(unique_ids)}")
 
     if not unique_ids:
         print("❌ No product IDs found. Exiting.")
         return
 
     gids = format_shopify_gids(unique_ids)
-    print("hello")
     print("📦 Fetching product data in batches...")
     raw_data = fetch_shopify_products_batched(gids)
+    
+    # Clean and process products (gender will be detected from tags)
+    all_products = clean_and_save_product_data_only_available_with_all_images_from_data(raw_data)
 
-    all_products = clean_and_save_product_data_only_available_with_all_images_from_data(raw_data, "women")
+    if not all_products:
+        print("❌ No products found. Exiting.")
+        return
 
     # Remove duplicate products by handle (keep first occurrence)
     seen_handles = set()
@@ -301,8 +332,8 @@ def complete_workflow_gymshark():
             seen_handles.add(prod["Handle"])
 
     # Save to JSON if needed
-    # with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
-    #     json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
+    with open("cleaned_products_new.json", "w", encoding="utf-8") as f:
+        json.dump({"products": unique_products}, f, ensure_ascii=False, indent=4)
 
     # Unified upsert for products, tags, and colors
     upsert_all_product_data(unique_products, BASE_URL, "USD")
